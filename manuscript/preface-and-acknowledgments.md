@@ -1,6 +1,6 @@
 # Preface and acknowledgments
 
-This book aims to be accessible to novices that have no prior experience in programming. Thus, this book is designed to be self-contained. After you finish reading the book I recommend that you check the "Further reading" chapter in case you are interested in diving deeper into some of the topics discussed.
+This book aims to be accessible to novices that have no prior experience in programming, but have some basic working experience with computers. Thus, this book is designed to be self-contained. After you finish reading the book I recommend that you check the "Further reading" chapter in case you are interested in diving deeper into some of the topics discussed.
 
 I was always curious to understand how things work. One of the reasons for writing this book is that I could not find a book that explained how to implement blockchain from scratch, so I had to do a lot of research on the internet in order to come up with a complete picture of what blockchain is and what it is good for.
 
