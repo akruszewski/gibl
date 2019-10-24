@@ -14,7 +14,7 @@ So, as an example, if we have the following macro `(define-macro (add-one x) (li
 
 So, what is the difference between using a macro and a function? To answer, we will consider these definitions:
 
-```
+```racket
 (require mzlib/defmacro)
 
 (define-macro (our-if-macro a b c) (list 'cond (list a b) (list 'else c)))
@@ -23,7 +23,7 @@ So, what is the difference between using a macro and a function? To answer, we w
 
 With a few evaluations:
 
-```
+```racket
 > (our-if-macro (eq? '() '()) #t #f)
 #t
 > (our-if-function (eq? '() '()) #t #f)

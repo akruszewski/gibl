@@ -87,7 +87,7 @@ One advantage is that there is no need for special order of operations. In high 
 
 So, let's start by writing (+ 1 (* 2 3)) in the interactions area of the DrRacket editor:
 
-```
+```racket
 > (+ 1 (* 2 3))
 7
 ```
@@ -110,7 +110,7 @@ In the evaluation we've done above, what we get as a result is a number. So the 
 
 Racket has some primitive types, such as: numbers, booleans, strings, lists, and procedures.
 
-```
+```racket
 > 123
 123
 > #t
@@ -138,7 +138,7 @@ Functions are mathematical entities that assign unique outputs to given inputs. 
 
 Now, back to lists, in order to produce the ordered list `[1, 2, 3]`, we can ask DrRacket to evaluate `(list 1 2 3)`:
 
-```
+```racket
 > (list 1 2 3)
 '(1 2 3)
 ```
@@ -170,7 +170,7 @@ There is a special list, called the empty list and is denoted as `'()` or `(quot
 
 Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result it returns a pair:
 
-```
+```racket
 > (cons 1 2)
 '(1 . 2)
 ```
@@ -216,14 +216,14 @@ For example, `(lambda (x) (+ x 1))` returns a function that accepts a single par
 
 If we try to evaluate the expression above, we get:
 
-```
+```racket
 > (lambda (x) (+ x 1))
 #<procedure>
 ```
 
 So, in order to call our function, we can try to pass a parameter to its return value:
 
-```
+```racket
 > ((lambda (x) (+ x 1)) 1)
 2
 ```
@@ -232,13 +232,13 @@ Of course, writing functions this way is hard. Instead, what we can do is define
 
 Definition:
 
-```
+```racket
 (define add-one (lambda (x) (+ x 1)))
 ```
 
 Interaction:
 
-```
+```racket
 > (add-one 1)
 2
 > (add-one 2)
@@ -249,7 +249,7 @@ Interaction:
 
 To make things a little bit easier for us, Racket has a special syntax for defining functions, so these two are equivalent:
 
-```
+```racket
 (define add-one (lambda (x) (+ x 1)))
 (define (add-one x) (+ x 1))
 ```
@@ -258,7 +258,7 @@ To make things a little bit easier for us, Racket has a special syntax for defin
 
 There are some very useful functions that produce boolean output for us, such as checking whether a number is greater than another one, or whether a value is a number. We can notice the usage of some of them in the code below:
 
-```
+```racket
 (define (add-one x) (+ x 1))
 (define x 1)
 (define hello "Hello World")
@@ -266,7 +266,7 @@ There are some very useful functions that produce boolean output for us, such as
 
 Interacting with it
 
-```
+```racket
 > (number? x)
 #t
 > (number? hello)
@@ -295,7 +295,7 @@ For example, `(if (= 1 1) "It is true" "It is not true")` will return `"It is tr
 
 The more general syntax for `if` is `cond`, which has the following syntax:
 
-```
+```racket
 (cond (test-1 action-1)
    (test-2 action-2)
    ...
@@ -306,7 +306,7 @@ Optionally, the last test can be an else to use the specific action if none of t
 
 As an example, here is one way to interact with it:
 
-```
+```racket
 (define (is-large x)
   (cond ((> x 10) #t)
         (else #f)))
@@ -314,7 +314,7 @@ As an example, here is one way to interact with it:
 
 Interacting
 
-```
+```racket
 > (is-large 5)
 #f
 > (is-large 10)
@@ -325,7 +325,7 @@ Interacting
 
 As we've seen, the `=` is an equivalence predicate used to check whether two numbers are equal. However, it works only on numbers and it will raise an error if we use it on anything else:
 
-```
+```racket
 > (= 1 1)
 #t
 > (= 2.5 2.5)
@@ -338,7 +338,7 @@ There are two important predicates which we will take a look at, and these are `
 
 As an example:
 
-```
+```racket
 > (define x '(1 2))
 > (define y '(1 2))
 > (eq? x y)
@@ -354,7 +354,7 @@ So, when comparing empty lists, `eq?` will always return #t because they represe
 
 The `equal?` predicate is exactly the same as the `eq?` predicate, except that it can be used on primitive types (numbers, strings, lists) to check if they are equivalent. For example:
 
-```
+```racket
 > (define x '(2 3))
 > (define y '(2 3))
 > (equal? x y)
@@ -372,7 +372,7 @@ In mathematics and computer science, a class of objects or methods exhibit recur
 
 For example, here is a demo which defines a function that calculates a length of a list, and how we interact with it:
 
-```
+```racket
 (define (list-length x)
   (cond ((equal? x '()) 0)
         (else (+ 1 (list-length (cdr x))))))
@@ -380,7 +380,7 @@ For example, here is a demo which defines a function that calculates a length of
 
 Running
 
-```
+```racket
 > (list-length '(1 2 3))
 3
 > (list-length '())
@@ -398,7 +398,7 @@ First, we define a function `list-length` that accepts a single parameter `x`, a
 
 Note how we discussed that list are a special type of a pair:
 
-```
+```racket
 > (car '(1 2 3))
 1
 > (cdr '(1 2 3))
@@ -413,7 +413,7 @@ What we can notice from the example above is that the `cdr` of a list will retur
 
 So here is how Racket evaluates `(list-length '(1 2 3))`:
 
-```
+```racket
 (list-length '(1 2 3))
 (+ 1 (list-length '(2 3)))
 (+ 1 (+ 1 (list-length '(3))))
@@ -436,7 +436,7 @@ In the example above, list-length generates a recursive process since it needs t
 
 In contrast, we can re-write `list-length` as:
 
-```
+```racket
 > (define (list-length-iter x n)
   (cond ((equal? x '()) n)
         (else (list-length-iter (cdr x) (+ n 1)))))
@@ -448,7 +448,7 @@ This procedure now generates an iterative process, since the results are capture
 
 So here is how Racket evaluates `(list-length-iter '(1 2 3) 0)`:
 
-```
+```racket
 (list-length-iter '(1 2 3) 0)
 (list-length-iter '(2 3) 1)
 (list-length-iter '(3) 2)
@@ -460,7 +460,7 @@ So here is how Racket evaluates `(list-length-iter '(1 2 3) 0)`:
 
 We can also construct functions that return other functions as a result. For example:
 
-```
+```racket
 > (define (f x) (lambda (y) (+ x y)))
 > f
 #<procedure:f>
@@ -472,7 +472,7 @@ We can also construct functions that return other functions as a result. For exa
 
 This concept is so powerful, that we can implement our own `cons`, `car`, and `cdr`:
 
-```
+```racket
 (define (my-cons x y) (lambda (z) (if (= z 1) x y)))
 (define (my-car x) (x 1))
 (define (my-cdr x) (x 2))
@@ -480,7 +480,7 @@ This concept is so powerful, that we can implement our own `cons`, `car`, and `c
 
 Evaluating
 
-```
+```racket
 > (my-cons 1 2)
 #<procedure>
 > (my-car (my-cons 1 2))
@@ -507,14 +507,14 @@ As an example usage:
 
 Definitions
 
-```
+```racket
 (define my-test-list '(1 2 3))
 (define (add-one x) (+ x 1))
 ```
 
 Interact
 
-```
+```racket
 > (map add-one my-test-list)
 '(2 3 4)
 > (filter even? my-test-list)
@@ -541,7 +541,7 @@ So, if we use the substitution method on `(map add-one my-test-list)`, we get: `
 
 We can actually implement these functions ourselves:
 
-```
+```racket
 (define (my-map f l)
   (cond ((eq? l '()) '())
         (else (cons (f (car l)) (my-map f (cdr l))))))
@@ -563,7 +563,7 @@ As an example, let's create a few procedures, and then save their definitions in
 
 `utils.rkt`:
 
-```
+```racket
 #lang racket
 
 (define (sum-list l) (foldl + 0 l))
@@ -573,7 +573,7 @@ As an example, let's create a few procedures, and then save their definitions in
 
 Now if we create another file called `test.rkt` in the same folder where `utils.rkt` is, and we write the following code:
 
-```
+```racket
 > (require "utils.rkt")
 > (sum-list '(1 2 3))
 6
@@ -587,7 +587,7 @@ We can notice how only the functions we provide within the special syntax `(prov
 
 Let's consider the following definitions:
 
-```
+```racket
 #lang racket
 (define my-number 123)
 (define (add-to-my-number x) (+ my-number x))
@@ -608,7 +608,7 @@ But what about the `x` within `add-to-my-number`? This variable is only accessib
 
 We can assign a new value to already defined variables by using the set! syntax as follows:
 
-```
+```racket
 #lang racket
 (define my-number 123)
 (define (add-to-my-number x) (+ my-number x))
@@ -621,7 +621,7 @@ This program will first output 124, and then 102. Note how our function keeps re
 
 With `let` we can define variables within the current scope that it is executed. The syntax is:
 
-```
+```racket
 (let ([var-1 value-1]
       [var-2 value-2])
   ... our code ...)
@@ -629,7 +629,7 @@ With `let` we can define variables within the current scope that it is executed.
 
 This creates "temporary" variables `var-1` and `var-2` visible only in the "our code" part, and after it is executed they are no longer accessible from outside the scope.
 
-```
+```racket
 > (let ([x 1] [y 2]) (+ x y))
 3
 > x
@@ -640,7 +640,7 @@ This creates "temporary" variables `var-1` and `var-2` visible only in the "our 
 
 There is another syntax `letrec` which is very similar to `let`, in that it allows variables to be visible in the variable scope as well, so we can do:
 
-```
+```racket
 > (letrec ([x 1] [y 2] [z (+ x y)]) z)
 3
 ```
@@ -649,7 +649,7 @@ Note that `[` and `]` have the same function as `(` and `)`, they are just used 
 
 Another interesting syntax is `for` and `for*` which have similar meaning to `let` and `letrec`. We can see how `for*` generates a Cartessian set in the following screenshot:
 
-```
+```racket
 (displayln "for")
 
 (for ([i (range 1 3)]
@@ -664,7 +664,7 @@ Another interesting syntax is `for` and `for*` which have similar meaning to `le
 
 Produces
 
-```
+```racket
 for
 (1 . 1)
 (2 . 2)

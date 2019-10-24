@@ -10,20 +10,20 @@ In a sense, we already know how we can capture abstractions with `car`, `cons`, 
 
 A few examples:
 
-```
+```racket
 > (struct document (author title content))
 > (struct book document (publisher))
 ```
 
 Having entered the first command, we automatically get the procedures `document-author`, `document-title`, `document-content` in order to extract values from objects, and the procedure document in order to construct object of such type. Now, we can construct an object that is using this data structure:
 
-```
+```racket
 > (define a-book (document "Boro Sitnikovski" "Gentle Introduction to Blockchain with Lisp" "Hello World"))
 ```
 
 We can also use the automatically generated procedures to extract values from objects that are using this data structure:
 
-```
+```racket
 > (document-author a-book)
 "Boro Sitnikovski"
 > (document-title a-book)
