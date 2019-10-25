@@ -1,4 +1,4 @@
-# 4. Implementation in Racket
+# 4. Component implementation
 
 Put code from https://github.com/bor0/scheme-coin
 
@@ -604,7 +604,7 @@ Finally
          run-peer)
 ```
 
-## 4.6. Putting everything together
+## 4.6. Utils
 
 utils.rkt is
 

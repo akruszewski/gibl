@@ -564,8 +564,6 @@ As an example, let's create a few procedures, and then save their definitions in
 `utils.rkt`:
 
 ```racket
-#lang racket
-
 (define (sum-list l) (foldl + 0 l))
 (define (add-one x) (+ x 1))
 (provide sum-list)
@@ -588,7 +586,6 @@ We can notice how only the functions we provide within the special syntax `(prov
 Let's consider the following definitions:
 
 ```racket
-#lang racket
 (define my-number 123)
 (define (add-to-my-number x) (+ my-number x))
 ```
@@ -609,7 +606,6 @@ But what about the `x` within `add-to-my-number`? This variable is only accessib
 We can assign a new value to already defined variables by using the set! syntax as follows:
 
 ```racket
-#lang racket
 (define my-number 123)
 (define (add-to-my-number x) (+ my-number x))
 (add-to-my-number 1)
