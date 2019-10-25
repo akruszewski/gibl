@@ -4,7 +4,7 @@ This book aims to be accessible to novices that have no prior experience in prog
 
 I was always curious to understand how things work. One of the reasons for writing this book is that I could not find a book that explained how to implement blockchain from scratch, so I had to do a lot of research on the internet in order to come up with a complete picture of what blockchain is and what it is good for.
 
-The idea of the book is to follow along and write the code as it's being explained instead of reading passively. This way you will get the most out of it.
+The recommended approach for the book is to follow along and write the code as it's being explained instead of reading passively. This way you will get the most out of it. All of the source code is available for download from github.com/bor0/scheme-coin.
 
 Feel free to contact me at buritomath@gmail.com for any questions you might have, and I will do my best to answer. You can also access my blog at bor0.wordpress.com to check out some of my latest work.
 
