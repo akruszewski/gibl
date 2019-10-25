@@ -187,7 +187,7 @@ Finally
 (provide (struct-out transaction-io) make-transaction-io valid-transaction-io?)
 ```
 
-## 4.3..2. Transactions
+## 4.3.2. Transaction
 
 Explain this code.
 

@@ -177,7 +177,7 @@ Another built-in function is `cons` which stands for construct. This function on
 
 Lists are a special kind of pairs, where `(list 1 2 3)` is equal to `(cons 1 (cons 2 (cons 3 '())))`.
 
-![The `(cons some-value nil)` pair](images/ast.png)
+![The `(cons some-value nil)` pair](images/pair.png)
 
 There are two other built-in functions called `car` and `cdr` which are used to retrieve the first and the second element of a pair respectively.
 
