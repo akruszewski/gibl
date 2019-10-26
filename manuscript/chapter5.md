@@ -43,58 +43,80 @@
 
 ```racket
 (require "./main-helper.rkt")
+```
 
-; Convert a string of type ip:port to peer-info structure
+This will convert a string of format `ip:port` to `peer-info` structure:
+
+```racket
 (define (string-to-peer-info s)
   (let ([s (string-split s ":")])
     (peer-info (car s) (string->number (cadr s)))))
+```
 
-; Create a new wallet for us to use
+This will create a new wallet for us to use:
+
+```racket
 (define wallet-a (make-wallet))
+```
 
-; Creation of new blockchain
+Finally, the creation of new blockchain that initializes wallets, transactions, unspect transactions and blockchain:
+
+```racket
 (define (initialize-new-blockchain)
   (begin
-    ; Initialize wallets
     (define scheme-coin-base (make-wallet))
 
-    ; Transactions
     (printf "Making genesis transaction...\n")
-    (define genesis-t (make-transaction scheme-coin-base wallet-a 100 '()))
+    (define genesis-t
+      (make-transaction scheme-coin-base wallet-a 100 '()))
 
-    ; Unspent transactions (store our genesis transaction)
     (define utxo (list
                   (make-transaction-io 100 wallet-a)))
 
-    ; Blockchain initiation
     (printf "Mining genesis block...\n")
     (define b (init-blockchain genesis-t "1337cafe" utxo))
     b))
+```
 
+Some command line parsing (what's a command line to a newbie?)
+
+```racket
 (define args (vector->list (current-command-line-arguments)))
 
 (when (not (= 3 (length args)))
   (begin
-    (printf "Usage: racket main-p2p.rkt dbfile.data port ip1:port1,ip2:port2,...\n")
+    (printf
+     "Usage: racket main-p2p.rkt dbfile.data port ip1:port1,...\n")
     (exit)))
 
-; Get args data
 (define db-filename (car args))
 (define port (string->number (cadr args)))
-(define valid-peers (map string-to-peer-info (string-split (caddr args) ",")))
+(define valid-peers
+  (map string-to-peer-info (string-split (caddr args) ",")))
+```
 
-; Try to read the blockchain from a file (DB), otherwise create a new one
+This will try to read the blockchain from a file (DB), otherwise create a new one:
+
+```racket
 (define b
   (if (file-exists? db-filename)
       (file->struct db-filename)
       (initialize-new-blockchain)))
+```
 
-(define peer-context (peer-context-data "Test peer" port (list->set valid-peers) '() b))
+Peer initialization:
+
+```racket
+(define peer-context
+  (peer-context-data "Test peer" port (list->set valid-peers) '() b))
 (define (get-blockchain) (peer-context-data-blockchain peer-context))
 
 (run-peer peer-context)
+```
 
-; Keep exporting the database to have up-to-date info whenever a user quits the app.
+We keep exporting the database to have up-to-date info whenever a user quits the app.
+
+```racket
 (define (export-loop)
   (begin
     (sleep 10)
@@ -103,10 +125,15 @@
     (export-loop)))
 
 (thread export-loop)
+```
 
-; Procedure to keep mining empty blocks, as the p2p runs in threaded mode.
+Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode.
+
+```racket
 (define (mine-loop)
-  (let ([newer-blockchain (send-money-blockchain (get-blockchain) wallet-a wallet-a 1)]) ; This blockchain includes a new block
+  (let ([newer-blockchain
+         ; This blockchain includes a new block
+         (send-money-blockchain (get-blockchain) wallet-a wallet-a 1)])
     (set-peer-context-data-blockchain! peer-context newer-blockchain)
     (displayln "Mined a block!")
     (sleep 5)
@@ -125,46 +152,79 @@
     (printf "Found 'blockchain.data', reading...\n")
     (print-blockchain (file->struct "blockchain.data"))
     (exit)))
+```
 
-; Initialize wallets
+We initialize wallets:
+
+```racket
 (define scheme-coin-base (make-wallet))
 (define wallet-a (make-wallet))
 (define wallet-b (make-wallet))
+```
 
-; Transactions
+We initialize transactions:
+
+```racket
 (printf "Making genesis transaction...\n")
 (define genesis-t (make-transaction scheme-coin-base wallet-a 100 '()))
+```
 
-; Unspent transactions (store our genesis transaction)
+We initialize unspent transactions (store our genesis transaction):
+
+```racket
 (define utxo (list
               (make-transaction-io 100 wallet-a)))
+```
 
-; Blockchain initiation
+Here's the blockchain initiation
+
+```racket
 (printf "Mining genesis block...\n")
 (define blockchain (init-blockchain genesis-t "1337cafe" utxo))
 (print-wallets blockchain wallet-a wallet-b)
+```
 
-; Make a second transaction
+Make a second transaction
+
+```racket
 (printf "Mining second transaction...\n")
-(set! blockchain (send-money-blockchain blockchain wallet-a wallet-b 20))
+(set! blockchain (send-money-blockchain blockchain wallet-a wallet-b 2))
 (print-wallets blockchain wallet-a wallet-b)
+```
 
-; Make a third transaction
+Make a third transaction
+
+```racket
 (printf "Mining third transaction...\n")
-(set! blockchain (send-money-blockchain blockchain wallet-b wallet-a 10))
+(set! blockchain (send-money-blockchain blockchain wallet-b wallet-a 1))
 (print-wallets blockchain wallet-a wallet-b)
+```
 
-; Attempt to make a fourth transaction
+Attempt to make a fourth transaction
+
+```racket
 (printf "Attempting to mine fourth (not-valid) transaction...\n")
-(set! blockchain (send-money-blockchain blockchain wallet-b wallet-a 200))
+(set! blockchain (send-money-blockchain blockchain wallet-b wallet-a 3))
 (print-wallets blockchain wallet-a wallet-b)
+```
 
+Check validity
+
+```racket
 (printf "Blockchain is valid: ~a\n\n" (valid-blockchain? blockchain))
+```
 
+Print contents
+
+```racket
 (for ([block (blockchain-blocks blockchain)])
   (print-block block)
   (newline))
+```
 
+And export
+
+```racket
 (struct->file blockchain "blockchain.data")
 (printf "Exported blockchain to 'blockchain.data'...\n")
 ```
