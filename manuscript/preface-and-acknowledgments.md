@@ -6,9 +6,11 @@ I was always curious to understand how things work. One of the reasons for writi
 
 The recommended approach for the book is to follow along and write the code as it's being explained instead of reading passively. This way you will get the most out of it. All of the source code is available for download from github.com/bor0/scheme-coin.
 
+TODO: Explain the structure of the book: since it's easy to get distracted by the loads of code every section will have a summary.
+
 Feel free to contact me at buritomath@gmail.com for any questions you might have, and I will do my best to answer. You can also access my blog at bor0.wordpress.com to check out some of my latest work.
 
-Book reviewers:
+TODO: Book reviewers:
 
 1.
 1.
