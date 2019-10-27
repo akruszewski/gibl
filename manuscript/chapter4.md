@@ -138,7 +138,7 @@ Public / private key explanation
 
 Signing and verifying signatures
 
-## 4.3.1. Transaction IO
+### 4.3.1. Transaction IO
 
 Explain this code
 
@@ -192,7 +192,7 @@ Finally
          make-transaction-io valid-transaction-io?)
 ```
 
-## 4.3.2. Transaction
+### 4.3.2. Transaction
 
 Explain this code.
 
