@@ -42,3 +42,9 @@ We can notice a couple of things from the code above:
 1. We see that the macro and the function produce two different outputs
 
 The macro and the function behave differently, as expected. However, in the case of `if`, it makes sense implementing it as a macro rather than a function. It does not make sense to evaluate the `else` case if we are sure that the first case will match.
+
+TODO: Say a few words for this
+
+```racket
+(display `(with backtick only comma prefixed will be evald ,(+ 1 2) vs (+ 1 2)))
+```
