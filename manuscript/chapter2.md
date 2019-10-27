@@ -12,6 +12,17 @@ When you write a program in any other programming language, there's a compiler (
 
 ![An abstract syntax tree](images/ast.png)
 
+For example, the image above represents an abstract syntax tree for the following code in C:
+
+```c
+while (x > 0) {
+    x = x - 1;
+    y = y * 2;
+}
+```
+
+It is not important to understand what this code does, rather how the compiler represents such code internally.
+
 A tree, in turn, is a data structure that simulates a hierarchical tree structure, with a root value and subtrees of children with a parent node, represented as a set of linked nodes. Family tree is one example of a tree.
 
 After the compiler has finished doing syntax analysis and produced a tree, it then evaluates (or computes) the tree in attempt to retrieve the desired results.
