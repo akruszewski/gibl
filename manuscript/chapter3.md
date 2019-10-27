@@ -36,7 +36,7 @@ We can also use the automatically generated procedures to extract values from ob
 "Hello World"
 ```
 
-Throughout this book, we will use serializable-struct (from the racket/serialize library) instead of struct, since this will allow for serializing data structures and writing them to the file system for example.
+Throughout this book, we will use `serializable-struct` (from the `racket/serialize` library) instead of `struct`, since this will allow for serializing data structures and writing them to the file system for example.
 
 A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
 
@@ -44,13 +44,11 @@ From the motivation in the previous section we can see a need of forming such a 
 
 ## 3.1. Linked lists
 
-A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example.
-Instead, each element points to the next. So the order is completely determined by the data in the linked list.
+A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
 
 ![An example of a linked list](images/linked-list.png)
 
-The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain.
-We will cover lists in depth in the Introduction to Racket chapter.
+The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will cover lists in depth in the Introduction to Racket chapter.
 
 Example in Racket
 
@@ -58,19 +56,19 @@ Example in Racket
 
 Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view their content.
 
-So we can assume that there are functions E(x) and D(x) for encryption and decryption respectively. Now we want these functions to have the following properties:
+So we can assume that there are functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. Now we want these functions to have the following properties:
 
-1. E(x) != x, meaning that the encrypted value should not be the same as the value we're trying to encrypt
-1. E(x) != D(x), meaning that the encrypted value should not be the same as the decrypted value
-1. D(E(x)) = x, meaning that the decryption of an encrypted value should return the original value
+1. {$$}E(x) \neq x{/$$}, meaning that the encrypted value should not be the same as the value we're trying to encrypt
+1. {$$}E(x) \neq D(x){/$$}, meaning that the encrypted value should not be the same as the decrypted value
+1. {$$}D(E(x)) = x{/$$}, meaning that the decryption of an encrypted value should return the original value
 
-So if we assume there's some kind of an encryption scheme, say E("Boro") = 426f726f, we can "safely" communicate with others the value 426f726f without actually exposing our original value, and only those who know the decryption scheme D(x) will be able to see that D(426f726f) = "Boro".
+So if we assume there's some kind of an encryption scheme, say {$$}E(\text{"Boro"}) = \text{426f726f}{/$$}, we can "safely" communicate with others the value {$$}\text{426f726f}{/$$} without actually exposing our original value, and only those who know the decryption scheme {$$}D(x){/$$} will be able to see that {$$}D(\text{426f726f}) = \text{"Boro"}{/$$}.
 
-However, the scheme described above is what is called a symmetric algorithm, meaning that we share the functions E and D with the parties involved, and as such, may be open to attacks given how we want to design our transactions, which we will cover in a later topic.
+However, the scheme described above is what is called a symmetric algorithm, meaning that we share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks given how we want to design our transactions, which we will cover in a later topic.
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
 
-So, what we want to use is what is called a asymmetric algorithm or a public-key cryptography. What this means it that we have two kind of keys: public and private. We share the public key with the world, and keep the private one to ourselves.
+So, what we want to use is what is called a asymmetric algorithm or a public-key cryptography. This means that we have two kind of keys: public and private. We share the public key with the world, and keep the private one to ourselves.
 
 ![Asymmetric-key algorithm](images/asymmetric-algo.png)
 
@@ -78,7 +76,7 @@ This algorithm scheme has a neat property in that only the private key can decod
 
 Note that the way we use the words encode and decode is abstract. This means that, for example, in terms of digital signatures for our transactions, a message can be signed with the sender's private key and can be verified by anyone who has access to the sender's public key.
 
-So, given TransactionSignature = Sign(x, PrivateKey) and a verification function Verify(Message, x, key), we want to be able to do Verify(Message TransactionSignature, PublicKey) in order to confirm a transaction's ownership.
+So, given {$$}\text{TransactionSignature} = \text{Sign}(x, \text{PrivateKey}){/$$} and a verification function {$$}\text{Verify}(\text{Message}, x, \text{key}){/$$}, we want to be able to do {$$}\text{Verify}(\text{Message}, \text{TransactionSignature}, \text{PublicKey}){/$$} in order to confirm a transaction's ownership.
 
 This brings us to wallets.
 
@@ -100,9 +98,9 @@ Mining is a validation of transactions. For this effort, successful miners obtai
 
 In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
 
-Another useful property hashing functions have is to connect two or more distinct blocks by having the information current-hash and previous-hash.
+Another useful property hashing functions have is to connect two or more distinct blocks by having the information `current-hash` and `previous-hash`.
 
-For example, block-1 may have a hash such as 0x123456 and block-2 may have a hash such as 0x345678. Now, block-2's previous-hash will be block-1's current-hash, that is, 0x123456, and in this way we've made a link between these two blocks.
+For example, `block-1` may have a hash such as `0x123456` and `block-2` may have a hash such as `0x345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `0x123456`, and in this way we've made a link between these two blocks.
 
 ![Illustration of few blocks connected in a blockchain](images/blockchain-illustration.png)
 
