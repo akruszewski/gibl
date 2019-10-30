@@ -36,7 +36,7 @@ We need a way to decentralize the ledger, such that at any given time any of the
 
 You are connected to your friends, and so are they to you. Informally, this makes a peer-to-peer network.
 
-I> ### Definition 3
+I> ### Definition 4
 I>
 I> A peer-to-peer network is formed when two or more computers are connected to each other.
 
@@ -54,16 +54,6 @@ At the end of the day, we say that we will trust the ledger who has put the most
 
 So if everybody agreed to use this ledger as a source of truth, there would be no need to exchange physical money at all. Everybody can just use the ledger to put or retrieve money to it.
 
-To give a quick summary of our example for motivation above:
-
-1. As the most basic building block, we have a transaction record (block)
-1. A block contains (among other data) transactions
-1. We have a ledger that is a ordered list of all valid blocks (blockchain)
-1. Every peer involved with the ledger has a wallet
-1. Every record in the ledger is signed by the owner, and can be verified by the public (digital signatures)
-1. The ledger is in a decentralized location, that is, everybody has their own copy of the ledger
-1. Trust is based upon proof of work (mining)
-
 ## 1.2. Bitcoin
 
 Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper authored by Satoshi Nakamoto titled "Bitcoin: A Peer-to-Peer Electronic Cash System" was published on a cryptography mailing list. Bitcoin's white paper is consisted of 9 pages, however, it is mostly theoretical explanation of the design, and as such may be a bit overwhelming to newcomers.
@@ -76,11 +66,19 @@ Although there are many cryptocurrency models and each one of them differ slight
 
 ### 1.3.1. Adding block to a blockchain
 
+TODO
+
 ### 1.3.2. Mining a block
+
+TODO
 
 ### 1.3.3. Checking wallet balance
 
+TODO
+
 ### 1.3.4. Sending money
+
+TODO
 
 ## 1.4. Cryptojacking
 
@@ -92,6 +90,18 @@ Cryptojacking is the unauthorized use of someone else's computer to mine cryptoc
 
 Since as we've seen, miners get reward for mining, this is a motivation for cryptojacking.
 
-Add some images
+TODO: Add some images
+
+## Summary
+
+Here's what we learned in this chapter, briefly:
+
+1. As the most basic building block, we have a transaction record (block)
+1. A block contains (among other data) transactions
+1. We have a ledger that is a ordered list of all valid blocks (blockchain)
+1. Every peer involved with the ledger has a wallet
+1. Every record in the ledger is signed by the owner, and can be verified by the public (digital signatures)
+1. The ledger is in a decentralized location, that is, everybody has their own copy of the ledger
+1. Trust is based upon proof of work (mining)
 
 [^ch1n1]: There is a way we can optimize this with so called unspent *transaction outputs* (UTXOs), which we will discuss in details later.

@@ -23,13 +23,19 @@ while (x > 0) {
 
 It is not important to understand what this code does, rather how the compiler represents such code internally.
 
-A tree, in turn, is a data structure that simulates a hierarchical tree structure, with a root value and subtrees of children with a parent node, represented as a set of linked nodes. Family tree is one example of a tree.
+I> ### Definition 2
+I>
+I> TODO: Revise sentence. A tree is a data structure that simulates a hierarchical tree structure, with a root value and subtrees of children with a parent node, represented as a set of linked nodes.
+
+Family tree is one example of a tree.
 
 After the compiler has finished doing syntax analysis and produced a tree, it then evaluates (or computes) the tree in attempt to retrieve the desired results.
 
 Since Lisps have no syntax, what we write as code is the actual abstract syntax tree. This allows for some neat things, for example macros.
 
-Macro is a syntactic extension to a programming language. This means that we can write (or introduce our own) keywords in the programming language itself.
+I> ### Definition 3
+I>
+I> A macro is a syntactic extension to a programming language. This means that we can write (or introduce our own) keywords in the programming language itself.
 
 Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
 
@@ -47,9 +53,9 @@ Scheme is widely used by a number of schools, as a programming language in intro
 
 There are three important notions in a Lisp, and thus Racket:
 
-- Primitives or axioms, starting points. For example numbers, strings are something we do not have to implement ourselves since they are already included in the programming language.
-- Means of composition. We have a way to compose primitives in attempt to do complex calculations.
-- Abstraction, or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function. We will cover functions later in this chapter.
+1. Primitives or axioms, starting points. For example numbers, strings are something we do not have to implement ourselves since they are already included in the programming language.
+1. Means of composition. We have a way to compose primitives in attempt to do complex calculations.
+1. Abstraction, or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function. We will cover functions later in this chapter.
 
 In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease.
 
@@ -57,8 +63,8 @@ This programming language favors composition over inheritance, and we will see f
 
 There are two main approaches to work with Racket:
 
-- Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book.
-- Using the command line utilities (racket - the interpreter/compiler, raco - the package manager, etc) for more advanced users.
+1. Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book.
+1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager, etc) for more advanced users.
 
 ## 2.2. Configuration and installation
 
@@ -687,3 +693,7 @@ for *
 (2 . 1)
 (2 . 2)
 ```
+
+## Summary
+
+TODO

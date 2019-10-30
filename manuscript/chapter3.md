@@ -1,5 +1,7 @@
 # 3. Technical prerequisites
 
+TODO: See what we need to move from here to chapter 2 (perhaps even merge?)
+
 A data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
 
 In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
@@ -42,7 +44,11 @@ From the motivation in the previous section we can see a need of forming such a 
 
 ## 3.1. Linked lists
 
-A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays (TODO: but explain arrays in standard languages) for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
+TODO: Explain arrays in standard languages
+
+I> ### Definition 1
+I>
+I> A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
 
 ![An example of a linked list](images/linked-list.png)
 
@@ -52,7 +58,9 @@ TODO: Example in Racket show that it can be simulated with `car`/`cons`
 
 ## 3.2. Encryption
 
-Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
+I> ### Definition 2
+I>
+I> Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
 
 So we can assume that there are functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. Now we want these functions to have the following properties:
 
@@ -80,19 +88,27 @@ This brings us to wallets.
 
 Wallet stores the public and private "keys" or "addresses" which can be used to receive or spend cryptocurrency coins. With the private key, it is possible to write new blocks (or transactions) on the blockchain, effectively spending the associated cryptocurrency. With the public key, it is possible for others to send currency to the wallet and verify signatures.
 
-Example in Racket
+TODO: Example in Racket
 
 ## 3.3. Hashing
 
-Hashing, however, is simpler than the encryption schemes described above, and is a one-way function that encodes text without a way to retrieve the original contents back.
+I> ### Definition 3
+I>
+I> Hashing is a one-way function that encodes text without a way to retrieve the original contents back.
+
+Hashing, however, is simpler than the encryption schemes described above.
 
 One example why we would need to use such technique is because they have some interesting properties, such as providing us with the so called notion proof-of-work.
 
-A proof-of-work system is an economic measure to deter denial of service attacks and other service abuses such as spam on a network by requiring some work from the service requester, usually meaning processing time by a computer.
+I> ### Definition 4
+I>
+I> A proof-of-work system is an economic measure to deter denial of service attacks and other service abuses such as spam on a network by requiring some work from the service requester, usually meaning processing time by a computer.
 
 Hashcash is a proof-of-work system, initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa. We will see how this algorithm works in details in the later chapters where we will implement it.
 
-Mining is a validation of transactions. For this effort, successful miners obtain new cryptocurrency as a reward. The Hashcash algorithm is what we will use to implement mining.
+I> ### Definition 5
+I>
+I> Mining is a validation of transactions. For this effort, successful miners obtain new cryptocurrency as a reward. The Hashcash algorithm is what we will use to implement mining.
 
 In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
 
@@ -106,6 +122,6 @@ Two or more blocks (or transactions) connected to each other form what is called
 
 Fortunately for us, Racket has libraries that will provide this for us, so we don't have to dig deeper into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
 
-Example in Racket
+TODO: Example in Racket
 
 [^ch3n1]: More on macros in Appendix A.
