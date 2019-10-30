@@ -187,6 +187,20 @@ There is another built-in function, called `quote`. So the expression `'(1 2 3)`
 
 There is a special list, called the empty list and is denoted as `'()` or `(quote ())`. We will later see why this list is special when we'll talk about recursion.
 
+TODO: Check the following block
+
+TODO: Explain arrays in standard languages
+
+I> ### Definition 1
+I>
+I> A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
+
+![An example of a linked list](images/linked-list.png)
+
+The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will see how to implement a blockchain with it in chapter 4.
+
+TODO: Example in Racket show that it can be simulated with `car`/`cons`
+
 ### 2.3.3. Pairs
 
 Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result it returns a pair:
@@ -696,4 +710,46 @@ for *
 
 ## Summary
 
-TODO
+TODO: See what we need to move from here
+
+A data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
+
+In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
+
+In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
+
+A few examples:
+
+```racket
+> (struct document (author title content))
+> (struct book document (publisher))
+```
+
+Having entered the first command, we automatically get the procedures `document-author`, `document-title`, `document-content` in order to extract values from objects, and the procedure document in order to construct object of such type. Now, we can construct an object that is using this data structure:
+
+```racket
+> (define a-book
+>   (document
+>    "Boro Sitnikovski"
+>    "Gentle Introduction to Blockchain with Lisp"
+>    "Hello World"))
+```
+
+We can also use the automatically generated procedures to extract values from objects that are using this data structure:
+
+```racket
+> (document-author a-book)
+"Boro Sitnikovski"
+> (document-title a-book)
+"Gentle Introduction to Blockchain with Lisp"
+> (document-content a-book)
+"Hello World"
+```
+
+Throughout this book, we will use `serializable-struct` (from the `racket/serialize` library) instead of `struct`, since this will allow for serializing data structures and writing them to the file system for example.
+
+A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
+
+From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, transaction amount, etc.
+
+[^ch3n1]: More on macros in Appendix A.

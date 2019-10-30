@@ -1,127 +1,762 @@
-# 3. Technical prerequisites
+# 3. Component implementation
 
-TODO: See what we need to move from here to chapter 2 (perhaps even merge?)
+Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a cryptocurrency.
 
-A data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
+## 3.1. Wallet
 
-In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
+We will start with the most basic data structure - a wallet.
 
-In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
+It is a structure that contains a public and a private key.
 
-A few examples:
-
-```racket
-> (struct document (author title content))
-> (struct book document (publisher))
-```
-
-Having entered the first command, we automatically get the procedures `document-author`, `document-title`, `document-content` in order to extract values from objects, and the procedure document in order to construct object of such type. Now, we can construct an object that is using this data structure:
+So it should have this form:
 
 ```racket
-> (define a-book
->   (document
->    "Boro Sitnikovski"
->    "Gentle Introduction to Blockchain with Lisp"
->    "Hello World"))
+(struct wallet
+  (private-key public-key)
+  #:prefab)
 ```
 
-We can also use the automatically generated procedures to extract values from objects that are using this data structure:
+Together with a procedure that generates a wallet. Make wallet by generating random public and private keys.
 
 ```racket
-> (document-author a-book)
-"Boro Sitnikovski"
-> (document-title a-book)
-"Gentle Introduction to Blockchain with Lisp"
-> (document-content a-book)
-"Hello World"
+(define (make-wallet)
+  (letrec ([rsa-impl (get-pk 'rsa libcrypto-factory)]
+           [privkey (generate-private-key rsa-impl '((nbits 512)))]
+           [pubkey (pk-key->public-only-key privkey)])
+    (wallet (bytes->hex-string
+             (pk-key->datum privkey 'PrivateKeyInfo))
+            (bytes->hex-string
+             (pk-key->datum pubkey 'SubjectPublicKeyInfo)))))
+
+(provide (struct-out wallet) make-wallet)
 ```
 
-Throughout this book, we will use `serializable-struct` (from the `racket/serialize` library) instead of `struct`, since this will allow for serializing data structures and writing them to the file system for example.
+Let's explain the code above. Additional dependencies are
 
-A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
+```racket
+(require crypto)
+(require crypto/all)
+```
 
-From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, transaction amount, etc.
+## 3.2. Block
 
-## 3.1. Linked lists
+We know that a block should contain the current hash, the previous hash, data, and timestamp when it was generated:
 
-TODO: Explain arrays in standard languages
+```racket
+(struct block
+  (hash previous-hash data timestamp))
+```
 
-I> ### Definition 1
-I>
-I> A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
+SHA is a type of a hashing algorithm that allows us to confirm that the block is really what it claims to be.
 
-![An example of a linked list](images/linked-list.png)
+In general, blocks can contain any data, not just transactions. But we are limiting it to transactions for now
 
-The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will see how to implement a blockchain with it in chapter 4.
+```racket
+(struct block
+  (hash previous-hash transaction timestamp nonce)
+  #:transparent)
+```
 
-TODO: Example in Racket show that it can be simulated with `car`/`cons`
+And so on
 
-## 3.2. Encryption
+The full code, explain it. Provide code without `utils.rkt` and with `utils.rkt`
 
-I> ### Definition 2
-I>
-I> Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
+```racket
+(require "utils.rkt")
+(require (only-in sha sha256))
+(require (only-in sha bytes->hex-string))
+(require racket/serialize)
 
-So we can assume that there are functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. Now we want these functions to have the following properties:
+(define difficulty 2)
+(define target (bytes->hex-string (make-bytes difficulty 32)))
 
-1. {$$}E(x) \neq x{/$$}, meaning that the encrypted value should not be the same as the value we're trying to encrypt
-1. {$$}E(x) \neq D(x){/$$}, meaning that the encrypted value should not be the same as the decrypted value
-1. {$$}D(E(x)) = x{/$$}, meaning that the decryption of an encrypted value should return the original value
+(struct block
+  (hash previous-hash transaction timestamp nonce)
+  #:prefab)
+```
 
-So if we assume there's some kind of an encryption scheme, say {$$}E(\text{"Boro"}) = \text{426f726f}{/$$}, we can "safely" communicate with others the value {$$}\text{426f726f}{/$$} without actually exposing our original value, and only those who know the decryption scheme {$$}D(x){/$$} will be able to see that {$$}D(\text{426f726f}) = \text{"Boro"}{/$$}.
+Now we have this procedure for calculating block hash:
 
-However, the scheme described above is what is called a symmetric algorithm, meaning that we share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks given how we want to design our transactions, which we will cover in a later topic.
+```racket
+(define (calculate-block-hash previous-hash timestamp transaction nonce)
+  (bytes->hex-string (sha256 (bytes-append
+           (string->bytes/utf-8 previous-hash)
+           (string->bytes/utf-8 (number->string timestamp))
+           (string->bytes/utf-8 (~a (serialize transaction)))
+           (string->bytes/utf-8 (number->string nonce))))))
+```
 
-![Symmetric-key algorithm](images/symmetric-algo.png)
+Now we have this procedure that determines block validity when the hash is corrcet
 
-So, what we want to use is what is called a asymmetric algorithm or a public-key cryptography. This means that we have two kind of keys: public and private. We share the public key with the world, and keep the private one to ourselves.
+```racket
+(define (valid-block? bl)
+  (equal? (block-hash bl)
+          (calculate-block-hash (block-previous-hash bl)
+                                (block-timestamp bl)
+                                (block-transaction bl)
+                                (block-nonce bl))))
+```
 
-![Asymmetric-key algorithm](images/asymmetric-algo.png)
+Now we have this procedure. A block is mined if the hash matches the target, given the difficulty.
 
-This algorithm scheme has a neat property in that only the private key can decode a message, and the public one can encode a message.
+```racket
+(define (mined-block? hash)
+  (equal? (subbytes (hex-string->bytes hash) 1 difficulty)
+          (subbytes (hex-string->bytes target) 1 difficulty)))
+```
 
-Note that the way we use the words encode and decode is abstract. This means that, for example, in terms of digital signatures for our transactions, a message can be signed with the sender's private key and can be verified by anyone who has access to the sender's public key.
+Now we have this Hashcash implementation procedure:
 
-So, given {$$}\text{TransactionSignature} = \text{Sign}(x, \text{PrivateKey}){/$$} and a verification function {$$}\text{Verify}(\text{Message}, x, \text{key}){/$$}, we want to be able to do {$$}\text{Verify}(\text{Message}, \text{TransactionSignature}, \text{PublicKey}){/$$} in order to confirm a transaction's ownership.
+```racket
+(define (make-and-mine-block
+         target previous-hash timestamp transaction nonce)
+  (let ([hash (calculate-block-hash
+               previous-hash timestamp transaction nonce)])
+    (if (mined-block? hash)
+        (block hash previous-hash transaction timestamp nonce)
+        (make-and-mine-block
+         target previous-hash timestamp transaction (+ nonce 1)))))
+```
 
-This brings us to wallets.
+Now we have this procedure which is a wrapper around `make-and-mine-block`.
 
-Wallet stores the public and private "keys" or "addresses" which can be used to receive or spend cryptocurrency coins. With the private key, it is possible to write new blocks (or transactions) on the blockchain, effectively spending the associated cryptocurrency. With the public key, it is possible for others to send currency to the wallet and verify signatures.
+```racket
+(define (mine-block transaction previous-hash)
+  (make-and-mine-block
+   target previous-hash (current-milliseconds) transaction 1))
+```
 
-TODO: Example in Racket
+Finally
 
-## 3.3. Hashing
+```racket
+(provide (struct-out block) mine-block valid-block? mined-block?)
+```
 
-I> ### Definition 3
-I>
-I> Hashing is a one-way function that encodes text without a way to retrieve the original contents back.
+## 3.3. Transactions
 
-Hashing, however, is simpler than the encryption schemes described above.
+Public / private key explanation
 
-One example why we would need to use such technique is because they have some interesting properties, such as providing us with the so called notion proof-of-work.
+Signing and verifying signatures
 
-I> ### Definition 4
-I>
-I> A proof-of-work system is an economic measure to deter denial of service attacks and other service abuses such as spam on a network by requiring some work from the service requester, usually meaning processing time by a computer.
+### 3.3.1. Transaction IO
 
-Hashcash is a proof-of-work system, initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa. We will see how this algorithm works in details in the later chapters where we will implement it.
+Explain this code
 
-I> ### Definition 5
-I>
-I> Mining is a validation of transactions. For this effort, successful miners obtain new cryptocurrency as a reward. The Hashcash algorithm is what we will use to implement mining.
+```racket
+(require (only-in sha sha256))
+(require (only-in sha bytes->hex-string))
+(require racket/serialize)
 
-In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
+(struct transaction-io
+  (hash value owner timestamp)
+  #:prefab)
+```
 
-Another useful property hashing functions have is to connect two or more distinct blocks by having the information `current-hash` and `previous-hash`.
+Now we have this procedure for calculating the hash of a `transaction-io` object
 
-For example, `block-1` may have a hash such as `0x123456` and `block-2` may have a hash such as `0x345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `0x123456`, and in this way we've made a link between these two blocks.
+```racket
+(define (calculate-transaction-io-hash value owner timestamp)
+  (bytes->hex-string (sha256 (bytes-append
+           (string->bytes/utf-8 (number->string value))
+           (string->bytes/utf-8 (~a (serialize owner)))
+           (string->bytes/utf-8 (number->string timestamp))))))
+```
 
-![Illustration of few blocks connected in a blockchain](images/blockchain-illustration.png)
+Now we have this procedure that makes a `transaction-io` object with calculated hash:
 
-Two or more blocks (or transactions) connected to each other form what is called a blockchain. The validity of each cryptocurrency coins is provided by it.
+```racket
+(define (make-transaction-io value owner)
+  (let ([timestamp (current-milliseconds)])
+    (transaction-io
+     (calculate-transaction-io-hash value owner timestamp)
+     value
+     owner
+     timestamp)))
+```
 
-Fortunately for us, Racket has libraries that will provide this for us, so we don't have to dig deeper into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
+Now we have this procedure that determines `transaction-io` validity when the hash is correct:
 
-TODO: Example in Racket
+```racket
+(define (valid-transaction-io? t-in)
+  (equal? (transaction-io-hash t-in)
+          (calculate-transaction-io-hash
+           (transaction-io-value t-in)
+           (transaction-io-owner t-in)
+           (transaction-io-timestamp t-in))))
+```
 
-[^ch3n1]: More on macros in Appendix A.
+Finally
+
+```racket
+(provide (struct-out transaction-io)
+         make-transaction-io valid-transaction-io?)
+```
+
+### 3.3.2. Transaction
+
+Explain this code.
+
+```racket
+(require "transaction-io.rkt")
+(require "utils.rkt")
+(require "wallet.rkt")
+(require crypto)
+(require crypto/all)
+(require racket/serialize)
+
+(struct transaction
+  (signature from to value inputs outputs)
+  #:prefab)
+```
+
+In addition, we need to use all crypto factories for converting the key between `hex<->pk-key`:
+
+```racket
+(use-all-factories!)
+```
+
+Now we have this procedure that returns digested signature of a transaction data:
+
+```racket
+(define (sign-transaction from to value)
+  (let ([privkey (wallet-private-key from)]
+        [pubkey (wallet-public-key from)])
+    (bytes->hex-string
+     (digest/sign
+      (datum->pk-key (hex-string->bytes privkey) 'PrivateKeyInfo)
+      'sha1
+      (bytes-append
+       (string->bytes/utf-8 (~a (serialize from)))
+       (string->bytes/utf-8 (~a (serialize to)))
+       (string->bytes/utf-8 (number->string value)))))))
+```
+
+Now we have this procedure that makes an empty, unprocessed and unsigned transaction:
+
+```racket
+(define (make-transaction from to value inputs)
+  (transaction
+   ""
+   from
+   to
+   value
+   inputs
+   '()))
+```
+
+Now we have this procedure for processing transactions. It sums all the inputs with `inputs-sum`, calculates the `leftover` and then generates new outputs to be used in the new signed and processed transaction `new-outputs`:
+
+```racket
+(define (process-transaction t)
+  (letrec
+      ([inputs (transaction-inputs t)]
+       [outputs (transaction-outputs t)]
+       [value (transaction-value t)]
+       [inputs-sum
+        (foldr + 0 (map (lambda (i) (transaction-io-value i)) inputs))]
+       [leftover (- inputs-sum value)]
+       [new-outputs
+        (list
+         (make-transaction-io value (transaction-to t))
+         (make-transaction-io leftover (transaction-from t)))])
+    (transaction
+     (sign-transaction (transaction-from t)
+                       (transaction-to t)
+                       (transaction-value t))
+     (transaction-from t)
+     (transaction-to t)
+     value
+     inputs
+     (remove-duplicates (append new-outputs outputs)))))
+```
+
+Now we have this procedure that checks the signature validity of a transaction:
+
+```racket
+(define (valid-transaction-signature? t)
+  (let ([pubkey (wallet-public-key (transaction-from t))])
+    (digest/verify
+     (datum->pk-key (hex-string->bytes pubkey) 'SubjectPublicKeyInfo)
+     'sha1
+     (bytes-append
+      (string->bytes/utf-8 (~a (serialize (transaction-from t))))
+      (string->bytes/utf-8 (~a (serialize (transaction-to t))))
+      (string->bytes/utf-8 (number->string (transaction-value t))))
+     (hex-string->bytes (transaction-signature t)))))
+```
+
+Now we have this procedure that determines transaction validity when:
+1. Its signature is valid `valid-transaction-signature?`
+1. All outputs are valid `valid-transaction-io?`
+1. The sum of the inputs is gte the sum of the outputs `>= sum-inputs sum-outputs`
+
+```racket
+(define (valid-transaction? t)
+  (let ([sum-inputs
+         (foldr + 0 (map (lambda (t) (transaction-io-value t))
+                         (transaction-inputs t)))]
+        [sum-outputs
+         (foldr + 0 (map (lambda (t) (transaction-io-value t))
+                         (transaction-outputs t)))])
+    (and
+     (valid-transaction-signature? t)
+     (true-for-all? valid-transaction-io? (transaction-outputs t))
+     (>= sum-inputs sum-outputs))))
+```
+
+Finally
+
+```racket
+(provide (all-from-out "transaction-io.rkt")
+         (struct-out transaction)
+         make-transaction process-transaction valid-transaction?)
+```
+
+## 3.4. Blockchain
+
+UTXO Why? Performance reasons.
+
+```racket
+(require "block.rkt")
+(require "transaction.rkt")
+(require "utils.rkt")
+(require "wallet.rkt")
+
+(struct blockchain
+  (blocks utxo)
+  #:prefab)
+```
+
+Now we have this procedure for initialization of the blockchain:
+
+```racket
+(define (init-blockchain t seed-hash utxo)
+  (blockchain (cons (mine-block (process-transaction t) seed-hash) '())
+              utxo))
+```
+
+Now we have this procedure. We start with 50 coins initially, and halve them on every 210000 blocks.
+
+```racket
+(define (mining-reward-factor blocks)
+  (/ 50 (expt 2 (floor (/ (length blocks) 210000)))))
+```
+
+Now we have this procedure that adds a transaction to blockchain by processing the unspent transaction outputs:
+
+```racket
+(define (add-transaction-to-blockchain b t)
+  (letrec ([hashed-blockchain
+            (mine-block t (block-hash (car (blockchain-blocks b))))]
+           [processed-inputs (transaction-inputs t)]
+           [processed-outputs (transaction-outputs t)]
+           [utxo (set-union processed-outputs
+                            (set-subtract (blockchain-utxo b)
+                                          processed-inputs))]
+           [new-blocks (cons hashed-blockchain (blockchain-blocks b))]
+           [utxo-rewarded (cons
+                           (make-transaction-io
+                            (mining-reward-factor new-blocks)
+                            (transaction-from t))
+                           utxo)])
+    (blockchain
+     new-blocks
+     utxo-rewarded)))
+```
+
+Now we have this procedure that sends money from one wallet to another by initiating transaction, and then adding it to the blockchain for processing:
+
+```racket
+(define (send-money-blockchain b from to value)
+  (letrec ([my-ts
+            (filter (lambda (t) (equal? from (transaction-io-owner t)))
+                    (blockchain-utxo b))]
+           [t (make-transaction from to value my-ts)])
+    (if (transaction? t)
+        (let ([processed-transaction (process-transaction t)])
+          (if (and (>= (balance-wallet-blockchain b from) value)
+                   (valid-transaction? processed-transaction))
+              (add-transaction-to-blockchain b processed-transaction)
+              b))
+        (add-transaction-to-blockchain b '()))))
+```
+
+Now we have this procedure that determines the balance of a wallet - the sum of all unspent transactions for the matching owner:
+
+```racket
+(define (balance-wallet-blockchain b w)
+  (letrec ([utxo (blockchain-utxo b)]
+           [my-ts (filter
+                   (lambda (t) (equal? w (transaction-io-owner t)))
+                   utxo)])
+    (foldr + 0 (map (lambda (t) (transaction-io-value t)) my-ts))))
+```
+
+Now we have this procedure that determines blockchain validity:
+
+1. All blocks are valid `valid-block?`
+1. Previous hashes are matching `equal?` check
+1. All transactions are valid `valid-transaction?`
+1. All blocks are mined `mined-block?`
+
+```racket
+(define (valid-blockchain? b)
+  (let ([blocks (blockchain-blocks b)])
+    (and
+     (true-for-all? valid-block? blocks)
+     (equal? (drop-right (map block-previous-hash blocks) 1)
+             (cdr (map block-hash blocks)))
+     (true-for-all?
+      valid-transaction? (map
+                          (lambda (block) (block-transaction block))
+                          blocks))
+     (true-for-all?
+      mined-block? (map block-hash blocks)))))
+```
+
+Finally
+
+```racket
+(provide (all-from-out "block.rkt")
+         (all-from-out "transaction.rkt")
+         (all-from-out "wallet.rkt")
+         (struct-out blockchain)
+         init-blockchain send-money-blockchain
+         balance-wallet-blockchain valid-blockchain?)
+```
+
+## 3.5. Peer-to-peer
+
+```racket
+(require "blockchain.rkt")
+(require "block.rkt")
+(require racket/serialize)
+```
+
+The `peer-info` structure contains an ip and a port:
+
+```racket
+(struct peer-info
+  (ip port)
+  #:prefab)
+```
+
+`peer-info-io` additionally contains IO ports:
+
+```racket
+(struct peer-info-io
+  (pi input-port output-port)
+  #:prefab)
+```
+
+`peer-context-data` contains all information needed for a single peer:
+
+```racket
+(struct peer-context-data
+  (name
+   port
+   [valid-peers #:mutable]
+   [connected-peers #:mutable]
+   [blockchain #:mutable])
+  #:prefab)
+```
+
+The list of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
+
+Now we have this procedure for getting the sum of nonces of a blockchain. Highest one has most effort and will win to get updated throughout the peers.
+
+```racket
+(define (get-blockchain-effort b)
+  (foldl + 0 (map block-nonce (blockchain-blocks b))))
+```
+
+Now we have this procedure which will server as a handler for updating latest blockchain:
+
+TODO: implement `(define (helper x) (deserialize (read (open-input-string (string-replace-line x "")))))`
+
+```racket
+(define (maybe-update-blockchain peer-context line)
+  (let ([current-blockchain
+         (deserialize
+          (read
+           (open-input-string
+            (string-replace line
+                            #rx"(latest-blockchain:|[\r\n]+)" ""))))]
+        [latest-blockchain (peer-context-data-blockchain peer-context)])
+    (when (and (valid-blockchain? current-blockchain)
+               (> (get-blockchain-effort current-blockchain)
+                  (get-blockchain-effort latest-blockchain)))
+      (printf "Blockchain updated for peer ~a\n"
+              (peer-context-data-name peer-context))
+      (set-peer-context-data-blockchain! peer-context
+                                         current-blockchain))))
+```
+
+Together with this handler for updating valid peers:
+
+```racket
+(define (maybe-update-valid-peers peer-context line)
+  (let ([valid-peers
+         (list->set
+          (deserialize
+           (read
+            (open-input-string
+             (string-replace line #rx"(valid-peers:|[\r\n]+)" "")))))]
+        [current-valid-peers (peer-context-data-valid-peers
+                              peer-context)])
+    (set-peer-context-data-valid-peers!
+     peer-context
+     (set-union current-valid-peers valid-peers))))
+```
+
+Now we have these generic handlers for both client and server: `handler`, `launch-handler-thread` and `peers`.
+
+`handler` is the main handler:
+
+```racket
+(define (handler peer-context in out)
+  (flush-output out)
+  (define line (read-line in))
+  (when (string? line) ; it can be eof
+    (cond [(string-prefix? line "get-valid-peers")
+           (begin (display "valid-peers:" out)
+                  (displayln
+                   (serialize
+                    (set->list
+                     (peer-context-data-valid-peers peer-context)))
+                   out)
+                  (handler peer-context in out))]
+          [(string-prefix? line "get-latest-blockchain")
+           (begin (display "latest-blockchain:" out)
+                  (write (serialize
+                          (peer-context-data-blockchain peer-context))
+                         out)
+                  (handler peer-context in out))]
+          [(string-prefix? line "latest-blockchain:")
+           (begin (maybe-update-blockchain peer-context line)
+                  (handler peer-context in out))]
+          [(string-prefix? line "valid-peers:")
+           (begin (maybe-update-valid-peers peer-context line)
+                  (handler peer-context in out))]
+          [(string-prefix? line "exit")
+           (displayln "bye" out)]
+          [else (handler peer-context in out)])))
+```
+
+Now we have this helper procedure to launch handler thread:
+
+```racket
+(define (launch-handler-thread handler peer-context in out cb)
+  (define-values (local-ip remote-ip) (tcp-addresses in))
+  (define current-peer (peer-info
+                        remote-ip
+                        (peer-context-data-port peer-context)))
+  (define current-peer-io (peer-info-io current-peer in out))
+  (thread
+   (lambda ()
+     (handler peer-context in out)
+     (cb)
+     (close-input-port in)
+     (close-output-port out))))
+```
+
+Now we have this procedure that will ping all peers in attempt to sync blockchains and update list of valid peers:
+
+```racket
+(define (peers peer-context)
+  (define (loop)
+    (sleep 10)
+    (for [(p (peer-context-data-connected-peers peer-context))]
+      (let ([in (peer-info-io-input-port p)]
+            [out (peer-info-io-output-port p)])
+        (displayln "get-latest-blockchain" out)
+        (displayln "get-valid-peers" out)
+        (flush-output out)))
+    (printf "Peer ~a reports ~a valid peers.\n"
+            (peer-context-data-name peer-context)
+            (set-count (peer-context-data-valid-peers peer-context)))
+    (loop))
+  (define t (thread loop))
+  (lambda ()
+    (kill-thread t)))
+```
+
+Now we have these two generic procedures for server: `accept-and-handle` and `serve`.
+
+`accept-and-handle` accepts a new connection:
+
+```racket
+(define (accept-and-handle listener handler peer-context)
+  (define-values (in out) (tcp-accept listener))
+  (launch-handler-thread handler peer-context in out void))
+```
+
+`serve` is the main server listener:
+
+```racket
+(define (serve peer-context)
+  (define main-cust (make-custodian))
+  (parameterize ([current-custodian main-cust])
+    (define listener
+      (tcp-listen (peer-context-data-port peer-context) 5 #t))
+    (define (loop)
+      (accept-and-handle listener handler peer-context)
+      (loop))
+    (thread loop))
+  (lambda ()
+    (custodian-shutdown-all main-cust)))
+```
+
+Now we have this generic procedure for client, `connections-loop`, that makes sure we're connected with all known peers. TODO: break this procedure into smaller parts?
+
+```racket
+(define (connections-loop peer-context)
+  (define conns-cust (make-custodian))
+  (parameterize ([current-custodian conns-cust])
+    (define (loop)
+      (letrec ([current-connected-peers (list->set (map peer-info-io-pi (peer-context-data-connected-peers peer-context)))]
+               [all-valid-peers (peer-context-data-valid-peers peer-context)]
+               [potential-peers (set-subtract all-valid-peers current-connected-peers)])
+        (for ([peer potential-peers])
+          (thread (lambda ()
+                    (with-handlers
+                        ([exn:fail?
+                          (lambda (x)
+                            ;(printf "Cannot connect to ~a:~a\n" (peer-info-ip peer) (peer-info-port peer))
+                            #t)])
+                      (begin
+                        ;(printf "Trying to connect to ~a:~a...\n" (peer-info-ip peer) (peer-info-port peer))
+                        (define-values (in out) (tcp-connect (peer-info-ip peer) (peer-info-port peer)))
+                        (printf "'~a' connected to ~a:~a!\n" (peer-context-data-name peer-context) (peer-info-ip peer) (peer-info-port peer))
+                        (define current-peer-io (peer-info-io peer in out))
+                        ; Add current peer to list of connected peers
+                        (set-peer-context-data-connected-peers! peer-context (cons current-peer-io (peer-context-data-connected-peers peer-context)))
+                        (launch-handler-thread handler
+                                               peer-context
+                                               in
+                                               out
+                                               (lambda ()
+                                                 ; Remove peer from list of connected peers
+                                                 (set-peer-context-data-connected-peers! peer-context
+                                                                                         (set-remove
+                                                                                          (peer-context-data-connected-peers peer-context)
+                                                                                          current-peer-io)))))))))
+        (sleep 10)
+        (loop)))
+    (thread loop))
+  (lambda ()
+    (custodian-shutdown-all conns-cust)))
+```
+
+Now we have this helper procedure for running a peer-to-peer connection.
+
+```racket
+(define (run-peer peer-context)
+  (let ([stop-listener (serve peer-context)]
+        [stop-peers-loop (peers peer-context)]
+        [stop-connections-loop (connections-loop peer-context)])
+    (lambda ()
+      (begin
+        (stop-connections-loop)
+        (stop-peers-loop)
+        (stop-listener)))))
+```
+
+Finally
+
+```racket
+(provide (struct-out peer-context-data)
+         (struct-out peer-info)
+         run-peer)
+```
+
+## 3.6. Utils
+
+utils.rkt is
+
+```racket
+(require racket/serialize)
+
+(define ASCII-ZERO (char->integer #\0))
+```
+
+Now we have this procedure that converts a hexadecimal character matching [0-9A-Fa-f] to a number from 0 to 15:
+
+```racket
+(define (hex-char->number c)
+  (if (char-numeric? c)
+      (- (char->integer c) ASCII-ZERO)
+      (match c
+        [(or #\a #\A) 10]
+        [(or #\b #\B) 11]
+        [(or #\c #\C) 12]
+        [(or #\d #\D) 13]
+        [(or #\e #\E) 14]
+        [(or #\f #\F) 15]
+        [_ (error 'hex-char->number "invalid hex char: ~a\n" c)])))
+```
+
+Now we have this procedure that converts a hex string to bytes:
+
+```racket
+(define (hex-string->bytes str)
+  (list->bytes (hex-string->bytelist str)))
+
+(define (hex-string->bytelist str)
+  (with-input-from-string
+      str
+    (thunk
+     (let loop ()
+       (define c1 (read-char))
+       (define c2 (read-char))
+       (cond [(eof-object? c1) null]
+             [(eof-object? c2) (list (hex-char->number c1))]
+             [else (cons (+ (* (hex-char->number c1) 16)
+                            (hex-char->number c2))
+                         (loop))])))))
+```
+
+Now we have this procedure that returns true if the predicate satisfies all members of the list:
+
+```racket
+(define (true-for-all? pred list)
+  (cond
+    [(empty? list) #t]
+    [(pred (first list)) (true-for-all? pred (rest list))]
+    [else #f]))
+```
+
+Now we have this procedure for exporting a struct to a file:
+
+```racket
+(define (struct->file object file)
+  (let ([out (open-output-file file #:exists 'replace)])
+    (write (serialize object) out)
+    (close-output-port out)))
+```
+
+Now we have this procedure for importing struct contents from a file:
+
+```racket
+(define (file->struct file)
+  (letrec ([in (open-input-file file)]
+           [result (read in)])
+    (close-input-port in)
+    (deserialize result)))
+```
+
+Finally
+
+```racket
+(provide hex-string->bytes true-for-all? struct->file file->struct)
+```
+
+## Summary
+
+Components are orthogonal. This means that every component is independent of one another, that is, wallet's implementation does not call procedures in block for example, and that a block can be used independently of wallet.
+But when combined we get a cryptocurrency system.
+
+What are the gains?
+
+- Immutability
+- Game WoW example players (peers) implementing their own rules, etc

@@ -54,7 +54,73 @@ At the end of the day, we say that we will trust the ledger who has put the most
 
 So if everybody agreed to use this ledger as a source of truth, there would be no need to exchange physical money at all. Everybody can just use the ledger to put or retrieve money to it.
 
-## 1.2. Bitcoin
+## 1.2. Encryption
+
+I> ### Definition 5
+I>
+I> Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
+
+So we can assume that there are functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. Now we want these functions to have the following properties:
+
+1. {$$}E(x) \neq x{/$$}, meaning that the encrypted value should not be the same as the value we're trying to encrypt
+1. {$$}E(x) \neq D(x){/$$}, meaning that the encrypted value should not be the same as the decrypted value
+1. {$$}D(E(x)) = x{/$$}, meaning that the decryption of an encrypted value should return the original value
+
+So if we assume there's some kind of an encryption scheme, say {$$}E(\text{"Boro"}) = \text{426f726f}{/$$}, we can "safely" communicate with others the value {$$}\text{426f726f}{/$$} without actually exposing our original value, and only those who know the decryption scheme {$$}D(x){/$$} will be able to see that {$$}D(\text{426f726f}) = \text{"Boro"}{/$$}.
+
+However, the scheme described above is what is called a symmetric algorithm, meaning that we share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks given how we want to design our transactions, which we will cover in a later topic.
+
+![Symmetric-key algorithm](images/symmetric-algo.png)
+
+So, what we want to use is what is called a asymmetric algorithm or a public-key cryptography. This means that we have two kind of keys: public and private. We share the public key with the world, and keep the private one to ourselves.
+
+![Asymmetric-key algorithm](images/asymmetric-algo.png)
+
+This algorithm scheme has a neat property in that only the private key can decode a message, and the public one can encode a message.
+
+Note that the way we use the words encode and decode is abstract. This means that, for example, in terms of digital signatures for our transactions, a message can be signed with the sender's private key and can be verified by anyone who has access to the sender's public key.
+
+So, given {$$}\text{TransactionSignature} = \text{Sign}(x, \text{PrivateKey}){/$$} and a verification function {$$}\text{Verify}(\text{Message}, x, \text{key}){/$$}, we want to be able to do {$$}\text{Verify}(\text{Message}, \text{TransactionSignature}, \text{PublicKey}){/$$} in order to confirm a transaction's ownership.
+
+This brings us to wallets.
+
+Wallet stores the public and private "keys" or "addresses" which can be used to receive or spend cryptocurrency coins. With the private key, it is possible to write new blocks (or transactions) on the blockchain, effectively spending the associated cryptocurrency. With the public key, it is possible for others to send currency to the wallet and verify signatures.
+
+TODO: Example in Racket
+
+## 1.3. Hashing
+
+I> ### Definition 6
+I>
+I> Hashing is a one-way function that encodes text without a way to retrieve the original contents back.
+
+Hashing, however, is simpler than the encryption schemes described above.
+
+One example why we would need to use such technique is because they have some interesting properties, such as providing us with the so called notion proof-of-work.
+
+I> ### Definition 7
+I>
+I> A proof-of-work system is an economic measure to deter denial of service attacks and other service abuses such as spam on a network by requiring some work from the service requester, usually meaning processing time by a computer.
+
+Hashcash is a proof-of-work system, initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa. We will see how this algorithm works in details in the later chapters where we will implement it.
+
+I> ### Definition 8
+I>
+I> Mining is a validation of transactions. For this effort, successful miners obtain new cryptocurrency as a reward. The Hashcash algorithm is what we will use to implement mining.
+
+In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
+
+Another useful property hashing functions have is to connect two or more distinct blocks by having the information `current-hash` and `previous-hash`.
+
+For example, `block-1` may have a hash such as `0x123456` and `block-2` may have a hash such as `0x345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `0x123456`, and in this way we've made a link between these two blocks.
+
+![Illustration of few blocks connected in a blockchain](images/blockchain-illustration.png)
+
+Two or more blocks (or transactions) connected to each other form what is called a blockchain. The validity of each cryptocurrency coins is provided by it.
+
+Fortunately for us, Racket has libraries that will provide this for us, so we don't have to dig deeper into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
+
+## 1.4. Bitcoin
 
 Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper authored by Satoshi Nakamoto titled "Bitcoin: A Peer-to-Peer Electronic Cash System" was published on a cryptography mailing list. Bitcoin's white paper is consisted of 9 pages, however, it is mostly theoretical explanation of the design, and as such may be a bit overwhelming to newcomers.
 
@@ -62,25 +128,25 @@ The bitcoin software is open source code and was released in January 2009 on Sou
 
 Although there are many cryptocurrency models and each one of them differ slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin (with some parts being simplified). After having read this book, readers can refer to the white paper to get the complete picture for the implementation details.
 
-## 1.3. Example workflows
+## 1.5. Example workflows
 
-### 1.3.1. Adding block to a blockchain
-
-TODO
-
-### 1.3.2. Mining a block
+### 1.5.1. Adding block to a blockchain
 
 TODO
 
-### 1.3.3. Checking wallet balance
+### 1.5.2. Mining a block
 
 TODO
 
-### 1.3.4. Sending money
+### 1.5.3. Checking wallet balance
 
 TODO
 
-## 1.4. Cryptojacking
+### 1.5.4. Sending money
+
+TODO
+
+## 1.6. Cryptojacking
 
 Modern browsers powerful contain a built-in programming language javascript
 
