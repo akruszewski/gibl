@@ -39,7 +39,7 @@ Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Li
 
 The language is used in a variety of contexts such as scripting, general-purpose programming, computer science education, and research.
 
-It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed itself in Racket. Racket is also used to teach students algebra through game development.
+It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
 
 Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at the MIT by Guy L. Steele and Gerald Jay Sussman.
 
@@ -96,7 +96,7 @@ This is true, but it is a direct consequence of that we are actually writing our
 
 One advantage is that there is no need for special order of operations. In high school, we have to remember that * and / have to come before + and -. This is not the case with Lisps, as the order of evaluation is obvious by the way we've written our program.
 
-So, let's start by writing (+ 1 (* 2 3)) in the interactions area of the DrRacket editor:
+So, let's start by writing `(+ 1 (* 2 3))` in the interactions area of the DrRacket editor:
 
 ```racket
 > (+ 1 (* 2 3))
@@ -107,11 +107,11 @@ We have done our first calculation in Lisp, congratulations!
 
 After having finished evaluation, DrRacket again waits for us to input a new command. This is so because in the interactions area we are in the REPL mode, which stands for Read-Evaluate-Print-Loop. That is, interactions area will read what we write, try to evaluate it (come up with a result), print the result, and loop back to reading again.
 
-Lisp evaluation is very similar to substitution in mathematics. For example, one way (+ 1 (* 2 3)) can be evaluated is as follows:
+Lisp evaluation is very similar to substitution in mathematics. For example, one way `(+ 1 (* 2 3))` can be evaluated is as follows:
 
-1. (+ 1 (* 2 3))
-1. (+ 1 6)
-1. 7
+1. `(+ 1 (* 2 3))`
+1. `(+ 1 6)`
+1. `7`
 
 We immediately notice how powerful substitution as a concept is.
 
@@ -143,7 +143,11 @@ Before talking about the most powerful idea in a Lisp, which is a list, we first
 
 ![A function](images/function.png)
 
-Functions are mathematical entities that assign unique outputs to given inputs. So for example, you might have a function that accepts as input a person, and as output returns the person's age, or name.
+I> ### Definition ?
+I>
+I> Functions are mathematical entities that assign unique outputs to given inputs.
+
+For example, you might have a function that accepts as input a person, and as output returns the person's age, or name.
 
 ### 2.3.2. Lists
 
@@ -194,7 +198,7 @@ There are two other built-in functions called `car` and `cdr` which are used to 
 
 So, `(car (cons 1 2))` will return 1, and `(cdr (cons 1 2))` will return 2.
 
-Now we can see how a Lisp, depending only on a few primitive notions (function calls, pairs, quote) we can build abstraction in an interesting way.
+Now we can see how a Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction in an interesting way.
 
 ### 2.3.4. Adding definitions
 
@@ -214,6 +218,8 @@ It is worth mentioning that everything that we type in the definitions area, we 
 We notice that we used another built-in function called `define` in order to attach a value (`123`) to a variable (`a-number`).
 
 Definitions can be saved to a file for later usage by navigating to `File > Save Definitions`.
+
+TODO: Show how we can follow definitions by clicking with the mouse
 
 ### 2.3.5. Procedures and functions
 

@@ -22,9 +22,7 @@ I> ### Definition 3
 I>
 I> A ledger is a book that contains a record of transactions.
 
-Then, at the end of every day you all sit together and use the ledger to do the calculations to settle up. If you spend more than you received, you put that money in the pot, otherwise you take that money out. Every peer in the system has a *wallet* of a kind, that resembles the balance for them.
-
-Note that we have to go through all existing records in order to do calculations. There is a way we can optimize this with so called unspent *transaction outputs* (UTXOs), which we will discuss in details later.
+Then, at the end of every day you all sit together and use the ledger to do the calculations to settle up. If you spend more than you received, you put that money in the pot, otherwise you take that money out. Every peer in the system has a *wallet* of a kind, that resembles the balance for them. Note that we have to go through all existing records in order to do calculations[^ch1n1]. 
 
 A problem that might appear with this kind of system is that anyone can add a transaction. For example, Bob can add a transaction where Alice pays him a few dollars, without Alice approving. We need to re-think our system such that all transactions in it are verified/signed.
 
@@ -95,3 +93,5 @@ Cryptojacking is the unauthorized use of someone else's computer to mine cryptoc
 Since as we've seen, miners get reward for mining, this is a motivation for cryptojacking.
 
 Add some images
+
+[^ch1n1]: There is a way we can optimize this with so called unspent *transaction outputs* (UTXOs), which we will discuss in details later.

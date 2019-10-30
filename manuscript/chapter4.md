@@ -1,5 +1,7 @@
 # 4. Component implementation
 
+Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a cryptocurrency.
+
 Put code from https://github.com/bor0/scheme-coin
 
 ## 4.1. Wallet

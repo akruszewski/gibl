@@ -1,10 +1,8 @@
 # 3. Technical prerequisites
 
-Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a cryptocurrency.
-
 A data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
 
-In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction.
+In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
 
 In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
 
@@ -44,17 +42,17 @@ From the motivation in the previous section we can see a need of forming such a 
 
 ## 3.1. Linked lists
 
-A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
+A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays (TODO: but explain arrays in standard languages) for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
 
 ![An example of a linked list](images/linked-list.png)
 
-The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will cover lists in depth in the Introduction to Racket chapter.
+The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will see how to implement a blockchain with it in chapter 4.
 
-Example in Racket
+TODO: Example in Racket show that it can be simulated with `car`/`cons`
 
 ## 3.2. Encryption
 
-Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view their content.
+Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
 
 So we can assume that there are functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. Now we want these functions to have the following properties:
 
@@ -109,3 +107,5 @@ Two or more blocks (or transactions) connected to each other form what is called
 Fortunately for us, Racket has libraries that will provide this for us, so we don't have to dig deeper into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
 
 Example in Racket
+
+[^ch3n1]: More on macros in Appendix A.
