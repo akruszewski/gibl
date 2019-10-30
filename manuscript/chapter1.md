@@ -1,4 +1,4 @@
-# 1. Blockchain introduction
+# 1. Introduction to Blockchain
 
 In this chapter we will get ourselves introduced to some definitions and examples for blockchain. We will see what properties a blockchain has, what it allows us to do and what it is good for.
 
