@@ -15,10 +15,13 @@ So, as an example, if we have the following macro `(define-macro (add-one x) (li
 So, what is the difference between using a macro and a function? To answer, we will consider these definitions:
 
 ```racket
-(require mzlib/defmacro)
+(require compatibility/defmacro)
 
-(define-macro (our-if-macro a b c) (list 'cond (list a b) (list 'else c)))
-(define (our-if-function a b c) (cond (a b) (else c)))
+(define-macro (our-if-macro a b c)
+  (list 'cond (list a b) (list 'else c)))
+
+(define (our-if-function a b c)
+  (cond (a b) (else c)))
 ```
 
 With a few evaluations:
@@ -43,8 +46,84 @@ We can notice a couple of things from the code above:
 
 The macro and the function behave differently, as expected. However, in the case of `if`, it makes sense implementing it as a macro rather than a function. It does not make sense to evaluate the `else` case if we are sure that the first case will match.
 
-TODO: Say a few words for this
+The way we've written our macro makes things much more explicit in terms of execution and substitution. We can also write it as follows, which is a bit more implicit:
 
 ```racket
-(display `(with backtick only comma prefixed will be evald ,(+ 1 2) vs (+ 1 2)))
+(define-macro (our-if-macro a b c)
+  `(cond (,a ,b) (else ,c)))
+```
+
+### Hygienic macros
+
+The way we've written our macros earlier are not a good practice in Racket. To see why, consider the following example:
+
+```racket
+(define-macro (swap a b)
+  `(let ((tmp ,a))
+     (set! ,a ,b)
+     (set! ,b tmp)))
+```
+
+This looks like a perfectly safe macro. Indeed:
+
+```racket
+> (define x 1)
+> (define y 2)
+> (displayln (list x y))
+(1 2)
+> (swap x y)
+> (displayln (list x y))
+(2 1)
+```
+
+However, we can break it by using the following code:
+
+```racket
+> (define x 1)
+> (define tmp 2)
+> (displayln (list x tmp))
+(1 2)
+> (swap x tmp)
+> (displayln (list x tmp))
+(1 2)
+```
+
+To see what happened, we can expand the macro by hand. The macro translates to:
+
+```racket
+> `(let ((tmp ,x))
+    (set! ,x ,tmp)
+    (set! ,tmp tmp))
+'(let ((tmp 2)) (set! 2 2) (set! 2 tmp))
+```
+
+As we can see, it is hard to control accidental capture of local identifiers. We can get around the problem using `gensym` which returns a unique symbol every time it's called:
+
+```racket
+(define-macro (swap a b)
+  (let ((tmp (gensym)))
+    `(let ((,tmp ,a))
+       (set! ,a ,b)
+       (set! ,b ,tmp))))
+```
+
+Now our macro works as intended:
+
+```racket
+> (define x 1)
+> (define tmp 2)
+> (displayln (list x tmp))
+(1 2)
+> (swap x tmp)
+> (displayln (list x tmp))
+(1 2)
+```
+
+However, instead of relying on `gensym`, the preferred way in Racket is to use `define-syntax-rules`:
+
+```racket
+(define-syntax-rule (swap a b)
+  (let ((tmp a))
+    (set! a b)
+    (set! b tmp)))
 ```
