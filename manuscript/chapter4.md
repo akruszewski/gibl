@@ -251,12 +251,12 @@ Modify `main-helper.rkt` to also include peer-to-peer implementation:
 
 ```racket
 ; ...
-(require "./src/peer-to-peer.rkt")
+(require "peer-to-peer.rkt")
 ; ...
 
-(provide (all-from-out "./src/blockchain.rkt")
-         (all-from-out "./src/utils.rkt")
-         (all-from-out "./src/peer-to-peer.rkt")
+(provide (all-from-out "blockchain.rkt")
+         (all-from-out "utils.rkt")
+         (all-from-out "peer-to-peer.rkt")
          format-transaction print-block print-blockchain print-wallets)
 ```
 
