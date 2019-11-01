@@ -336,6 +336,8 @@ Now we have this procedure for initialization of the blockchain:
               utxo))
 ```
 
+In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
+
 Now we have this procedure. We start with 50 coins initially, and halve them on every 210000 blocks.
 
 ```racket

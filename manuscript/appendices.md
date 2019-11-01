@@ -1,6 +1,22 @@
 # Appendices
 
-## Appendix A: Macros
+## Appendix A: Cryptojacking
+
+Modern Internet browsers are very powerful. They contain a built-in programming language called JavaScript that enables code execution on the viewer's computer. This is what enables web pages to be dynamic, or to do animations, etc.
+
+As a consequence, when you visit a webpage on the Internet, this webpage can tell your browser's JavaScript to start mining.
+
+I> ### Definition 1
+I>
+I> Cryptojacking is the unauthorized use of someone else's computer to mine cryptocurrency.
+
+Recall that miners get reward (coins) for mining. In this case, your computer's resources are used for the purpose of mining. This serves as a motivation for cryptojacking.
+
+TODO: Add some images
+
+TODO: Maybe some example JavaScript code?
+
+## Appendix B: Macros
 
 So far we've been writing our definitions and interacted with them, but what if we had a way to write a piece of code that, when executed, would write a code itself? Macros are a way to do exactly that.
 
