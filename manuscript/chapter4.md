@@ -362,3 +362,5 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 
 (mine-loop)
 ```
+
+## Summary

@@ -286,6 +286,7 @@ Now we have this procedure that checks the signature validity of a transaction:
 ```
 
 Now we have this procedure that determines transaction validity when:
+
 1. Its signature is valid `valid-transaction-signature?`
 1. All outputs are valid `valid-transaction-io?`
 1. The sum of the inputs is gte the sum of the outputs `>= sum-inputs sum-outputs`

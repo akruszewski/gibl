@@ -53,9 +53,9 @@ Scheme is widely used by a number of schools, as a programming language in intro
 
 There are three important notions in a Lisp, and thus Racket:
 
-1. Primitives or axioms, starting points. For example numbers, strings are something we do not have to implement ourselves since they are already included in the programming language.
-1. Means of composition. We have a way to compose primitives in attempt to do complex calculations.
-1. Abstraction, or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function. We will cover functions later in this chapter.
+1. Primitives or axioms, starting points. For example numbers, strings are something we do not have to implement ourselves since they are already included in the programming language
+1. Means of composition. We have a way to compose primitives in attempt to do complex calculations
+1. Abstraction, or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function. We will cover functions later in this chapter
 
 In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease.
 
@@ -63,8 +63,8 @@ This programming language favors composition over inheritance, and we will see f
 
 There are two main approaches to work with Racket:
 
-1. Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book.
-1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager, etc) for more advanced users.
+1. Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book
+1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager, etc) for more advanced users
 
 ## 2.2. Configuration and installation
 
@@ -140,20 +140,10 @@ Racket has some primitive types, such as: numbers, booleans, strings, lists, and
 
 Each of the evaluations above have a specific type attached to the value produced:
 
-1. The first evaluation has a type of number.
-1. The second evaluation (which stands for true) has a type of boolean.
-1. The third evaluation (which stands for false) has a type of boolean.
-1. The fourth evaluation has a type of a string.
-
-Before talking about the most powerful idea in a Lisp, which is a list, we first have to recall what functions are.
-
-![A function](images/function.png)
-
-I> ### Definition ?
-I>
-I> Functions are mathematical entities that assign unique outputs to given inputs.
-
-For example, you might have a function that accepts as input a person, and as output returns the person's age, or name.
+1. The first evaluation has a type of number
+1. The second evaluation (which stands for true) has a type of boolean
+1. The third evaluation (which stands for false) has a type of boolean
+1. The fourth evaluation has a type of a string
 
 ### 2.3.2. Lists
 
@@ -178,8 +168,8 @@ What Lisp did instead, is it returned a *quoted* list. This is the same as sayin
 
 To understand how this affects the evaluation model better, let's consider an example where you say either of these statements to some friend of yours:
 
-1. Say your name.
-1. Say "your name".
+1. Say your name
+1. Say "your name"
 
 In the first example, you expect your friend to tell you their name. However, in the second example, you expect them to say "your name", rather than their actual name.
 
@@ -431,7 +421,7 @@ Let's try to understand how this example works.
 First, we define a function `list-length` that accepts a single parameter `x`, and in the body of the function we have a condition:
 
 1. If we are passing an empty list, just return 0 since the length of an empty list is 0
-1. Otherwise, return the value of `(list-length (cdr x))` plus one.
+1. Otherwise, return the value of `(list-length (cdr x))` plus one
 
 Note how we discussed that list are a special type of a pair:
 
