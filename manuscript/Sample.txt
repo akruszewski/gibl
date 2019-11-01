@@ -1,4 +1,5 @@
 preface-and-acknowledgments.md
 chapter1.md
+chapter4.md
 further-reading.md
 about-author.md
