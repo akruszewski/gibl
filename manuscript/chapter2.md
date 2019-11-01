@@ -1,14 +1,52 @@
 # 2. Racket programming language
 
-Lisp, originating from 1958, stands for LISt Processing. Unlike other programming languages, it has a fully parenthesized prefix notation. There is a very good reason for this as we will see. The Racket programming language is a multi-paradigm programming language, belonging to the Lisp family.
+## 2.1. Introduction to Lisp
 
-A language is consisted of syntax and grammar. This is also true for programming languages. Most programming languages have a special syntax and reserved keywords, for example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
+Lisp, originating from 1958, stands for LISt Processing. Unlike standard programming languages, it has a fully parenthesized prefix notation. For example, instead of writing `1 + 2`, one would write `(+ 1 2)`.
+
+There are three important notions in a Lisp:
+
+1. Primitives or axioms, starting points. As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations upon the numbers, such as `+`, `*`, etc.
+1. Composition or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
+1. Abstraction or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
 
 I> ### Definition 1
 I>
-I> An abstract syntax tree is a tree representation of the abstract syntactic structure of source code written in a programming language.
+I> A data structure is a collection of values, the relationships among them, and the functions or operations that can be applied to the data.
 
-When you write a program in any other programming language, there's a compiler (or an interpreter) that parses the program and derives an abstract syntax tree.
+As we have mentioned, an example of a data structure is numbers together with the plus and multiplication functions.
+
+From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, transaction amount, etc.
+
+There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting number of elements, appending two lists, etc.
+
+I> ### Definition 2
+I>
+I> In mathematics and computer science, objects exhibit recursive behavior when they can be defined by two properties:
+I>
+I> 1. A simple base case (or cases) - a terminating case that returns a value without using recursion
+I> 1. A set of rules that reduce all other cases toward the base case
+
+The best example is the factorial function, defined as:
+
+{$$}fact(n) = \left\{ \begin{array}{ll} 1\text{, if } n = 0 \\	n * fact(n - 1)\text{, otherwise} \end{array} \right.{/$$}
+
+For example, using only substitution we can see that {$$}fact(3){/$$} evaluates to {$$}3 \cdot fact(2){/$$} which is {$$}3 \cdot 2 \cdot fact(1){/$$}, and then finally {$$}3 \cdot 2 \cdot 1 \cdot fact(0){/$$} which is just 6.
+
+I> ### Definition 3
+I>
+I> A tree is a hierarchical, recursive data structure that can have two possible values:
+I>
+I> 1. The empty value
+I> 1. A single value, coupled together with another two sub-trees
+
+Further, a language is consisted of syntax and grammar. This is also true for most programming languages - they have a special syntax and reserved keywords. For example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
+
+I> ### Definition 4
+I>
+I> An abstract syntax tree is a tree representation of the abstract syntactic structure of a source code written in a programming language.
+
+When you write a program in a programming language, there's an intermediate step that parses the program's source code and derives an abstract syntax tree.
 
 ![An abstract syntax tree](images/ast.png)
 
@@ -23,23 +61,11 @@ while (x > 0) {
 
 It is not important to understand what this code does, rather how the compiler represents such code internally.
 
-I> ### Definition 2
-I>
-I> TODO: Revise sentence. A tree is a data structure that simulates a hierarchical tree structure, with a root value and subtrees of children with a parent node, represented as a set of linked nodes.
+Lisps, unlike most languages, have no syntax. What we will write as code is the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
 
-Family tree is one example of a tree.
+The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
-After the compiler has finished doing syntax analysis and produced a tree, it then evaluates (or computes) the tree in attempt to retrieve the desired results.
-
-Since Lisps have no syntax, what we write as code is the actual abstract syntax tree. This allows for some neat things, for example macros.
-
-I> ### Definition 3
-I>
-I> A macro is a syntactic extension to a programming language. This means that we can write (or introduce our own) keywords in the programming language itself.
-
-Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
-
-## 2.1. Why Racket
+## 2.2. Why Racket
 
 Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Lisp, since there are many Lisp implementations, but we found this one to be particularly easy for entry level programmers.
 
@@ -51,12 +77,6 @@ Scheme, the programming language from which Racket was influenced and based upon
 
 Scheme is widely used by a number of schools, as a programming language in introductory courses for computer science.
 
-There are three important notions in a Lisp, and thus Racket:
-
-1. Primitives or axioms, starting points. For example numbers, strings are something we do not have to implement ourselves since they are already included in the programming language
-1. Means of composition. We have a way to compose primitives in attempt to do complex calculations
-1. Abstraction, or capturing composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function. We will cover functions later in this chapter
-
 In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease.
 
 This programming language favors composition over inheritance, and we will see further in the book the interesting properties that composition offers and how easily we can update and refactor our code.
@@ -66,7 +86,7 @@ There are two main approaches to work with Racket:
 1. Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book
 1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager, etc) for more advanced users
 
-## 2.2. Configuration and installation
+## 2.3. Configuration and installation
 
 To start, we need to download the binaries from https://download.racket-lang.org. There are available binaries for Windows, Linux, and Mac. After having downloaded and installed the complete package, we can run DrRacket.
 
@@ -90,7 +110,7 @@ The Help Desk under `Help > Help Desk` contains useful information such as quick
 
 It is recommended that you browse around it as we go through some concepts in this book, in attempt to understand things better. We also recommend that you interact with the editor and try to get the same results as we have in the screenshots.
 
-## 2.3. Tutorial
+## 2.4. Tutorial
 
 Remember how back in high school we could use an expression such as 1+2*3 on our calculators? The way that + and * are used here, or the way that expression is written is called an infix notation.
 
@@ -121,7 +141,7 @@ Lisp evaluation is very similar to substitution in mathematics. For example, one
 
 We immediately notice how powerful substitution as a concept is.
 
-### 2.3.1. Primitive types
+### 2.4.1. Primitive types
 
 In the evaluation we've done above, what we get as a result is a number. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
 
@@ -145,7 +165,7 @@ Each of the evaluations above have a specific type attached to the value produce
 1. The third evaluation (which stands for false) has a type of boolean
 1. The fourth evaluation has a type of a string
 
-### 2.3.2. Lists
+### 2.4.2. Lists
 
 Now, back to lists, in order to produce the ordered list `[1, 2, 3]`, we can ask DrRacket to evaluate `(list 1 2 3)`:
 
@@ -191,7 +211,7 @@ The motivation for using a linked list is that it's a data structure that allows
 
 TODO: Example in Racket show that it can be simulated with `car`/`cons`
 
-### 2.3.3. Pairs
+### 2.4.3. Pairs
 
 Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result it returns a pair:
 
@@ -210,7 +230,7 @@ So, `(car (cons 1 2))` will return 1, and `(cdr (cons 1 2))` will return 2.
 
 Now we can see how a Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction in an interesting way.
 
-### 2.3.4. Adding definitions
+### 2.4.4. Adding definitions
 
 So far, we have only worked with the interactions area in DrRacket. Let's try to do something useful with the definitions area.
 
@@ -231,9 +251,9 @@ Definitions can be saved to a file for later usage by navigating to `File > Save
 
 TODO: Show how we can follow definitions by clicking with the mouse
 
-### 2.3.5. Procedures and functions
+### 2.4.5. Procedures and functions
 
-Every Lisp procedure is syntactically a function; when called, it returns some data object as its value. We will use the words "procedure" and "function" interchangeably.
+In Lisp, a procedure is essentially a function. When invoked, it returns some data as its value. We will use the words "procedure" and "function" interchangeably.
 
 Some Lisp expressions and procedures have side effects, for example, doing a network operation, which means that this function can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice they are frequently referred to as "functions" anyway, even those that may have side effects, in order to emphasize that a computed result is always returned.
 
@@ -281,7 +301,7 @@ To make things a little bit easier for us, Racket has a special syntax for defin
 (define (add-one x) (+ x 1))
 ```
 
-### 2.3.6. Comparison functions
+### 2.4.6. Comparison functions
 
 There are some very useful functions that produce boolean output for us, such as checking whether a number is greater than another one, or whether a value is a number. We can notice the usage of some of them in the code below:
 
@@ -388,14 +408,9 @@ The `equal?` predicate is exactly the same as the `eq?` predicate, except that i
 #t
 ```
 
-### 2.3.7. Recursive procedures
+### 2.4.7. Recursive procedures
 
 Procedures can also be recursive, which means that we can call the procedure within itself in attempt to make a computation, or a loop.
-
-In mathematics and computer science, a class of objects or methods exhibit recursive behavior when they can be defined by two properties:
-
-1. A simple base case (or cases) - a terminating scenario that does not use recursion to produce an answer
-1. A set of rules that reduce all other cases toward the base case
 
 For example, here is a demo which defines a function that calculates a length of a list, and how we interact with it:
 
@@ -483,7 +498,7 @@ So here is how Racket evaluates `(list-length-iter '(1 2 3) 0)`:
 3
 ```
 
-### 2.3.8. Procedures that return procedures
+### 2.4.8. Procedures that return procedures
 
 We can also construct functions that return other functions as a result. For example:
 
@@ -522,7 +537,7 @@ If we try to use the substitution method, we can note that `(my-cons 10 20)` eva
 
 Then, when we call `my-car` or `my-cdr` on this function, we just pass 1 or 2 to get the first or the second value respectively.
 
-### 2.3.9. General higher order procedures
+### 2.4.9. General higher order procedures
 
 With the example above we've seen how Lisp can return a function as a return value. It can also accept a function as an input.
 
@@ -580,7 +595,7 @@ We can actually implement these functions ourselves:
 
 It is recommended that you attempt to try to implement the folding functions yourself. Note that `foldl` generates an iterative process, while `foldr` generates a recursive one.
 
-### 2.3.10. Packages
+### 2.4.10. Packages
 
 In computer science, a library is a collection of resources used by computer programs. These may include configuration data, documentation, help data, message templates, pre-written code and procedures, structures, or values. Racket packages are similar to a library.
 
@@ -608,7 +623,7 @@ add-one: undefined;
 
 We can notice how only the functions we provide within the special syntax `(provide ...)` will be available for usage by those who require our library.
 
-### 2.3.11. Scope
+### 2.4.11. Scope
 
 Let's consider the following definitions:
 
@@ -702,8 +717,6 @@ for *
 
 TODO: See what we need to move from here
 
-A data structure is a collection of data values, the relationships among them, and the functions or operations that can be applied to the data.
-
 In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
 
 In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
@@ -739,7 +752,5 @@ We can also use the automatically generated procedures to extract values from ob
 Throughout this book, we will use `serializable-struct` (from the `racket/serialize` library) instead of `struct`, since this will allow for serializing data structures and writing them to the file system for example.
 
 A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
-
-From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, transaction amount, etc.
 
 [^ch3n1]: More on macros in Appendix A.

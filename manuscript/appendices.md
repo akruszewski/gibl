@@ -20,6 +20,10 @@ TODO: Maybe some example JavaScript code?
 
 So far we've been writing our definitions and interacted with them, but what if we had a way to write a piece of code that, when executed, would write a code itself? Macros are a way to do exactly that.
 
+I> ### Definition 2
+I>
+I> A macro is a syntactic extension to a programming language. This means that we can write (or introduce our own) keywords in the programming language itself.
+
 There is another special syntax in Lisp named `define-macro` which allows us to create a macro. It accepts a name of a macro, parameters (which are optional), and as a result it should return a quoted list of Lisp commands.
 
 When we run our definitions (or compile them), Racket will replace all occurrences of the macro call with the actual code that we made it produce.
