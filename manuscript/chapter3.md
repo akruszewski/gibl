@@ -428,7 +428,7 @@ Finally
          balance-wallet-blockchain valid-blockchain?)
 ```
 
-## 3.6. `utils.rkt`
+## 3.5. `utils.rkt`
 
 ```racket
 (require racket/serialize)
@@ -507,9 +507,9 @@ Finally
 (provide hex-string->bytes true-for-all? struct->file file->struct)
 ```
 
-## 3.7. Integrating components
+## 3.6. Integrating components
 
-### 3.7.1. `main-helper.rkt`
+### 3.6.1. `main-helper.rkt`
 
 ```racket
 (require "blockchain.rkt")
@@ -548,7 +548,7 @@ Finally
          format-transaction print-block print-blockchain print-wallets)
 ```
 
-### 3.7.2. `main.rkt`
+### 3.6.2. `main.rkt`
 
 ```racket
 (require "./main-helper.rkt")
