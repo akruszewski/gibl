@@ -138,7 +138,14 @@ We immediately notice how powerful substitution as a concept is.
 
 In the evaluation we've done above, what we get as a result is a number. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
 
-Racket has some primitive types, such as: numbers, booleans, strings, lists, and functions.
+Racket has some primitive types, such as:
+
+1. Numbers - 1, 2, 3.14
+1. Booleans - True, False
+1. Characters - or single letters: #\A, #\B, #\C
+1. Strings - or list of characters: "Hello", "World"
+1. Lists - (1, 2, 3)
+1. Functions - f(x) = x + 1
 
 ```racket
 > 123
@@ -147,6 +154,8 @@ Racket has some primitive types, such as: numbers, booleans, strings, lists, and
 #t
 > #f
 #f
+> #\A
+#\A
 > "Hello World"
 "Hello World"
 ```
@@ -156,7 +165,8 @@ Each of the evaluations above have a specific type attached to the value produce
 1. The first evaluation has a type of number
 1. The second evaluation (which stands for true) has a type of boolean
 1. The third evaluation (which stands for false) has a type of boolean
-1. The fourth evaluation has a type of a string
+1. The fourth evaluation has a type of a character
+1. The fifth evaluation has a type of a string
 
 ### 2.4.2. Lists, evaluation, quotes
 
@@ -235,9 +245,7 @@ Definitions can be saved to a file for later usage by navigating to `File > Save
 
 ### 2.4.5. Procedures and functions
 
-In Lisp, a procedure is essentially a function. When invoked, it returns some data as its value. We will use the words "procedure" and "function" interchangeably.
-
-Some Lisp expressions and procedures have side effects, for example, doing a network operation, which means that this function can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice they are frequently referred to as "functions" anyway, even those that may have side effects, in order to emphasize that a computed result is always returned.
+In Lisp, a procedure is essentially a function. When invoked, it returns some data as its value. However, some Lisp expressions and procedures have side effects, for example, doing a network operation, which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice they are frequently referred to as "functions" anyway, even those that may have side effects, in order to emphasize that a computed result is always returned.
 
 There is a special built-in syntax called `lambda`, which accepts two parameters, and produces a function for us as a result. The first parameter is a list of arguments this functions accepts, and the second parameter is an expression that acts upon these parameters.
 
@@ -257,7 +265,7 @@ So, in order to call our function, we can try to pass a parameter to its return 
 2
 ```
 
-Of course, writing functions this way is hard. Instead, what we can do is define our function in the definitions area and then interact with it in the interactions area:
+Of course, writing and evaluating functions this way is hard. Instead, we can define our function in the definitions area and then interact with it in the interactions area:
 
 Definition:
 
@@ -288,19 +296,13 @@ To make things a little bit easier for us, Racket has a special syntax for defin
 There are some very useful functions that produce boolean output for us, such as checking whether a number is greater than another one, or whether a value is a number. We can notice the usage of some of them in the code below:
 
 ```racket
-(define (add-one x) (+ x 1))
-(define x 1)
-(define hello "Hello World")
-```
-
-Interacting with it
-
-```racket
-> (number? x)
+> (number? 1)
 #t
-> (number? hello)
+> (number? "hello")
 #f
-> (string? hello)
+> (character? #\A)
+#t
+> (string? "hello")
 #t
 > (procedure? add-one)
 #t
@@ -312,28 +314,33 @@ Interacting with it
 #t
 ```
 
-We can also do a conditional check, and evaluate expressions based on the truthiness of some predicate (comparison function).
-
-For example, `if` is a built-in syntax that accepts three parameters:
+We can also do a conditional check, and evaluate expressions based on the truthiness of some predicate (comparison function). For example, `if` is a built-in syntax that accepts three parameters:
 
 1. Conditional to check
 1. Expression to evaluate if the conditional is true
 1. Expression to evaluate if the conditional is false
 
-For example, `(if (= 1 1) "It is true" "It is not true")` will return `"It is true"`, whereas `(if (= 1 2) "It is true" "It is not true")` will return `"It is not true"`.
+Here are a few example usages:
+
+```racket
+> (if (= 1 1) "It is true" "It is not true")
+"It is true"
+> (if (= 1 2) "It is true" "It is not true")
+"It is not true"
+```
 
 The more general syntax for `if` is `cond`, which has the following syntax:
 
 ```racket
 (cond (test-1 action-1)
-   (test-2 action-2)
-   ...
-   (test-n action-n))
+      (test-2 action-2)
+      ...
+      (test-n action-n))
 ```
 
-Optionally, the last test can be an else to use the specific action if none of the conditions above match.
+Optionally, the last test can be an `else` to use the specific action if none of the conditions above it match.
 
-As an example, here is one way to interact with it:
+As an example, here is one way to use `cond` in a definition:
 
 ```racket
 (define (is-large x)
@@ -341,7 +348,7 @@ As an example, here is one way to interact with it:
         (else #f)))
 ```
 
-Interacting
+Interacting with it:
 
 ```racket
 > (is-large 5)
@@ -355,54 +362,91 @@ Interacting
 As we've seen, the `=` is an equivalence predicate used to check whether two numbers are equal. However, it works only on numbers and it will raise an error if we use it on anything else:
 
 ```racket
-> (= 1 1)
-#t
-> (= 2.5 2.5)
+> (= 1 2)
+#f
+> (= 3.14 3.14)
 #t
 > (= '() '())
 =: contract violation
 ```
 
-There are two important predicates which we will take a look at, and these are `eq?` and `equal?`. The `eq?` predicate is used to check whether its two parameters represent the same object in memory.
+There are three other important predicates:
 
-As an example:
+1. `eq?` - checks whether the two parameters refer to the same object in memory
+1. `eqv?` - exactly the same as `eq?` checks, except that in addition it can be used for primitive types (e.g. numbers, strings)
+1. `equal?` - exactly the same as the `eqv?` predicate, except that in addition it can be used to check if the arguments have the same recursive structure (e.g. lists)
+
+Note that there's only one empty list `'()` in memory (actually the empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list). This means that all three predicates will return true for checking an empty list against an empty list.
+
+To show where `eq?` fails, we will introduce a new function `integer->char` that converts a number to a character. Here are some examples using `eq?`:
 
 ```racket
-> (define x '(1 2))
-> (define y '(1 2))
-> (eq? x y)
+> (integer->char 65)
+#\A
+> (eq? '() '())
+#t
+> (eq? '(1) '(1))
 #f
-> (define y x)
-> (eq? x y)
+> (eq? (integer->char 65) (integer->char 65))
+#f
+```
+
+As expected, it will return true for the empty list, but is not able to compare lists that actually have elements, or objects that aren't referred to the same memory location. Note how `eqv?` differs in this case:
+
+```racket
+> (eqv? '() '())
+#t
+> (eqv? '(1) '(1))
+#f
+> (eqv? (integer->char 65) (integer->char 65))
 #t
 ```
 
-Note, however that there's only one empty list `'()` in memory (actually the empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list).
-
-So, when comparing empty lists, `eq?` will always return #t because they represent the same object in memory. Note that different type comparisons with eq? depend on the implementation of a Lisp.
-
-The `equal?` predicate is exactly the same as the `eq?` predicate, except that it can be used on primitive types (numbers, strings, lists) to check if they are equivalent. For example:
+Finally, `equal?` will compare structures recursively, supporting lists:
 
 ```racket
-> (define x '(2 3))
-> (define y '(2 3))
-> (equal? x y)
+> (equal? '() '())
+#t
+> (equal? '(1) '(1))
+#t
+> (equal? (integer->char 65) (integer->char 65))
 #t
 ```
 
 ### 2.4.7. Recursive procedures
 
-Procedures can also be recursive, which means that we can call the procedure within itself in attempt to make a computation, or a loop.
+Procedures, just like data structures, can also be recursive. We already saw an example with the factorial function, in that it calls itself in attempt to make a computation, or a loop. For example, here's how we could define factorial:
 
-For example, here is a demo which defines a function that calculates a length of a list, and how we interact with it:
+```racket
+(define (fact n)
+  (if (= n 0)
+      1
+      (* n (fact (- n 1)))))
+```
+
+Calling it will produce:
+
+```racket
+> (fact 3)
+6
+> (fact 0)
+1
+```
+
+For a more advanced example we will define a function that calculates the length (number of elements) of a list:
 
 ```racket
 (define (list-length x)
-  (cond ((equal? x '()) 0)
+  (cond ((eq? x '()) 0)
         (else (+ 1 (list-length (cdr x))))))
 ```
 
-Running
+We defined a function `list-length` that accepts a single parameter `x`, and in the body of the function we have a condition:
+
+1. If we are passing an empty list, just return 0 since the length of an empty list is 0
+1. Otherwise, return the value of `(list-length (cdr x))` plus one
+
+Testing it with a few values:
 
 ```racket
 > (list-length '(1 2 3))
@@ -413,14 +457,7 @@ Running
 1
 ```
 
-Let's try to understand how this example works.
-
-First, we define a function `list-length` that accepts a single parameter `x`, and in the body of the function we have a condition:
-
-1. If we are passing an empty list, just return 0 since the length of an empty list is 0
-1. Otherwise, return the value of `(list-length (cdr x))` plus one
-
-Note how we discussed that list are a special type of a pair:
+Recall that lists are represented in terms of pairs:
 
 ```racket
 > (car '(1 2 3))
@@ -433,52 +470,51 @@ Note how we discussed that list are a special type of a pair:
 '(3)
 ```
 
-What we can notice from the example above is that the `cdr` of a list will return that same list without the first element.
-
-So here is how Racket evaluates `(list-length '(1 2 3))`:
+In other words, `cdr` of a list will return that same list without the first element. Here is how Racket evaluates `(list-length '(1 2 3))`:
 
 ```racket
 (list-length '(1 2 3))
-(+ 1 (list-length '(2 3)))
-(+ 1 (+ 1 (list-length '(3))))
-(+ 1 (+ 1 (+ 1 (list-length '()))))
-(+ 1 (+ 1 (+ 1 0)))
-(+ 1 (+ 1 1))
-(+ 1 2)
-3
+= (+ 1 (list-length '(2 3)))
+= (+ 1 (+ 1 (list-length '(3))))
+= (+ 1 (+ 1 (+ 1 (list-length '()))))
+= (+ 1 (+ 1 (+ 1 0)))
+= (+ 1 (+ 1 1))
+= (+ 1 2)
+= 3
 ```
 
-So we see how this exhibits a recursive behaviour since the recursive cases were reduced to the base case in attempt to get a result.
+We just saw an example of a recursive behaviour, since the recursive cases were reduced to the base case in attempt to get a result. With this example, we can see the power of recursion and how it allows us to do processing of values in a repeating manner.
 
-With this example, we can see the power of recursion and how it allows us to do processing of values in a repeating manner.
-
-A recursive procedure can generate an iterative or a recursive process.
-
-An iterative process is a process where the state is captured completely by its arguments. A recursive one, in contrast is one where the state is not captured by the arguments, and so it relies on "deferred" evaluations.
-
-In the example above, list-length generates a recursive process since it needs to go down to the base case, and then build its way back up to do the calculations that were "deferred".
-
-In contrast, we can re-write `list-length` as:
+There is another way that we can write `list-length` as:
 
 ```racket
 > (define (list-length-iter x n)
-  (cond ((equal? x '()) n)
+  (cond ((eq? x '()) n)
         (else (list-length-iter (cdr x) (+ n 1)))))
 > (list-length-iter '(1 2 3) 0)
 3
 ```
 
-This procedure now generates an iterative process, since the results are captured in the arguments.
-
-So here is how Racket evaluates `(list-length-iter '(1 2 3) 0)`:
+Here's how it evaluates:
 
 ```racket
 (list-length-iter '(1 2 3) 0)
-(list-length-iter '(2 3) 1)
-(list-length-iter '(3) 2)
-(list-length-iter '() 3)
-3
+= (list-length-iter '(2 3) 1)
+= (list-length-iter '(3) 2)
+= (list-length-iter '() 3)
+= 3
 ```
+
+We can notice that both procedures generate the same result, however, the nature of evaluation is very different.
+
+I> ### Definition
+I>
+I> Recursive procedures can generate an **iterative** or a **recursive** process:
+I>
+I> 1. A recursive process is one where the state is not captured by the arguments, and so it relies on "deferred" evaluations
+I> 1. An iterative process is a process where the state is captured completely by its arguments
+
+In the examples above, `list-length` generates a recursive process since it needs to go down to the base case, and then build its way back up to do the calculations that were "deferred". In contrast, `list-length-iter` generates an iterative process, since the results are captured in the arguments.
 
 ### 2.4.8. Procedures that return procedures
 
@@ -494,7 +530,7 @@ We can also construct functions that return other functions as a result. For exa
 3
 ```
 
-This concept is so powerful, that we can implement our own `cons`, `car`, and `cdr`:
+This concept is so powerful that we can implement our own `cons`, `car`, and `cdr`:
 
 ```racket
 (define (my-cons x y) (lambda (z) (if (= z 1) x y)))
@@ -521,11 +557,13 @@ Then, when we call `my-car` or `my-cdr` on this function, we just pass 1 or 2 to
 
 ### 2.4.9. General higher order procedures
 
-With the example above we've seen how Lisp can return a function as a return value. It can also accept a function as an input.
+With the example above we've seen how Racket can return a function as a return value. It can also accept a function as an input.
 
-In general, a higher order procedure is one that takes one or more functions as arguments, or returns a function as its result.
+I> ### Definition 4
+I>
+I> A higher-order function is a function that takes one or more functions as parameters or returns a function as a result.
 
-There are three general built-in higher order procedures: `map`, `filter`, `fold` (left and right).
+There are three common built-in higher order procedures: `map`, `filter`, `fold` (left and right).
 
 As an example usage:
 
@@ -735,4 +773,4 @@ Throughout this book, we will use `serializable-struct` (from the `racket/serial
 
 A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
 
-[^ch2n1]: More on macros in Appendix A.
+[^ch2n1]: We will cover details about macros in Appendix B.
