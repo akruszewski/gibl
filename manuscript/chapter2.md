@@ -40,7 +40,13 @@ I>
 I> 1. An empty value
 I> 1. A single value, coupled together with another two sub-trees
 
-TODO: Example of a tree.
+A family tree is one example of a tree. Another example of a tree is a binary tree where the left sub-tree's value is less than the current value and the right sub-tree's value is greater than the current value:
+
+```text
+  2
+ / \
+1   3
+```
 
 I> ### Definition 4
 I>
@@ -49,7 +55,7 @@ I>
 I> 1. _Symbols_, which can be combined into sentences
 I> 1. _Grammar_, which is a set of rules that tells us which sentences are well-formeed
 
-The definition of a language also reflects programming languages - they have a special syntax and reserved keywords. For example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
+The definition of a language also reflects programming languages - they have a special grammar - syntax. For example, the C programming language has a special syntax - you have to follow specific rules when writing program statements. 
 
 I> ### Definition 5
 I>
@@ -68,11 +74,13 @@ while (x > 0) {
 }
 ```
 
-It is not important to understand what this code does, rather how the compiler represents such code internally.
+It is not important to understand what this code does, rather how such programs are represented internally in programming languages.
 
-Lisps have no syntax in the way that most standard languages have. What we will write as code is the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
+Lisps do not have the restriction of a special syntax like C for example. What we will write as code is the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap with existing ones.
 
-TODO: The word syntax has special meaning in Lisps. In Lisps, there's a thing called "reader", which is part of the process when we execute a program. The "reader" reads in the source code, then turns that into a sequence of lisp primitives such as lists, symbols, numbers, etc. This, lispers think of as “the lisp syntax”. With macros as part of the core language it's possible to build new syntax[^ch2n1].
+Due to this minimalism, building a cryptocurrency (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and we will see further in the book the interesting properties that composition offers and how easily we can maintain and extend our code.
+
+Finally, the word syntax has a special meaning in Lisps. In Lisps, there's something called "reader", which is part of the process when we execute a program. The "reader" reads in the source code, then turns that into a sequence of Lisp primitives such as lists, symbols, numbers, etc. With macros as part of the core language it's possible to extend the syntax[^ch2n1].
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
@@ -83,8 +91,6 @@ Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Li
 The language is used in a variety of contexts such as scripting, general-purpose programming, computer science education, and research. It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
 
 Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at the MIT by Guy L. Steele and Gerald Jay Sussman. Scheme is widely used by a number of schools, as a programming language in introductory courses for computer science.
-
-TODO: Move before? In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease. This programming language favors function composition, and we will see further in the book the interesting properties that composition offers and how easily we can update and refactor our code.
 
 There are two main approaches to work with Racket:
 
@@ -190,11 +196,11 @@ There is a special list, called the empty list and is denoted as `'()` or `(quot
 Also note that we can use `quote` on any set of symbols:
 
 ```racket
-> (quote hey)
-'hey
+> (quote hello)
+'hello
 ```
 
-TODO: This allows for...
+This allows for creation of new symbols, and is especially important in the creation of macros.
 
 ### 2.4.3. Pairs
 
