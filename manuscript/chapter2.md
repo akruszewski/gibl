@@ -37,10 +37,19 @@ I> ### Definition 3
 I>
 I> A tree is a hierarchical, recursive data structure that can have two possible values:
 I>
-I> 1. The empty value
+I> 1. An empty value
 I> 1. A single value, coupled together with another two sub-trees
 
-Further, a language is consisted of syntax and grammar. This is also true for most programming languages - they have a special syntax and reserved keywords. For example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
+TODO: Example of a tree.
+
+I> ### Definition
+I>
+I> A **language** is consisted of:
+I>
+I> 1. _Symbols_, which can be combined into sentences
+I> 1. _Grammar_, which is a set of rules that tells us which sentences are well-formeed
+
+The definition of a language also reflects programming languages - they have a special syntax and reserved keywords. For example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
 
 I> ### Definition 4
 I>
@@ -61,7 +70,9 @@ while (x > 0) {
 
 It is not important to understand what this code does, rather how the compiler represents such code internally.
 
-Lisps, unlike most languages, have no syntax. What we will write as code is the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
+Lisps have no syntax in the way that most standard languages have. What we will write as code is the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special keywords, where sometimes some functionalities overlap with existing ones.
+
+TODO: The word syntax has special meaning in Lisps. In Lisps, there's a thing called "reader", which is part of the process when we execute a program. The "reader" reads in the source code, then turns that into a sequence of lisp primitives such as lists, symbols, numbers, etc. This, lispers think of as “the lisp syntax”. With macros as part of the core language it's possible to build new syntax[^ch2n1].
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
@@ -69,17 +80,11 @@ The Racket programming language that we will use in this book is a multi-paradig
 
 Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Lisp, since there are many Lisp implementations, but we found this one to be particularly easy for entry level programmers.
 
-The language is used in a variety of contexts such as scripting, general-purpose programming, computer science education, and research.
+The language is used in a variety of contexts such as scripting, general-purpose programming, computer science education, and research. It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
 
-It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
+Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at the MIT by Guy L. Steele and Gerald Jay Sussman. Scheme is widely used by a number of schools, as a programming language in introductory courses for computer science.
 
-Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at the MIT by Guy L. Steele and Gerald Jay Sussman.
-
-Scheme is widely used by a number of schools, as a programming language in introductory courses for computer science.
-
-In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease.
-
-This programming language favors composition over inheritance, and we will see further in the book the interesting properties that composition offers and how easily we can update and refactor our code.
+TODO: Move before? In our opinion, building a cryptocurrency (or anything, for that matter) in Racket will imply that you can do the same in most other languages with ease. This programming language favors function composition, and we will see further in the book the interesting properties that composition offers and how easily we can update and refactor our code.
 
 There are two main approaches to work with Racket:
 
@@ -88,50 +93,38 @@ There are two main approaches to work with Racket:
 
 ## 2.3. Configuration and installation
 
-To start, we need to download the binaries from https://download.racket-lang.org. There are available binaries for Windows, Linux, and Mac. After having downloaded and installed the complete package, we can run DrRacket.
-
-If you get the following screen after trying to run it, congratulations! It means that the installation was successful.
+Racket can be downloaded and installed via https://download.racket-lang.org. There are available binaries for Windows, Linux, and Mac. After having downloaded and installed the complete package, we can run DrRacket. If you get the following screen after trying to run it, congratulations! It means that the installation was successful.
 
 ![DrRacket](images/drracket.png)
 
-The upper textarea part of the editor is what is called the definitions area. Alternatively, the lower part of the editor is what is called the interactions area.
+The upper textarea part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interactions area where we interact with the definitions.
 
-This means that in the definitions area we usually write our definitions, and then we try to interact with them in the interactions area.
+I> ### Definition
+I>
+I> A package in Racket resembles a set of definitions someone has written for others to use.
 
-A package in Racket resembles a set of definitions someone has written for others to use. For example, if we want to use a hashing function, we will include the package for hashing in order to have the hashing definitions available to interact with.
+For example, if we want to use a hashing function, we will include the package for hashing in order to have the hashing definitions available to interact with. This allows us to put our focus on the design of our system, instead of re-defining everything.
 
-Packages can be browsed from http://pkgs.racket-lang.org. They can be installed using `raco pkg install <package_name>` from the command line.
+Packages can be browsed at http://pkgs.racket-lang.org. Packages can be installed from the DrRacket GUI - when we try to use a package that is missing and available in the packages repository, DrRacket will give us the option to install it. Alternatively, they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages in Racket later in the book.
 
-Alternatively, they can also be installed from the DrRacket GUI, when we try to use a package that is missing and available in the packages repository. At this point, DrRacket will give us the option to install it.
-
-We will take advantage of packages in Racket later in the book.
-
-The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples, etc. which is also available in offline-mode.
-
-It is recommended that you browse around it as we go through some concepts in this book, in attempt to understand things better. We also recommend that you interact with the editor and try to get the same results as we have in the screenshots.
+The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples, etc. which is also available in offline-mode, but is optional for this book.
 
 ## 2.4. Tutorial
 
-Remember how back in high school we could use an expression such as 1+2*3 on our calculators? The way that + and * are used here, or the way that expression is written is called an infix notation.
+The first thing that Lisp newcomers notice is that there are too many parentheses in most Lisp programs. This is true, but it is a direct consequence of that we are actually writing our own abstract syntax tree in a language that has no special syntax.
 
-Lisp does not use infix notation. It uses the prefix notation. In order to evaluate the same expression as above, we would have to write (+ 1 (* 2 3)). This might be a little tricky to grasp at first, but eventually one gets used to it.
+As we go through this book, we will understand the power of expressiveness we get as a result. For example, one advantage is that there is no need for special order of operations. In high school, we had to remember that `*` and `/` have to come before `+` and `-`. This is not the case with Lisps, as the order of evaluation is obvious by the way we've written our program.
 
-The first thing that Lisp newcomers notice is that there are too many parentheses in most Lisp programs.
-
-This is true, but it is a direct consequence of that we are actually writing our own abstract syntax tree in a language that has no special syntax, which as we go through this book we will understand the power of expressiveness we get as a result.
-
-One advantage is that there is no need for special order of operations. In high school, we have to remember that * and / have to come before + and -. This is not the case with Lisps, as the order of evaluation is obvious by the way we've written our program.
-
-So, let's start by writing `(+ 1 (* 2 3))` in the interactions area of the DrRacket editor:
+So, let's start by writing `(+ 1 (* 2 3))`, followed by the return key, in the interactions area of the DrRacket editor:
 
 ```racket
 > (+ 1 (* 2 3))
 7
 ```
 
-We have done our first calculation in Lisp, congratulations!
+If you get 7 as a result, then congratulations! You have done your first calculation in Racket.
 
-After having finished evaluation, DrRacket again waits for us to input a new command. This is so because in the interactions area we are in the REPL mode, which stands for Read-Evaluate-Print-Loop. That is, interactions area will read what we write, try to evaluate it (come up with a result), print the result, and loop back to reading again.
+After it finished evaluation, DrRacket again waits for us to input a new command. This is so because in the interactions area we are in the REPL mode, which stands for Read-Evaluate-Print-Loop. That is, interactions area will read what we write, try to evaluate it (come up with a result), print the result, and loop back to reading again.
 
 Lisp evaluation is very similar to substitution in mathematics. For example, one way `(+ 1 (* 2 3))` can be evaluated is as follows:
 
@@ -145,7 +138,7 @@ We immediately notice how powerful substitution as a concept is.
 
 In the evaluation we've done above, what we get as a result is a number. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
 
-Racket has some primitive types, such as: numbers, booleans, strings, lists, and procedures.
+Racket has some primitive types, such as: numbers, booleans, strings, lists, and functions.
 
 ```racket
 > 123
@@ -165,26 +158,20 @@ Each of the evaluations above have a specific type attached to the value produce
 1. The third evaluation (which stands for false) has a type of boolean
 1. The fourth evaluation has a type of a string
 
-### 2.4.2. Lists
+### 2.4.2. Lists, evaluation, quotes
 
-Now, back to lists, in order to produce the ordered list `[1, 2, 3]`, we can ask DrRacket to evaluate `(list 1 2 3)`:
+In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to evaluate `(list 1 2 3)`:
 
 ```racket
 > (list 1 2 3)
 '(1 2 3)
 ```
 
-`list` is a built-in function that accepts any number of parameters, and as a result returns a list generated from them.
+`list` is a built-in function, just like `+`. `list` accepts any number of parameters, and as a result returns a list generated from them.
 
-We see how parentheses are used in Lisp to denote a function call, or evaluation. In general, the code in Lisp `(f a_1 a_2 ... a_n)` makes a function call to f, passing n parameters in that order.
+We notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2.
 
-A function call is basically an evaluation of a function. For example, for the mathematical function `f(x) = x + 1`, one example evaluation is `f(1)` where as a return value we get 2.
-
-However, now, as a result, we get `'(1 2 3)`. Let's try to understand what happened here.
-
-If Lisp had returned `(1 2 3)`, this wouldn't have made much sense, since as we discussed above this notation would try to call the function 1 with arguments 2 and 3.
-
-What Lisp did instead, is it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
+However, now, as a result, we get `'(1 2 3)`. Let's try to understand what happened here. If it had returned `(1 2 3)`, this wouldn't have made much sense, since as we discussed above this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
 
 To understand how this affects the evaluation model better, let's consider an example where you say either of these statements to some friend of yours:
 
@@ -193,23 +180,9 @@ To understand how this affects the evaluation model better, let's consider an ex
 
 In the first example, you expect your friend to tell you their name. However, in the second example, you expect them to say "your name", rather than their actual name.
 
-There is another built-in function, called `quote`. So the expression `'(1 2 3)` in Lisp is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell the compiler to return the actual list `(1 2 3)`, instead of evaluating it.
+There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell Racket to return the actual list `(1 2 3)`, instead of evaluating it.
 
 There is a special list, called the empty list and is denoted as `'()` or `(quote ())`. We will later see why this list is special when we'll talk about recursion.
-
-TODO: Check the following block
-
-TODO: Explain arrays in standard languages
-
-I> ### Definition 1
-I>
-I> A linked list is a linear collection of data elements, whose order is not given by their physical placement in memory, unlike arrays for example. Instead, each element points to the next. So the order is completely determined by the data in the linked list.
-
-![An example of a linked list](images/linked-list.png)
-
-The motivation for using a linked list is that it's a data structure that allows us to link several blocks together to make a blockchain. We will see how to implement a blockchain with it in chapter 4.
-
-TODO: Example in Racket show that it can be simulated with `car`/`cons`
 
 ### 2.4.3. Pairs
 
@@ -220,15 +193,24 @@ Another built-in function is `cons` which stands for construct. This function on
 '(1 . 2)
 ```
 
-Lists are a special kind of pairs, where `(list 1 2 3)` is equal to `(cons 1 (cons 2 (cons 3 '())))`.
-
 ![The `(cons some-value nil)` pair](images/pair.png)
 
-There are two other built-in functions called `car` and `cdr` which are used to retrieve the first and the second element of a pair respectively.
+There are two other built-in functions called `car` and `cdr` which are used to retrieve the first and the second element of a pair respectively:
 
-So, `(car (cons 1 2))` will return 1, and `(cdr (cons 1 2))` will return 2.
+```racket
+> (car (cons 1 2))
+1
+> (cdr (cons 1 2))
+2
+```
 
-Now we can see how a Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction in an interesting way.
+Pairs are so important that we can encode any data structure with them. In fact, lists are a special kind of pairs, where `(list 1 2 3)` is equal to `(cons 1 (cons 2 (cons 3 '())))`.
+
+![An example of a list](images/list.png)
+
+The motivation for using a list is that it will allow us, for exeample, to link several blocks together to make a blockchain.
+
+Finally, we notice how in Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction in an interesting way.
 
 ### 2.4.4. Adding definitions
 
@@ -238,18 +220,18 @@ So far, we have only worked with the interactions area in DrRacket. Let's try to
 
 We can notice a couple of things from the screenshot above:
 
-1. We've filled the definitions area with some code
-1. In the interaction area, we've interacted with something that was already defined in the definitions area (in this case, the interaction was to just display its value)
+1. In the definitions area, we added some code. We notice that we used another built-in syntax called `define` in order to attach a value (`123`) to a symbol (`a-number`)
+1. In the interactions area, we interacted with something that was already defined in the definitions area (in this case, the interaction was to just display its value)
 
-For the purpose of this book, every Racket program will start with `#lang racket`. This just means that we will be dealing with Racket's ordinary syntax. There are other values this can accept, for example we can work with a language specialized in drawing graphics, but that is out of context for the purpose of this book.
+In this book every Racket program will start with `#lang racket`. This means that we will be dealing with Racket's ordinary syntax. There are other values this can accept, for example we can work with a language specialized in drawing graphics, but that is out of context for the purpose of this book.
 
-It is worth mentioning that everything that we type in the definitions area, we can also type in the interactions area and vice-versa. Once you've filled the definitions area, in order to have the definitions available in the interactions area you need to Run the program by navigating to the top menu `Racket > Run`.
+Everything that we type in the definitions area, we can also type in the interactions area and vice-versa. In order to have the definitions available in the interactions area we need to Run the program by navigating to the top menu `Racket > Run`. Note that when we Run a program, the interactions area gets cleared.
 
-We notice that we used another built-in function called `define` in order to attach a value (`123`) to a variable (`a-number`).
+If our definitions have references, using the mouse we can hover over the symbol's name and DrRacket will draw a line pointing to the definition of that reference. For big and complex programs, it is advised to use this approach to fully understand how one function works, when necessary.
+
+![Following references in DrRacket](images/drracket-refs.png)
 
 Definitions can be saved to a file for later usage by navigating to `File > Save Definitions`.
-
-TODO: Show how we can follow definitions by clicking with the mouse
 
 ### 2.4.5. Procedures and functions
 
@@ -257,7 +239,7 @@ In Lisp, a procedure is essentially a function. When invoked, it returns some da
 
 Some Lisp expressions and procedures have side effects, for example, doing a network operation, which means that this function can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice they are frequently referred to as "functions" anyway, even those that may have side effects, in order to emphasize that a computed result is always returned.
 
-There is a special built-in notation called lambda, which accepts two parameters, and produces a function for us as a result. The first parameter is a list of arguments this functions accepts, and the second parameter is an expression that acts upon these parameters.
+There is a special built-in syntax called `lambda`, which accepts two parameters, and produces a function for us as a result. The first parameter is a list of arguments this functions accepts, and the second parameter is an expression that acts upon these parameters.
 
 For example, `(lambda (x) (+ x 1))` returns a function that accepts a single parameter, and when this function is called with a parameter, it increases this parameter's value by one.
 
@@ -717,7 +699,7 @@ for *
 
 TODO: See what we need to move from here
 
-In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction[^ch3n1].
+In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction.
 
 In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
 
@@ -753,4 +735,4 @@ Throughout this book, we will use `serializable-struct` (from the `racket/serial
 
 A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
 
-[^ch3n1]: More on macros in Appendix A.
+[^ch2n1]: More on macros in Appendix A.
