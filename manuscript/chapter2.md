@@ -42,7 +42,7 @@ I> 1. A single value, coupled together with another two sub-trees
 
 TODO: Example of a tree.
 
-I> ### Definition
+I> ### Definition 4
 I>
 I> A **language** is consisted of:
 I>
@@ -51,7 +51,7 @@ I> 1. _Grammar_, which is a set of rules that tells us which sentences are well-
 
 The definition of a language also reflects programming languages - they have a special syntax and reserved keywords. For example, the C programming language has keywords such as `struct`, `return`, `if`, etc.
 
-I> ### Definition 4
+I> ### Definition 5
 I>
 I> An abstract syntax tree is a tree representation of the abstract syntactic structure of a source code written in a programming language.
 
@@ -99,14 +99,6 @@ Racket can be downloaded and installed via https://download.racket-lang.org. The
 
 The upper textarea part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interactions area where we interact with the definitions.
 
-I> ### Definition
-I>
-I> A package in Racket resembles a set of definitions someone has written for others to use.
-
-For example, if we want to use a hashing function, we will include the package for hashing in order to have the hashing definitions available to interact with. This allows us to put our focus on the design of our system, instead of re-defining everything.
-
-Packages can be browsed at http://pkgs.racket-lang.org. Packages can be installed from the DrRacket GUI - when we try to use a package that is missing and available in the packages repository, DrRacket will give us the option to install it. Alternatively, they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages in Racket later in the book.
-
 The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples, etc. which is also available in offline-mode, but is optional for this book.
 
 ## 2.4. Tutorial
@@ -115,7 +107,7 @@ The first thing that Lisp newcomers notice is that there are too many parenthese
 
 As we go through this book, we will understand the power of expressiveness we get as a result. For example, one advantage is that there is no need for special order of operations. In high school, we had to remember that `*` and `/` have to come before `+` and `-`. This is not the case with Lisps, as the order of evaluation is obvious by the way we've written our program.
 
-So, let's start by writing `(+ 1 (* 2 3))`, followed by the return key, in the interactions area of the DrRacket editor:
+Let's start by writing `(+ 1 (* 2 3))`, followed by the return key, in the interactions area of the DrRacket editor:
 
 ```racket
 > (+ 1 (* 2 3))
@@ -140,6 +132,7 @@ In the evaluation we've done above, what we get as a result is a number. So the 
 
 Racket has some primitive types, such as:
 
+1. Symbols - more about them in the next section
 1. Numbers - 1, 2, 3.14
 1. Booleans - True, False
 1. Characters - or single letters: #\A, #\B, #\C
@@ -194,6 +187,15 @@ There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just 
 
 There is a special list, called the empty list and is denoted as `'()` or `(quote ())`. We will later see why this list is special when we'll talk about recursion.
 
+Also note that we can use `quote` on any set of symbols:
+
+```racket
+> (quote hey)
+'hey
+```
+
+TODO: This allows for...
+
 ### 2.4.3. Pairs
 
 Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result it returns a pair:
@@ -247,9 +249,11 @@ Definitions can be saved to a file for later usage by navigating to `File > Save
 
 In Lisp, a procedure is essentially a function. When invoked, it returns some data as its value. However, some Lisp expressions and procedures have side effects, for example, doing a network operation, which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice they are frequently referred to as "functions" anyway, even those that may have side effects, in order to emphasize that a computed result is always returned.
 
-There is a special built-in syntax called `lambda`, which accepts two parameters, and produces a function for us as a result. The first parameter is a list of arguments this functions accepts, and the second parameter is an expression that acts upon these parameters.
+From this point, we will refrain from using the word `function` and stick to `procedure`.
 
-For example, `(lambda (x) (+ x 1))` returns a function that accepts a single parameter, and when this function is called with a parameter, it increases this parameter's value by one.
+There is a special built-in syntax called `lambda`, which accepts two parameters, and produces a procedure for us as a result. The first parameter is a list of arguments this procedure accepts, and the second parameter is an expression that acts upon these parameters.
+
+For example, `(lambda (x) (+ x 1))` returns a procedure that accepts a single parameter, and when this procedure is called with a parameter, it increases this parameter's value by one.
 
 If we try to evaluate the expression above, we get:
 
@@ -258,14 +262,14 @@ If we try to evaluate the expression above, we get:
 #<procedure>
 ```
 
-So, in order to call our function, we can try to pass a parameter to its return value:
+In order to call our procedure, we can try to pass a parameter to its return value:
 
 ```racket
 > ((lambda (x) (+ x 1)) 1)
 2
 ```
 
-Of course, writing and evaluating functions this way is hard. Instead, we can define our function in the definitions area and then interact with it in the interactions area:
+Of course, writing and evaluating procedures this way is hard. Instead, we can define our procedure in the definitions area and then interact with it in the interactions area:
 
 Definition:
 
@@ -284,16 +288,16 @@ Interaction:
 3
 ```
 
-To make things a little bit easier for us, Racket has a special syntax for defining functions, so these two are equivalent:
+To make things a little bit easier for us, Racket has a special syntax for defining procedures, so these two are equivalent:
 
 ```racket
 (define add-one (lambda (x) (+ x 1)))
 (define (add-one x) (+ x 1))
 ```
 
-### 2.4.6. Comparison functions
+### 2.4.6. Comparison procedures
 
-There are some very useful functions that produce boolean output for us, such as checking whether a number is greater than another one, or whether a value is a number. We can notice the usage of some of them in the code below:
+There are some very useful procedures that produce boolean output for us, such as checking whether a number is greater than another one, or whether a value is a number. We can notice the usage of some of them in the code below:
 
 ```racket
 > (number? 1)
@@ -306,6 +310,10 @@ There are some very useful functions that produce boolean output for us, such as
 #t
 > (procedure? add-one)
 #t
+> (symbol? (quote hey))
+#t
+> (symbol? 1)
+#f
 > (> 1 2)
 #f
 > (= 1 2)
@@ -314,7 +322,7 @@ There are some very useful functions that produce boolean output for us, such as
 #t
 ```
 
-We can also do a conditional check, and evaluate expressions based on the truthiness of some predicate (comparison function). For example, `if` is a built-in syntax that accepts three parameters:
+We can also do a conditional check, and evaluate expressions based on the truthiness of some predicate (comparison procedure). For example, `if` is a built-in syntax that accepts three parameters:
 
 1. Conditional to check
 1. Expression to evaluate if the conditional is true
@@ -378,7 +386,7 @@ There are three other important predicates:
 
 Note that there's only one empty list `'()` in memory (actually the empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list). This means that all three predicates will return true for checking an empty list against an empty list.
 
-To show where `eq?` fails, we will introduce a new function `integer->char` that converts a number to a character. Here are some examples using `eq?`:
+To show where `eq?` fails, we will introduce a new procedure `integer->char` that converts a number to a character. Here are some examples using `eq?`:
 
 ```racket
 > (integer->char 65)
@@ -415,7 +423,7 @@ Finally, `equal?` will compare structures recursively, supporting lists:
 
 ### 2.4.7. Recursive procedures
 
-Procedures, just like data structures, can also be recursive. We already saw an example with the factorial function, in that it calls itself in attempt to make a computation, or a loop. For example, here's how we could define factorial:
+Procedures, just like data structures, can also be recursive. We already saw an example with the factorial procedure, in that it calls itself in attempt to make a computation, or a loop. For example, here's how we could define factorial:
 
 ```racket
 (define (fact n)
@@ -433,7 +441,7 @@ Calling it will produce:
 1
 ```
 
-For a more advanced example we will define a function that calculates the length (number of elements) of a list:
+For a more advanced example we will define a procedure that calculates the length (number of elements) of a list:
 
 ```racket
 (define (list-length x)
@@ -441,7 +449,7 @@ For a more advanced example we will define a function that calculates the length
         (else (+ 1 (list-length (cdr x))))))
 ```
 
-We defined a function `list-length` that accepts a single parameter `x`, and in the body of the function we have a condition:
+We defined a procedure `list-length` that accepts a single parameter `x`, and in the body of the procedure we have a condition:
 
 1. If we are passing an empty list, just return 0 since the length of an empty list is 0
 1. Otherwise, return the value of `(list-length (cdr x))` plus one
@@ -507,7 +515,7 @@ Here's how it evaluates:
 
 We can notice that both procedures generate the same result, however, the nature of evaluation is very different.
 
-I> ### Definition
+I> ### Definition 6
 I>
 I> Recursive procedures can generate an **iterative** or a **recursive** process:
 I>
@@ -518,7 +526,7 @@ In the examples above, `list-length` generates a recursive process since it need
 
 ### 2.4.8. Procedures that return procedures
 
-We can also construct functions that return other functions as a result. For example:
+We can also construct procedures that return other procedures as a result. For example:
 
 ```racket
 > (define (f x) (lambda (y) (+ x y)))
@@ -549,99 +557,155 @@ Evaluating
 2
 ```
 
-To explain what happened here, note how we define `my-cons` to return another function that accepts a parameter, and then based on that parameter we either return the first parameter to `my-cons` or the second one.
+To explain what happened here, note how we define `my-cons` to return another procedure that accepts a parameter, and then based on that parameter we either return the first parameter to `my-cons` or the second one.
 
-If we try to use the substitution method, we can note that `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our function "captures" data in a sense.
+If we try to use the substitution method, we can note that `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our procedure "captures" data in a sense.
 
-Then, when we call `my-car` or `my-cdr` on this function, we just pass 1 or 2 to get the first or the second value respectively.
+Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
 
 ### 2.4.9. General higher order procedures
 
-With the example above we've seen how Racket can return a function as a return value. It can also accept a function as an input.
+With the example before we've seen how Racket can return procedures as a return value. It can also accept procedures as input.
 
-I> ### Definition 4
+I> ### Definition 7
 I>
-I> A higher-order function is a function that takes one or more functions as parameters or returns a function as a result.
+I> A higher-order procedure is a procedure that takes one or more procedures as parameters or returns a procedure as a result.
 
-There are three common built-in higher order procedures: `map`, `filter`, `fold` (left and right).
+There are three common built-in higher order procedures:
 
-As an example usage:
+1. `map` takes as input a procedure with a single parameter and a list and returns a list where all members of the list have this procedure applied to them
+1. `filter` takes as input a predicate with a single parameter and a list, and only returns those members in the list whose predicate evaluates to true
+1. `fold` is a procedure that takes as input a combining procedure that accepts two parameters (current value and accumulator), an initial value and a list and returns a value combined with this procedure. There are two types of folds, a right and a left one, which combines from the right and from the left respectively
+  - The right fold exhibits a recursive process (think `my-length`), while the left one exhibits an iterative one (think `my-length-iter`)
 
-Definitions
+Given the following definitions:
 
 ```racket
 (define my-test-list '(1 2 3))
 (define (add-one x) (+ x 1))
+(define (gt-1 x) (> x 1))
 ```
 
-Interact
+As an example usage:
 
 ```racket
+> (map (lambda (x) (+ x 1)) my-test-list)
+'(2 3 4)
 > (map add-one my-test-list)
 '(2 3 4)
-> (filter even? my-test-list)
-'(2)
+> (filter gt-1 my-test-list)
+'(2 3)
 > (foldr cons '() '(1 2 3))
 '(1 2 3)
 > (foldl cons '() '(1 2 3))
 '(3 2 1)
 ```
 
-Note in the example above how we evaluated expressions in the definitions area itself and get the produced results in the interactions area.
+If we use substitution on `(map add-one my-test-list)`, we get: `(list (add-one 1) (add-one 2) (add-one 3))`. For the other higher order procedures, it is best to actually implement them in order to understand how they work.
 
-Here's a description of each higher order function used in the above example:
+`map` takes a transformation procedure `f`, together with a list `l`. We have two cases to cover:
 
-1. `map` is a function that takes as input a function with a single parameter, and returns a list where all members of the list have this function applied
-1. `filter` is a function that takes as input a function (predicate) with a single parameter (that returns a boolean), and only returns those members in the list whose function evaluates to true
-1. `fold` is a function that takes as input a combining function that accepts two parameters, an initial value and returns a list combined with this fun
-
-There are two types of folds, a left and a right one, which combines from the left and from the right respectively.
-
-For example, the right fold may use `(+ 1 (+ 2 (+ 3 0)))`, while the left one `(+ (+ (+ 0 1) 2) 3)`.
-
-So, if we use the substitution method on `(map add-one my-test-list)`, we get: `(list (add-one 1) (add-one 2) (add-one 3))`.
-
-We can actually implement these functions ourselves:
+1. For empty list, we just return the empty list
+1. Otherwise, we extract the first element, apply the transformation procedure, and re-construct the list recursively mapping the remainder of the elements
 
 ```racket
 (define (my-map f l)
   (cond ((eq? l '()) '())
         (else (cons (f (car l)) (my-map f (cdr l))))))
+```
+
+`filter` takes a predicate `p`, together with a list `l`. There are three cases:
+
+1. For empty list, just as before, we just return the empty list
+1. Otherwise, if a predicate matches the current element we include it in the generation of the new list, recursively filtering the remainder of the elements
+1. Otherwise, we recursively filter the remainder of the elements skipping adding the current one to the list
+
+```racket
 (define (my-filter p l)
   (cond ((eq? l '()) '())
         ((p (car l)) (cons (car l) (my-filter p (cdr l))))
         (else (my-filter p (cdr l)))))
 ```
 
-It is recommended that you attempt to try to implement the folding functions yourself. Note that `foldl` generates an iterative process, while `foldr` generates a recursive one.
+`foldr` takes a combining operator (function) `op`, together with an initial value `i` and list `l`. The two cases we need to cover are:
+
+1. For empty list, we return the initial value
+1. Otherwise, we use the combining operator to the current element, applied to the folded remainder of the list
+
+```racket
+(define (my-foldr op i l)
+  (cond ((eq? '() l) i)
+        (else (op (car l)
+                  (my-foldr op i (cdr l))))))
+```
+
+Finally, `foldl` is a bit more complex. We will start by defining a procedure `iter` that has two cases:
+
+1. For empty list, we return the initial value
+1. Otherwise, we call `iter` again with the remainder of the list and changing the initial value to be combined with the current element
+
+```racket
+(define (iter op l i)
+  (cond ((eq? '() l) i)
+        (else (iter op (cdr l) (op (car l) i)))))
+```
+
+This function works in a similar way with `foldr`, except that the result is captured in the procedure's argument. For example, here's how it unfolds for `(iter + '(1 2 3) 0)`:
+
+```racket
+(iter + '(1 2 3) 0)
+= (iter + '(2 3) 1)
+= (iter + '(3) 3)
+= (iter + '() 6)
+= 6
+```
+
+After having defined this, `my-foldl` is simply:
+
+```racket
+(define (my-foldl op i l)
+  (iter op l i))
+```
 
 ### 2.4.10. Packages
 
-In computer science, a library is a collection of resources used by computer programs. These may include configuration data, documentation, help data, message templates, pre-written code and procedures, structures, or values. Racket packages are similar to a library.
+I> ### Definition 8
+I>
+I> A package in Racket resembles a set of definitions someone has written for others to use.
 
-To import a library, we use the syntax `(require <library_name>)`.
+For example, if we want to use a hashing function, we will include the package for hashing in order to have the hashing definitions available to interact with. This allows us to put our focus on the design of our system, instead of re-defining everything.
 
-As an example, let's create a few procedures, and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions`:
+Packages can be browsed at http://pkgs.racket-lang.org. Packages can be installed from the DrRacket GUI - when we try to use a package that is missing and available in the packages repository, DrRacket will give us the option to install it. Alternatively, they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages in Racket later in the book.
 
-`utils.rkt`:
+To export data from a package, we use the syntax `provide`. As an example, let's create a few procedures, and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions`.
 
 ```racket
 (define (sum-list l) (foldl + 0 l))
 (define (add-one x) (+ x 1))
+
 (provide sum-list)
 ```
 
-Now if we create another file called `test.rkt` in the same folder where `utils.rkt` is, and we write the following code:
+Now we will create another file called `test.rkt` in the same folder where `utils.rkt` is. We'll use the syntax `(require <package_name>)`.
 
 ```racket
-> (require "utils.rkt")
+(require "utils.rkt")
+
+(define (add-two x) (+ x 2))
+```
+
+We can now interact with `test.rkt`:
+
+```racket
 > (sum-list '(1 2 3))
 6
+> (add-two 1)
+3
 > (add-one 1)
 add-one: undefined;
 ```
 
-We can notice how only the functions we provide within the special syntax `(provide ...)` will be available for usage by those who require our library.
+Note that `add-one` was undefined, because only the procedures we provide within the special syntax `(provide ...)` will be available for usage by those who require our package.
 
 ### 2.4.11. Scope
 
@@ -655,29 +719,15 @@ Let's consider the following definitions:
 Here we can notice a couple of things:
 
 1. We created a variable `my-number` and assigned the number 123 to it
-1. We created a function `add-to-my-number` which adds the number passed to it as a parameter to `my-number`
+1. We created a procedure `add-to-my-number` which adds the number passed to it as a parameter to `my-number`
 
-One question is, depending on the current state of execution, what is the visibility of our variables?
+I> ### Definition 9
+I>
+I> Scope refers to the visibility of the definitions, or which parts of the program can use them.
 
-Scope refers to the visibility of the definitions, or which parts of the program can use them.
+For example, we know that `my-number` is defined at the same level as `add-to-my-number`, and so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition, and not accessible to anything outside it.
 
-For example, we know that `my-number` is in the scope of `add-to-my-number`, and so we can conclude that `my-number` is kind of a global variable accessible anywhere within the definitions list.
-
-But what about the `x` within `add-to-my-number`? This variable is only accessible within the body of the function definition, and no longer accessible outside it.
-
-We can assign a new value to already defined variables by using the set! syntax as follows:
-
-```racket
-(define my-number 123)
-(define (add-to-my-number x) (+ my-number x))
-(add-to-my-number 1)
-(set! my-number 100)
-(add-to-my-number 2)
-```
-
-This program will first output 124, and then 102. Note how our function keeps referring to the global variable `my-number`, and so may produce different results depending on its value.
-
-With `let` we can define variables within the current scope that it is executed. The syntax is:
+Using the `let` syntax we can introduce variables that are visible only in a certain section:
 
 ```racket
 (let ([var-1 value-1]
@@ -685,10 +735,10 @@ With `let` we can define variables within the current scope that it is executed.
   ... our code ...)
 ```
 
-This creates "temporary" variables `var-1` and `var-2` visible only in the "our code" part, and after it is executed they are no longer accessible from outside the scope.
+This creates variables `var-1` and `var-2` visible only in the "our code" part.
 
 ```racket
-> (let ([x 1] [y 2]) (+ x y))
+> (let ((x 1) (y 2)) (+ x y))
 3
 > x
 . . x: undefined;
@@ -696,81 +746,88 @@ This creates "temporary" variables `var-1` and `var-2` visible only in the "our 
 . . y: undefined;
 ```
 
-There is another syntax `letrec` which is very similar to `let`, in that it allows variables to be visible in the variable scope as well, so we can do:
+There is another syntax `letrec`, which is very similar to `let`. In addition, the variables will be visible in the variable scope as well.
 
 ```racket
-> (letrec ([x 1] [y 2] [z (+ x y)]) z)
-3
+> (letrec ((x 1) (y (+ x 1))) y)
+2
 ```
 
-Note that `[` and `]` have the same function as `(` and `)`, they are just used for clearer display and meaning of the code.
+I> ### Definition 10
+I>
+I> Variable "shadowing" occurs when a variable defined in a scope has the same name as a variable defined in an outer scope.
 
-Another interesting syntax is `for` and `for*` which have similar meaning to `let` and `letrec`. We can see how `for*` generates a Cartessian set in the following screenshot:
+For example, compare the result of these two evaluations:
 
 ```racket
-(displayln "for")
-
-(for ([i (range 1 3)]
-      [j (range 1 3)])
-  (displayln (cons i j)))
-
-(displayln "for*")
-(for* ([i (range 1 3)]
-      [j (range 1 3)])
-  (displayln (cons i j)))
+> (let ((x 1)) x)
+1
+> (let ((x 1)) (let ((x 2)) x))
+2
 ```
 
-Produces
+In the second example we have a `let` within a `let`. The inner `let` is defining an `x`, and so is the outer `let`. However, the `x` within the inner `let` will be used in the inner `let`'s body.
+
+In fact, the way we defined `my-foldl` earlier exposed `iter` to the global scope. We can rewrite it as follows, making `iter` visible only within `my-foldl`, and also using variable shadowing for `l` and `i`:
 
 ```racket
-for
-(1 . 1)
-(2 . 2)
-for *
-(1 . 1)
-(1 . 2)
-(2 . 1)
-(2 . 2)
+(define (my-foldl op i l)
+  (define (iter l i)
+    (cond ((eq? '() l) i)
+          (else
+           (iter (cdr l) (op (car l) i)))))
+  (iter l i))
+```
+
+### 2.4.12. Structures
+
+I> ### Definition 11
+I>
+I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
+
+In Racket, there's a special syntax `struct` which allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
+
+Given the following definitions:
+
+```racket
+(struct document (author title content))
+```
+
+We automatically get the procedures `document-author`, `document-title`, `document-content` in order to extract values from objects, the procedure `document` in order to construct object of such type, and the predicate `document?` to check whether a given object is of such type. Now, we can construct an object that is using this data structure:
+
+```racket
+(define a-document
+  (document
+   "Boro Sitnikovski"
+   "Gentle Introduction to Blockchain with Lisp"
+   "Hello World"))
+```
+
+We can use the automatically generated procedures to extract values from objects that are using this data structure:
+
+```racket
+> (document-author a-document)
+"Boro Sitnikovski"
+> (document-title a-document)
+"Gentle Introduction to Blockchain with Lisp"
+> (document-content a-document)
+"Hello World"
+> (document? a-document)
+#t
+> (document? "test")
+#f
 ```
 
 ## Summary
 
-TODO: See what we need to move from here
+The point of this chapter was to get a feeling of the Racket programming language. Here's what we learned in this chapter, briefly:
 
-In Racket, there's a special syntax (that is, a macro) named `define-struct` which allows us to capture data structures and come up with a new kind of abstraction.
-
-In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however `define-struct` is much more convenient since once we defined our data structures it will automatically provide procedures for us to construct such data type and retrieve its values.
-
-A few examples:
-
-```racket
-> (struct document (author title content))
-> (struct book document (publisher))
-```
-
-Having entered the first command, we automatically get the procedures `document-author`, `document-title`, `document-content` in order to extract values from objects, and the procedure document in order to construct object of such type. Now, we can construct an object that is using this data structure:
-
-```racket
-> (define a-book
->   (document
->    "Boro Sitnikovski"
->    "Gentle Introduction to Blockchain with Lisp"
->    "Hello World"))
-```
-
-We can also use the automatically generated procedures to extract values from objects that are using this data structure:
-
-```racket
-> (document-author a-book)
-"Boro Sitnikovski"
-> (document-title a-book)
-"Gentle Introduction to Blockchain with Lisp"
-> (document-content a-book)
-"Hello World"
-```
-
-Throughout this book, we will use `serializable-struct` (from the `racket/serialize` library) instead of `struct`, since this will allow for serializing data structures and writing them to the file system for example.
-
-A structure in most programming languages is a composite data type (or record) declaration that defines a physically grouped list of variables to be placed under one name in a block of memory.
+1. Lisp is a family of programming languages, and Racket belongs to the Lisp family
+1. Lisps have no syntax compared to standard programming languages, and syntax is defined differently in Lisp
+1. Lisp evaluation is very similar to substitution in mathematics
+1. There are several primitive types: symbols, booleans, characters, strings, lists
+1. Lists are a special kind of pairs
+1. Procedures are a way to capture abstraction. They can accept and return any kind of types including procedures themselves
+1. Packages allow us to re-use code, written either by ourself or someone else
 
 [^ch2n1]: We will cover details about macros in Appendix B.
