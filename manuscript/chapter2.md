@@ -525,7 +525,7 @@ Here's how it evaluates:
 
 We can notice that both procedures generate the same result, however, the nature of evaluation is very different.
 
-I> ### Definition 6
+I> ### Definition 7
 I>
 I> Recursive procedures can generate an **iterative** or a **recursive** process:
 I>
@@ -577,7 +577,7 @@ Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 t
 
 With the example before we've seen how Racket can return procedures as a return value. It can also accept procedures as input.
 
-I> ### Definition 7
+I> ### Definition 8
 I>
 I> A higher-order procedure is a procedure that takes one or more procedures as parameters or returns a procedure as a result.
 
@@ -679,7 +679,7 @@ After having defined this, `my-foldl` is simply:
 
 ### 2.4.10. Packages
 
-I> ### Definition 8
+I> ### Definition 9
 I>
 I> A package in Racket resembles a set of definitions someone has written for others to use.
 
@@ -731,7 +731,7 @@ Here we can notice a couple of things:
 1. We created a variable `my-number` and assigned the number 123 to it
 1. We created a procedure `add-to-my-number` which adds the number passed to it as a parameter to `my-number`
 
-I> ### Definition 9
+I> ### Definition 10
 I>
 I> Scope refers to the visibility of the definitions, or which parts of the program can use them.
 
@@ -763,7 +763,7 @@ There is another syntax `letrec`, which is very similar to `let`. Also, the vari
 2
 ```
 
-I> ### Definition 10
+I> ### Definition 11
 I>
 I> Variable "shadowing" occurs when a variable defined in scope has the same name as a variable defined in an outer scope.
 
@@ -791,7 +791,7 @@ The way we defined `my-foldl` earlier exposed `iter` to the global scope. We can
 
 ### 2.4.12. Structures
 
-I> ### Definition 11
+I> ### Definition 12
 I>
 I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
 
