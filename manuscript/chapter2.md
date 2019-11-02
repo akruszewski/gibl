@@ -171,7 +171,7 @@ Each of the evaluations above has a specific type attached to the value produced
 1. The fourth evaluation has a type of character
 1. The fifth evaluation has a type of string
 
-We'll cover symbols, lists and functions in the following sections.
+We'll cover symbols, lists, and functions in the following sections.
 
 ### 2.4.2. Lists, evaluation, quotes
 
@@ -565,7 +565,7 @@ This concept is so powerful that we can implement our own `cons`, `car`, and `cd
 (define (my-cdr x) (x 2))
 ```
 
-Evaluating
+Evaluating:
 
 ```racket
 > (my-cons 1 2)
@@ -605,7 +605,7 @@ There are three common built-in higher-order procedures: `map`, `filter` and `fo
 '(2 3 4)
 ```
 
-If we use substitution on `(map add-one my-test-list)`, we get `(list (add-one 1) (add-one 2) (add-one 3))`. However, it is best to implement these procedures ourself to understand how they work. `map` takes a transformation procedure `f`, together with a list `l`. We have two cases to cover:
+If we use substitution on `(map add-one my-test-list)`, we get `(list (add-one 1) (add-one 2) (add-one 3))`. However, it is best to implement these procedures ourselves to understand how they work. `map` takes a transformation procedure `f`, together with a list `l`. We have two cases to cover:
 
 1. For empty list, we just return the empty list
 1. Otherwise, we extract the first element, apply the transformation procedure, and re-construct the list recursively mapping the remainder of the elements
@@ -657,7 +657,7 @@ To re-implement filter, note that it takes a predicate `p`, together with a list
                   (my-foldr op i (cdr l))))))
 ```
 
-Finally, `foldl` is a bit more complex. We will start by defining a procedure `iter` that has two cases:
+`foldl` is a bit more complex. We will start by defining a procedure `iter` that has two cases:
 
 1. For empty list, we return the initial value
 1. Otherwise, we call `iter` again with the remainder of the list and changing the initial value to be combined with the current element
@@ -691,11 +691,11 @@ I> ### Definition 9
 I>
 I> A package in Racket resembles a set of definitions someone has written for others to use.
 
-For example, if we want to use a hashing function, we will include the package for hashing to have the hashing definitions available to interact with. This allows us to put our focus on the design of our system, instead of re-defining everything.
+For example, if we want to use hashing functions, we would pick a package that implements these and use them. This allows us to put our focus on the design of our system, instead of re-defining everything.
 
 Packages can be browsed at http://pkgs.racket-lang.org. Packages can be installed from the DrRacket GUI - when we try to use a package that is missing and available in the packages repository, DrRacket will give us the option to install it. Alternatively, they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages in Racket later in the book.
 
-To export data from a package, we use the syntax `provide`. As an example, let's create a few procedures, and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions`.
+To export objects from a package, we use the syntax `provide`. As an example, let's create a few procedures, and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions`.
 
 ```racket
 (define (sum-list l) (foldl + 0 l))
@@ -704,7 +704,7 @@ To export data from a package, we use the syntax `provide`. As an example, let's
 (provide sum-list)
 ```
 
-Now we will create another file called `test.rkt` in the same folder where `utils.rkt` is. We'll use the syntax `(require <package_name>)`.
+We will create another file called `test.rkt` in the same folder as `utils.rkt`. We'll use the syntax `(require <package_name>)`:
 
 ```racket
 (require "utils.rkt")
@@ -734,13 +734,13 @@ Let's consider the following definitions:
 (define (add-to-my-number x) (+ my-number x))
 ```
 
-We created a variable `my-number` and assigned the number 123 to it. We also created a procedure `add-to-my-number` which adds the number passed to it as a parameter to `my-number`
+We created a variable `my-number` and assigned the number 123 to it. We also created a procedure `add-to-my-number` which adds the number passed to it as a parameter to `my-number`.
 
 I> ### Definition 10
 I>
 I> Scope refers to the visibility of the definitions, or which parts of the program can use them.
 
-For example, we know that `my-number` is defined at the same level as `add-to-my-number`, and so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition, and not accessible to anything outside it.
+`my-number` is defined at the same level as, and before `add-to-my-number`, so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition, and not accessible to anything outside it.
 
 Using the `let` syntax we can introduce variables that are visible only in a certain section:
 
@@ -761,7 +761,7 @@ This creates variables `var-1` and `var-2` visible only in the "our code" part.
 . . y: undefined;
 ```
 
-There is another syntax `letrec`, which is very similar to `let`. Also, the variables will be visible in the variable scope as well.
+There is another syntax `letrec`, which is very similar to `let`, where in addition the variables will be visible in the variable scope:
 
 ```racket
 > (letrec ((x 1) (y (+ x 1))) y)
@@ -800,15 +800,21 @@ I> ### Definition 12
 I>
 I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
 
-In Racket, there's a special syntax `struct` which allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`, however, `struct` is much more convenient since once we defined our data structures it will automatically provide procedures to construct such data type and retrieve its values.
+In Racket, there's a special syntax `struct` which allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient, since it will automatically provide procedures to construct a data type and retrieve its values.
 
-Given the following definitions:
+For example, given the following definition:
 
 ```racket
 (struct document (author title content))
 ```
 
-We automatically get the procedures `document-author`, `document-title`, `document-content` to extract values from objects, the procedure `document` to construct an object of such type, and the predicate `document?` to check whether a given object is of such type. Now, we can construct an object that is using this data structure:
+We automatically get the following procedures:
+
+1. `document-author`, `document-title`, `document-content` - to extract values from objects
+1. `document` - to construct an object of such type
+1. `document?` - to check whether a given object is of such type
+
+We can construct an object that is using this data structure:
 
 ```racket
 (define a-document
