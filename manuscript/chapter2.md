@@ -184,7 +184,11 @@ In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to 
 
 `list` is a built-in function, just like `+`. `list` accepts any number of parameters, and as a result, returns a list generated from them.
 
-We notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2.
+For additional information on `list` (or any other function), you can click on the word using the mouse and press the F1 button. This will open Racket's manuals screen that will give you an option to pick a function that you want information for. Usually, it's the first match on this list. Clicking on it will show the following:
+
+![DrRacket manual for `list`](images/drracket-docs.png)
+
+Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2.
 
 However, now, as a result, we get `'(1 2 3)`. Let's try to understand what happened here. If it had returned `(1 2 3)`, this wouldn't have made much sense, since as we discussed above this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
 
@@ -841,7 +845,7 @@ We can use the automatically generated procedures to extract values from objects
 
 ## Summary
 
-The point of this chapter was to get a feeling of the Racket programming language. Here's what we learned in this chapter, briefly:
+The point of this chapter was to get a basic understanding of the Racket programming language. Here's what we learned in this chapter, briefly:
 
 1. Lisp is a family of programming languages, and Racket belongs to the Lisp family
 1. Lisps have no syntax compared to standard programming languages, and syntax is defined differently in Lisp, through S-exprs
