@@ -2,6 +2,8 @@
 
 Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a cryptocurrency.
 
+TODO: Might use some procedures that we haven't introduced but we will introduce them as we go through the code. For additional help you can use Racket's manuals.
+
 ## 3.1. `wallet.rkt`
 
 We will start with the most basic data structure - a wallet.
