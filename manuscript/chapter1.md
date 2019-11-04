@@ -48,7 +48,7 @@ I> ### Definition 5
 I>
 I> A peer-to-peer network is formed when two or more computers are connected to each other.
 
-For example, when you are accessing a web page on the Internet using a browser, your browser is the "client" and the web page you're acessing is hosted by a "server". This is a centralized system since every user is getting the information from a single place - the "server".
+For example, when you are accessing a web page on the Internet using a browser, your browser is the "client" and the web page you're accessing is hosted by a "server". This is a centralized system since every user is getting the information from a single place - the "server".
 
 In contrast, in a peer-to-peer network - which represents a decentralized system - the distinction between a "client" and a "server" is blurred. Every peer is both a "client" and a "server" at the same time.
 
