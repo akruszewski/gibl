@@ -115,24 +115,24 @@ We have two functions:
 1. {$$}E(x, k){/$$}, that encrypts a message {$$}x{/$$} given a public key {$$}k{/$$}
 1. {$$}D(x, k){/$$}, that decrypts a message {$$}x{/$$} given a private key {$$}k{/$$}
 
-As we said earlier, each record will also include a special number (or a hash). This hash will be what is produced by {$$}S(x, k){/$$}. We will use the verify function to confirm a record's ownership.
-
-Here's one example of such a basic algorithm based adding/modulo operation:
+Recall the modulo operation - {$$}a \bmod b{/$$} represents the remainder when {$$}a{/$$} is divided by {$$}b{/$$}. Here's one example of a basic algorithm based on addition and modulo operations:
 
 1. Pick one random number, for example 100. This will represent a common, publicly available key
 1. We generate a random private key in the range {$$}(1, 100){/$$}, for example 97
 1. We generate a public key, pub = 100 - private = 3
-1. To encrypt data, add it to the public key and take modulo 100. {$$}E(x, k) = (x + k) % 100{/$$}
-1. To decrypt data, we use the same logic but with our private key, so {$$}D(x, k) = (x + k) % 100{/$$}
+1. To encrypt data, add it to the public key and take modulo 100. {$$}E(x, k) = (x + k) \bmod 100{/$$}
+1. To decrypt data, we use the same logic but with our private key, so {$$}D(x, k) = (x + k) \bmod 100{/$$}
 
-For example, suppose we want to encrypt 5. Then {$$}E(x, 3) = (5 + 3) % 100 = 8{/$$}. To decrypt 8, we have {$$}D(8, 97) = (8 + 97) % 100 = 105 % 100 = 5{/$$}.
+For example, suppose we want to encrypt 5. Then {$$}E(x, 3) = (5 + 3) \bmod 100 = 8{/$$}. To decrypt 8, we have {$$}D(8, 97) = (8 + 97) \bmod 100 = 105 \bmod 100 = 5{/$$}.
 
-This example uses a very simple generation pair {$$}(x + k) % c{/$$}. But, in practice this algorithm is not known, or if it is known then it will take a lot of time to compute.
+This example uses a very simple generation pair {$$}(x + k) \bmod c{/$$}. But, in practice this algorithm is not known, or if it is known then it will take a lot of time to compute.
 
 We can use this scheme to define digital signatures:
 
 1. {$$}S(x, k){/$$}, that signs a message {$$}x{/$$} given a private key {$$}k{/$$}
 1. {$$}V(x, s, k){/$$}, that verifies a message {$$}x{/$$}, given signature {$$}s{/$$} and public key {$$}k{/$$}
+
+As we said earlier, each record will also include a special number (or a hash). This hash will be what is produced by {$$}S(x, k){/$$}. We will use the verify function to confirm a record's ownership.
 
 In the wallet, we will store the public and the private keys. These keys will be used to receive or spend money. With the private key, it is possible to write new blocks (or transactions) to the blockchain, effectively spending money. With the public key, others can send currency to the wallet and verify signatures.
 
