@@ -26,15 +26,15 @@ I> A ledger is a book that contains a record of transactions.
 
 Further, at the end of every day, you all sit together and refer to the ledger to do the calculations to settle up. If you spent more than you received, you put that money in the pot, otherwise, you take that money out.
 
-Every peer in the system has a *wallet* of a kind, that resembles the balance for them. Note that we have to go through all existing records to do calculations[^ch1n1].
+Every peer in the system has a *wallet* of a kind, that resembles the balance for them. Note that we have to go through all existing records to determine the balance of a wallet[^ch1n1].
 
-A problem that might appear with this kind of system is that anyone can add a transaction. For example, Bob can add a transaction where Alice pays him a few dollars, without Alice approving. We need to re-think our system such that all transactions will be verified/signed.
+A problem that might appear with this kind of system is that anyone can add a transaction. For example, Bob can add a transaction where Alice pays him a few dollars without Alice approving. We need to re-think our system such that all transactions will be verified/signed.
 
 I> ### Definition 4
 I>
 I> A digital signature is a way to verify the authenticity of digital messages or documents.
 
-For signing and verifying transactions we will rely on digital signatures. For now, let's assume that anyone who adds information to the ledger also adds a signature with each record, and others have no way to modify the signature, but only to verify it. We will cover the details in section 1.2.
+For signing and verifying transactions we will rely on digital signatures. For now, let's assume that anyone who adds information to the ledger also adds a signature with each record, and others have no way to modify the signature, but only to verify it. We will cover the technical details in section 1.2.
 
 ![Our ledger now contains signatures](images/signatures.png)
 
@@ -46,9 +46,11 @@ You are connected to your friends, and so are they to you. Informally, this make
 
 I> ### Definition 5
 I>
-I> A peer-to-peer network is formed when two or more computers are connected.
+I> A peer-to-peer network is formed when two or more computers are connected to each other.
 
-For example, when you are accessing a web page on the Internet using a browser, your browser is the "client" and the web page you're addressing is hosted by a "server". The distinction between a "client" and a "server" is blurred in a peer-to-peer network, so every peer is both a client and a server at the same time.
+For example, when you are accessing a web page on the Internet using a browser, your browser is the "client" and the web page you're acessing is hosted by a "server". This is a centralized system since every user is getting the information from a single place - the "server".
+
+In contrast, in a peer-to-peer network - which represents a decentralized system - the distinction between a "client" and a "server" is blurred. Every peer is both a "client" and a "server" at the same time.
 
 ![A decentralized ledger](images/decentralized-ledger.png)
 
@@ -58,7 +60,7 @@ I> ### Definition 6
 I>
 I> A proof of work is data that is time-consuming to calculate, and easy for others to verify.
 
-For each record, we will also include a special number (or a hash) that will represent *proof of work*, in that it will provide proof that the transaction is valid. We will cover the details in section 1.3.
+For each record we will also include a special number (or a hash) that will represent *proof of work*, in that it will provide proof that the transaction is valid. We will cover the technical details in section 1.3.
 
 At the end of the day, we agree that we will trust the ledger who has put most of the work in it. If Bob has some errands to run, he can catch up the next day by trusting the rest of the peers in the network.
 
@@ -90,7 +92,7 @@ I> Encryption is a method of encoding values such that only authorized persons c
 
 We can assume that there exist functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. We want these functions to have the following properties:
 
-1. {$$}E(x) \neq x{/$$}, meaning that the encrypted value should not be the same as the value we're trying to encrypt
+1. {$$}E(x) \neq x{/$$}, meaning that the encrypted value should not be the same as the original value
 1. {$$}E(x) \neq D(x){/$$}, meaning that the encrypted value should not be the same as the decrypted value
 1. {$$}D(E(x)) = x{/$$}, meaning that the decryption of an encrypted value should return the original value
 
@@ -102,9 +104,9 @@ However, the scheme described above makes a symmetric algorithm, meaning that we
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
 
-Instead, we want to use what is called an asymmetric algorithm or public-key cryptography. In this scheme, we have two kinds of keys: public and private. We share the public key with the world and keep the private one to ourselves.
-
 ### 1.2.2. Asymmetric-key algorithm
+
+To solve the problems that arise with symmetric-key algorithms, we will use what is called an asymmetric algorithm or public-key cryptography. In this scheme, we have two kinds of keys: public and private. We share the public key with the world and keep the private one to ourselves.
 
 This algorithm scheme has a neat property where only the private key can decode a message, and the public key can encode a message.
 
@@ -125,9 +127,9 @@ Recall the modulo operation - {$$}a \bmod b{/$$} represents the remainder when {
 
 For example, suppose we want to encrypt 5. Then {$$}E(x, 3) = (5 + 3) \bmod 100 = 8{/$$}. To decrypt 8, we have {$$}D(8, 97) = (8 + 97) \bmod 100 = 105 \bmod 100 = 5{/$$}.
 
-This example uses a very simple generation pair {$$}(x + k) \bmod c{/$$}. But, in practice this algorithm is not known, or if it is known then it will take a lot of time to compute.
+This example uses a very simple generation pair {$$}(x + k) \bmod c{/$$}. But, in practice the pair generation algorithm is much more complex and harder to break by attackers.
 
-We can use this scheme to define digital signatures:
+We can use the same algorithm for digital signatures:
 
 1. {$$}S(x, k){/$$}, that signs a message {$$}x{/$$} given a private key {$$}k{/$$}
 1. {$$}V(x, s, k){/$$}, that verifies a message {$$}x{/$$}, given signature {$$}s{/$$} and public key {$$}k{/$$}
@@ -140,33 +142,31 @@ In the wallet, we will store the public and the private keys. These keys will be
 
 I> ### Definition 9
 I>
-I> Hashing is a one-way function that encodes text without a way to retrieve the original contents back.
+I> Hashing is a one-way function that encodes text without a way to retrieve the original value back.
 
-Hashing, however, is simpler than the encryption schemes described above. One example of a hashing function is one that returns the length of characters. For example the hashing function {$$}H{/$$} produces {$$}H(\text{"abc"}) = 3{/$$}, but also {$$}H(\text{"bcd"}) = 3{/$$}. This means that we don't have a way to retrieve the original contents just by using the return value 3.
+Hashing, however, is simpler than the encryption schemes described above. One example of a hashing function is to return the length of characters - {$$}H(\text{"abc"}) = 3{/$$}, but also {$$}H(\text{"bcd"}) = 3{/$$}. This means that we don't have a way to retrieve the original value just by using the return value 3.
 
 As we mentioned earlier, the reason to use such a technique is that they have some interesting properties, such as providing us with the so-called notion proof-of-work.
 
 I> ### Definition 10
 I>
-I> Mining is a validation of transactions. For this effort, successful miners obtain new coins as a reward.
+I> Mining is the process of validating transactions. For this effort, successful miners obtain money as a reward.
 
-Hashcash is one kind of a proof-of-work system[^ch1n3]. The Hashcash algorithm is what we will use to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
+Hashcash is one kind of a proof-of-work system[^ch1n3]. We will use it to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
 
-Hashing functions have another useful property that allows connecting two or more distinct blocks by having the information `current-hash` and `previous-hash` in each block.
-
-For example, `block-1` may have a hash such as `0x123456` and `block-2` may have a hash such as `0x345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `0x123456`, and in this way we've made a link between these two blocks.
+Hashing functions have another useful property that allows connecting two or more distinct blocks by having the information `current-hash` and `previous-hash` in each block. For example, `block-1` may have a hash such as `123456` and `block-2` may have a hash such as `345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `123456` - thus we've linked these two blocks.
 
 The hash of the block is based on the block's data itself, so to verify a hash we can just hash the block's data and compare it to `current-hash`.
 
-Two or more blocks (or transactions) connected to form what is called a blockchain. The validity of each transaction and the validity of blockchain as well depend on it.
+Two or more blocks (or transactions) that are connected form a blockchain. The validity of each transaction will depend on the validity of the blockchain.
 
 ## 1.4. Bitcoin
 
 Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper authored by Satoshi Nakamoto titled "Bitcoin: A Peer-to-Peer Electronic Cash System" was published on a cryptography mailing list. Bitcoin's white paper consists of 9 pages, however, it is a mostly theoretical explanation of the design, and as such may be a bit overwhelming to newcomers.
 
-The bitcoin software is open source code and was released in January 2009 on SourceForge. As a result of that, anyone can clone the code and make their blockchain, thus implementing a separate cryptocurrency. Such cryptocurrencies are usually called altcoins. The design of a bitcoin includes a decentralized network (peer-to-peer network), block (mining), blockchain, transactions, and wallets, each of which we will look in detail in this book.
+The bitcoin software is open source code and was released in January 2009 on SourceForge. As a result of that, anyone can clone the source code and make their blockchain, thus implementing a separate cryptocurrency. Such cryptocurrencies are usually called altcoins. The design of a bitcoin includes a decentralized network (peer-to-peer network), block (mining), blockchain, transactions, and wallets, each of which we will look in detail in this book.
 
-Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin (with some parts being simplified). After having read this book, readers can refer to the white paper to get the complete picture for the implementation details.
+Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin - with some parts simplified.
 
 ## 1.5. Example workflows
 
@@ -188,11 +188,11 @@ TODO
 
 ## Summary
 
-The point of this chapter was to give a vague idea of how the system we want to design will look like. Things will become much clearer in the implementation chapter where we will have to be explicit about the definitions of every entity.
+The point of this chapter was to give a vague idea of how the system that we will design looks like. Things will become much clearer in the implementation chapter where we will have to be explicit about the definitions of every entity.
 
 Here's what we learned in this chapter, briefly:
 
-1. As the most basic building block, we have a transaction record (block)
+1. The core entity of the system is a block
 1. A block contains (among other data) transactions
 1. We have a ledger that is an ordered list of all valid blocks (blockchain)
 1. Every peer involved with the ledger has a wallet

@@ -14,11 +14,11 @@ I> ### Definition 1
 I>
 I> A data structure is a collection of values, the relationships among them, and the functions or operations that can be applied to the data.
 
-As we have mentioned, an example of a data structure is numbers together with the plus and multiplication functions.
+An example of a data structure is numbers together with the plus and multiplication functions.
 
 From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, and transaction amount.
 
-There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, appending two lists, etc.
+There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, merging two lists, etc.
 
 I> ### Definition 2
 I>
@@ -38,7 +38,7 @@ I>
 I> A tree is a hierarchical, recursive data structure that can have two possible values:
 I>
 I> 1. An empty value
-I> 1. A single value, coupled together with another two sub-trees
+I> 1. A single value, coupled together with another two (sub)trees
 
 A family tree is one example of a tree. Another example of a tree is a binary tree where the left subtree's value is less than the current value and the right subtree's value is greater than the current value:
 
@@ -76,15 +76,15 @@ while (x > 0) {
 
 It is not important to understand what this code does, rather how such programs are represented internally in programming languages.
 
-Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap with existing ones.
+Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap.
 
-Due to this minimalism, building a cryptocurrency (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book, we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
+Due to this minimalism, building a cryptocurrency (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
 I> ### Definition 6
 I>
-I> The syntactic elements in Lisp are symbolic expressions or S-expressions. S-expressions can be either a symbol or a list.
+I> The syntactic elements in Lisp are symbolic expressions or S-expressions. S-expressions have a value of either a symbol or a list.
 
-S-expressions form the syntax of a Lisp. Thus, the word syntax has a special meaning in Lisps, compared to other languages. With macros as part of the core language, it's possible to extend the syntax[^ch2n1].
+S-expressions form the syntax of a Lisp. Thus, the word syntax has a special meaning in Lisps compared to other languages. With macros as part of the core language it's possible to extend this syntax[^ch2n1].
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
@@ -92,9 +92,9 @@ The Racket programming language that we will use in this book is a multi-paradig
 
 Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Lisp, since there are many Lisp implementations, but we found this one to be particularly easy for entry-level programmers.
 
-The language is used in a variety of contexts such as scripting, general-purpose programming, computer science education, and research. It has been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
+The language is used in a variety of contexts such as research, computer science education and general-purpose programming. It has also been used for commercial projects. One notable example is the Hacker News website, which runs on Arc, a programming language developed in Racket. Racket is also used to teach students algebra through game development.
 
-Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at MIT by Guy L. Steele and Gerald Jay Sussman. Scheme is widely used by several schools, as a programming language in introductory courses for computer science.
+Scheme, the programming language from which Racket was influenced and based upon, was created in the 1970s at MIT by Guy L. Steele and Gerald Jay Sussman. Scheme is widely used by several schools as a programming language in introductory courses for computer science.
 
 There are two main approaches to work with Racket:
 
@@ -103,30 +103,30 @@ There are two main approaches to work with Racket:
 
 ## 2.3. Configuration and installation
 
-Racket can be downloaded and installed via https://download.racket-lang.org. There are available binaries for Windows, Linux, and Mac. After having downloaded and installed the complete package, we can run DrRacket. If you get the following screen after trying to run it, congratulations! It means that the installation was successful.
+Racket can be downloaded and installed via https://download.racket-lang.org. There are available binaries for Windows, Linux, and Mac. After downloading and installing the complete package, we can run DrRacket. If you get to the following screen, congratulations! It means that the installation was successful.
 
 ![DrRacket](images/drracket.png)
 
-The upper text area part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interaction area where we interact with the definitions.
+The upper text area part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interactions area where we interact with the definitions.
 
-The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples which is also available in offline-mode but is optional for this book.
+The Help Desk under `Help > Help Desk` on the top menu contains useful information such as quick introduction, reference manuals, examples.
 
 ## 2.4. Tutorial
 
-The first thing that Lisp newcomers notice is that there are too many parentheses in most Lisp programs. This is true, but it is a direct consequence of that we are writing our abstract syntax tree in a language that has no special syntax.
+The first thing that Lisp newcomers notice is that there are too many parentheses in Lisp programs. This is true, but it is a direct consequence of that we are writing our abstract syntax tree in a language that has no special syntax.
 
-As we go through this book, we will understand the power of expressiveness we get as a result. For example, one advantage is that there is no need for a special order of operations. In high school, we had to remember that `*` and `/` have to come before `+` and `-`. This is not the case with Lisps, as the order of evaluation is obvious by the way we've written our program.
+As we go through this book, we will understand the power of expressiveness we get as a result. For example, one advantage is that there is no need for a special order of operations. In high school, we had to remember that `*` and `/` have to come before `+` and `-`. This is not the case with Lisps as the order of evaluation is obvious by the way we've written our program.
 
-Let's start by writing `(+ 1 (* 2 3))`, followed by the return key, in the interactions area of the DrRacket editor:
+Let's start by writing `(+ 1 (* 2 3))` followed by the return key in the interactions area of the DrRacket editor:
 
 ```racket
 > (+ 1 (* 2 3))
 7
 ```
 
-If you get 7 as a result, then congratulations! You have done your first calculation in Racket.
+If you get 7 as a result then congratulations! You have done your first calculation in Racket.
 
-After it finishes an evaluation, DrRacket again waits for a new command. This is so because in the interactions area we are in the REPL mode, which stands for Read-Evaluate-Print-Loop. That is, the interactions area will read what we write, try to evaluate it (come up with a result), print the result, and loop back to reading again.
+After finishing an evaluation, DrRacket again waits for a new command. In the interactions area we are in the REPL mode, which stands for Read-Evaluate-Print-Loop. That is, the interactions area will read what we write, try to evaluate it (come up with a result), print the result, and loop back to reading again.
 
 Lisp evaluation is very similar to substitution in mathematics. For example, one way `(+ 1 (* 2 3))` can be evaluated is as follows:
 
@@ -138,17 +138,17 @@ We immediately notice how powerful substitution as a concept is.
 
 ### 2.4.1. Primitive types
 
-In the evaluation we've done above, we get a number as a result. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
+In the evaluation above we get a number as a result. So the value 7 has a type of number. While types of values are implicit in Racket, we still have a way to check what the type of a value is, as we will see later with the help of predicates.
 
 Racket has some primitive types, such as:
 
-1. Symbols - hello, world
-1. Numbers - 1, 2, 3.14
-1. Booleans - True, False
-1. Characters - or single letters: #\A, #\B, #\C
-1. Strings - or list of characters: "Hello", "World"
-1. Lists - (1, 2, 3)
-1. Functions - f(x) = x + 1
+1. Symbols - `hello`, `world`
+1. Lists - `(1, 2, 3)`
+1. Functions - `f(x) = x + 1`
+1. Numbers - `1`, `2`, `3.14`
+1. Booleans - `#t` (for True), `#f` (for False)
+1. Characters - or single letters: `#\A`, `#\B`, `#\C`
+1. Strings - or list of characters: `"Hello"`, `"World"`
 
 ```racket
 > 123
@@ -163,11 +163,10 @@ Racket has some primitive types, such as:
 "Hello World"
 ```
 
-Each of the evaluations above has a specific type attached to the value produced:
+Each evaluation above has a specific type attached to the value produced:
 
 1. The first evaluation has a type of number
-1. The second evaluation (which stands for true) has a type of boolean
-1. The third evaluation (which stands for false) has a type of boolean
+1. The second and third evaluations have a type of boolean
 1. The fourth evaluation has a type of character
 1. The fifth evaluation has a type of string
 
@@ -182,24 +181,26 @@ In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to 
 '(1 2 3)
 ```
 
-`list` is a built-in function, just like `+`. `list` accepts any number of parameters, and as a result, returns a list generated from them.
+`list` is a built-in function, just like `+` which we already used. `list` accepts any number of parameters, and as a result, returns a list generated from them.
+1. Lists - `(1, 2, 3)`
+1. Functions - `f(x) = x + 1`
 
 For additional information on `list` (or any other function), you can click on the word using the mouse and press the F1 button. This will open Racket's manuals screen that will give you an option to pick a function that you want information for. Usually, it's the first match on this list. Clicking on it will show the following:
 
 ![Racket manual for `list`](images/drracket-docs.png)
 
-Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2.
+Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2, and we write `(f 2)`.
 
-However, now, as a result, we get `'(1 2 3)`. Let's try to understand what happened here. If it had returned `(1 2 3)`, this wouldn't have made much sense, since as we discussed above this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
+However, now as a result we get `'(1 2 3)`. Let's try to understand what happened here. If `(list 1 2 3)` had returned `(1 2 3)` this wouldn't have made much sense since as (we discussed above) this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
 
-To understand how this affects the evaluation model better, let's consider an example where you say either of these statements to some friend of yours:
+To understand how this affects the evaluation model better, let's consider an example where you say either of these statements to someone:
 
 1. Say your name
 1. Say "your name"
 
-In the first example, you expect your friend to tell you their name. However, in the second example, you expect them to say "your name", rather than their actual name.
+In the first example, you expect your friend to tell you their name. In the second example you expect them to say "your name", rather than their actual name.
 
-There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell Racket to return the actual list `(1 2 3)`, instead of evaluating it.
+There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell Racket to return the actual list `(1 2 3)` instead of evaluating it.
 
 There is a special list, called the empty list and is denoted as `(list)`, or `(quote ())` or simply `'()`. We will later see why this list is special when we'll talk about recursion.
 
@@ -212,7 +213,7 @@ Also, note that we can use `quote` on any set of symbols:
 
 This allows for the creation of new symbols and is especially important for the creation of macros.
 
-Recall that S-expressions can be either a symbol or a list. Since we discussed evaluation, lists, and symbols in this section, at this point in the book, we have covered the core of a Lisp.
+Recall that S-expressions can be either a symbol or a list. Since we discussed evaluation, lists, and symbols in this section, at this point in the book we have covered the core of a Lisp.
 
 ### 2.4.3. Pairs
 
@@ -223,7 +224,7 @@ Another built-in function is `cons` which stands for construct. This function on
 '(1 . 2)
 ```
 
-![The `(cons some-value nil)` pair](images/pair.png)
+![The `(cons 'some-value 'nil)` pair](images/pair.png)
 
 There are two other built-in functions called `car` and `cdr` which are used to retrieve the first and the second element of a pair respectively:
 
@@ -244,43 +245,43 @@ We notice how in Lisp, depending only on a few primitive notions (function calls
 
 ### 2.4.4. Adding definitions
 
-So far, we have only worked with the interactions area in DrRacket. Let's try to do something useful with the definitions area.
+So far we worked only in the interactions area in DrRacket. Let's try to do something useful in the definitions area.
 
 ![Adding definitions in DrRacket](images/drracket-definitions.png)
 
 We can notice a couple of things from the screenshot above:
 
-1. In the definitions area, we added some code. We notice that we used another built-in syntax called `define` to attach a value (`123`) to a symbol (`a-number`)
-1. In the interactions area, we interacted with something that was already defined in the definitions area (in this case, the interaction was to just display its value by referring to the symbol)
+1. In the definitions area we added some code. We notice that we used another built-in syntax called `define` to attach a value (`123`) to a symbol (`a-number`)
+1. In the interactions area we interacted with something that was already defined in the definitions area. In this case the interaction was to just display the definition's value by referring to its symbol
 
-In this book, every Racket program will start with `#lang racket`. This means that we will be dealing with Racket's ordinary syntax. There are other values this can accept, for example, we can work with a language specialized in drawing graphics, but that is out of context for this book.
+In this book every Racket program will start with `#lang racket`. This means that we will be dealing with Racket's ordinary syntax. There are different values this can accept, for example, we can work with a language specialized in drawing graphics, but that is out of context for this book.
 
-Everything that we type in the definitions area, we can also type in the interactions area and vice-versa. To have the definitions available in the interactions area we need to Run the program by navigating to the top menu `Racket > Run`. Note that when we Run a program, the interactions area gets cleared.
+Everything that we write in the definitions area we can also write in the interactions area and vice-versa. To have the definitions available in the interactions area we need to Run the program by navigating to the top menu `Racket > Run`. Note that when we Run a program the interactions area gets cleared.
 
-If our definitions have references, we can hover over the symbol's name using the mouse and DrRacket will draw a line pointing to the definition of that reference. For big and complex programs, using this approach may help in uncovering details of how a function works.
+If our definitions have references we can hover over the symbol's name using the mouse and DrRacket will draw a line pointing to the definition of that reference. For big and complex programs this will be useful for uncovering details of a function.
 
 ![Following references in DrRacket](images/drracket-refs.png)
 
-Definitions can be saved to a file for later usage by navigating to `File > Save Definitions`.
+Definitions can be saved to a file for later usage by navigating to `File > Save Definitions` on the top menu.
 
 ### 2.4.5. Procedures and functions
 
-In Lisp, a procedure is essentially a function. When invoked, it returns some data as its value. However, some Lisp expressions and procedures have side effects, for example, getting weather data from an external service, which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice, they are frequently referred to as "functions" anyway, even those that may have side effects, to emphasize that a computed result is always returned.
+In Lisp a procedure is essentially a function. When invoked it returns some data as its value. However, some Lisp expressions and procedures have side effects, for example, getting weather data from an external service which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice, they are frequently referred to as "functions" anyway (even those that may have side effects), to emphasize that a computed result is always returned.
 
 From this point, we will refrain from using the word "function" and stick to "procedure".
 
-There is a special built-in syntax called `lambda`, which accepts two parameters, and produces a procedure as a result. The first parameter is a list of arguments this procedure accepts, and the second parameter is an expression (body) that acts upon these parameters.
+There is a special built-in syntax called `lambda` which accepts two parameters and produces a procedure as a result. The first parameter is a list of arguments this procedure accepts, and the second parameter is an expression (body) that acts upon these parameters.
 
-For example, `(lambda (x) (+ x 1))` returns a procedure that accepts a single parameter `x`, and when this procedure is called with a parameter, it increases this parameter's value by one, `(+ x 1)`.
+For example, `(lambda (x) (+ x 1))` returns a procedure that accepts a single parameter `x`, and when this procedure is called with a parameter it increases this parameter's value by one - `(+ x 1)`.
 
-If we try to evaluate the expression above, we get:
+Evaluating the expression above:
 
 ```racket
 > (lambda (x) (+ x 1))
 #<procedure>
 ```
 
-In order to call our procedure, we can try to pass a parameter to its return value:
+In order to call the procedure we can try to pass a parameter:
 
 ```racket
 > ((lambda (x) (+ x 1)) 1)
@@ -304,7 +305,7 @@ Interaction:
 3
 ```
 
-To make things a little bit easier, Racket has a special syntax for defining procedures, so these two are equivalent:
+To make things a little bit easier, Racket has a special syntax for defining procedures so these two are equivalent:
 
 ```racket
 (define add-one (lambda (x) (+ x 1)))
@@ -320,7 +321,7 @@ Procedures can also take more than one argument:
 
 ### 2.4.6. Conditional procedures
 
-There are useful procedures that produce boolean output, such as checking whether a value is a number, or whether a number is greater than another:
+There are useful procedures that produce boolean output such as checking whether a value is a number, or whether a number is greater than another:
 
 ```racket
 > (number? 1)
@@ -390,7 +391,7 @@ Interacting with it:
 #t
 ```
 
-As we've seen, the `=` is an equivalence predicate used to check whether two numbers are equal. However, it only works on numbers and it will raise an error if we use it on anything else:
+As we've seen the `=` is an equivalence predicate to check whether two numbers are equal. However, it only works on numbers and it will raise an error if we use it on anything else:
 
 ```racket
 > (= 1 2)
@@ -409,28 +410,28 @@ There are three other important predicates:
 
 Note that there's only one empty list `'()` in memory[^ch2n2], so all three predicates will return the same value when checking against empty lists.
 
-To show where `eq?` fails, we will introduce a new procedure `integer->char` that converts a number to a character. Here are some examples using `eq?`:
+To show where `eq?` fails we will use a built-in procedure `integer->char` that converts a number to a character. Here are some examples using `eq?`:
 
 ```racket
 > (integer->char 65)
 #\A
 > (eq? '() '())
 #t
-> (eq? '(1) '(1))
-#f
 > (eq? (integer->char 65) (integer->char 65))
+#f
+> (eq? '(1) '(1))
 #f
 ```
 
-As expected, it will return true for the empty list, but is not able to compare lists that actually have elements, or objects that aren't referred to the same memory location. Note how `eqv?` differs in this case:
+As expected, it will return true for the empty list but it is not able to compare objects that aren't referred to the same memory location or lists that actually have elements. Note how `eqv?` differs in this case:
 
 ```racket
 > (eqv? '() '())
 #t
-> (eqv? '(1) '(1))
-#f
 > (eqv? (integer->char 65) (integer->char 65))
 #t
+> (eqv? '(1) '(1))
+#f
 ```
 
 Finally, `equal?` will compare structures recursively, supporting lists:
@@ -438,9 +439,9 @@ Finally, `equal?` will compare structures recursively, supporting lists:
 ```racket
 > (equal? '() '())
 #t
-> (equal? '(1) '(1))
-#t
 > (equal? (integer->char 65) (integer->char 65))
+#t
+> (equal? '(1) '(1))
 #t
 ```
 
@@ -580,13 +581,13 @@ Evaluating:
 2
 ```
 
-Note how we define `my-cons` to return another procedure that accepts a parameter, and then based on that parameter we either return the first parameter to `my-cons` or the second one.
+Note how we define `my-cons` to return another procedure that accepts a parameter, and then based on that parameter we either return the first parameter or the second one.
 
-Using the substitution method, `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our procedure "captures" data in a sense. Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
+Using the substitution method `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our procedure "captures" data in a sense. Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
 
 ### 2.4.9. General higher-order procedures
 
-With the example before we've seen how Racket can return procedures as a return value. It can also accept procedures as input.
+With the example above we've seen how Racket can return procedures as a return value. It can also accept procedures as input.
 
 I> ### Definition 8
 I>
@@ -631,7 +632,7 @@ To re-implement filter, note that it takes a predicate `p`, together with a list
 
 1. For empty list, just as before, we just return the empty list
 1. Otherwise, if a predicate matches the current element we include it in the generation of the new list, recursively filtering the remainder of the elements
-1. Otherwise, we recursively filter the remainder of the elements skipping adding the current one to the list
+1. Otherwise, we recursively filter the remainder of the elements, skipping the addition of the current one to the list
 
 ```racket
 (define (my-filter p l)
@@ -640,7 +641,7 @@ To re-implement filter, note that it takes a predicate `p`, together with a list
         (else (my-filter p (cdr l)))))
 ```
 
-`fold` is a procedure that takes as input a combining procedure that accepts two parameters (current value and accumulator), an initial value and a list and returns a value combined with this procedure. There are two types of folds, a right and a left one, which combines from the right and the left respectively[^ch2n3]:
+`fold` is a procedure that takes as input a combining procedure that accepts two parameters (current value and accumulator), an initial value and a list and returns a value combined with this procedure. There are two types of folds, a right and a left one, which combine from the right and the left respectively[^ch2n3]:
 
 ```racket
 > (foldr cons '() '(1 2 3))
@@ -661,32 +662,25 @@ To re-implement filter, note that it takes a predicate `p`, together with a list
                   (my-foldr op i (cdr l))))))
 ```
 
-`foldl` is a bit more complex. We will start by defining a procedure `iter` that has two cases:
+`foldl` is a bit more complex. We start by defining a procedure has two cases:
 
 1. For empty list, we return the initial value
-1. Otherwise, we call `iter` again with the remainder of the list and changing the initial value to be combined with the current element
-
-```racket
-(define (iter op l i)
-  (cond ((eq? '() l) i)
-        (else (iter op (cdr l) (op (car l) i)))))
-```
-
-This function works in a similar way with `foldr`, except that the result is captured in the procedure's argument. For example, here's how it unfolds for `(iter + '(1 2 3) 0)`:
-
-```racket
-(iter + '(1 2 3) 0)
-= (iter + '(2 3) 1)
-= (iter + '(3) 3)
-= (iter + '() 6)
-= 6
-```
-
-After having defined this, `my-foldl` is simply:
+1. Otherwise, we call the fold again, changing the initial value to be combined with the current element, and the remainder of the list
 
 ```racket
 (define (my-foldl op i l)
-  (iter op l i))
+  (cond ((eq? '() l) i)
+        (else (my-foldl op (op (car l) i) (cdr l)))))
+```
+
+This function works in a similar way with `foldr`, except that the result is captured in the procedure's argument. For example, here's how it unfolds for `(my-foldl + 0 '(1 2 3))`:
+
+```racket
+(my-foldl + 0 '(1 2 3))
+= (my-foldl + 1 '(2 3))
+= (my-foldl + 3 '(3))
+= (my-foldl + 6 '())
+= 6
 ```
 
 ### 2.4.10. Packages
@@ -695,11 +689,11 @@ I> ### Definition 9
 I>
 I> A package in Racket resembles a set of definitions someone has written for others to use.
 
-For example, if we want to use hashing functions, we would pick a package that implements these and use them. This allows us to put our focus on the design of our system, instead of re-defining everything.
+For example, if we want to use hashing functions we would pick a package that implements these and use them. This allows us to put our focus on the design of our system instead of re-defining everything.
 
-Packages can be browsed at http://pkgs.racket-lang.org. Packages can be installed from the DrRacket GUI - when we try to use a package that is missing and available in the packages repository, DrRacket will give us the option to install it. Alternatively, they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages in Racket later in the book.
+Packages can be browsed at http://pkgs.racket-lang.org. They can be installed from the DrRacket GUI - we will be provided with an option to install a package when we try to use one that is available in the packages repository. Alternatively they can be installed using `raco pkg install <package_name>` from the command line. We will take the advantage of packages later.
 
-To export objects from a package, we use the syntax `provide`. As an example, let's create a few procedures, and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions`.
+To export objects from a package we use the syntax `provide`. As an example, let's create a few procedures and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions` on the top menu.
 
 ```racket
 (define (sum-list l) (foldl + 0 l))
@@ -708,7 +702,7 @@ To export objects from a package, we use the syntax `provide`. As an example, le
 (provide sum-list)
 ```
 
-We will create another file called `test.rkt` in the same folder as `utils.rkt`. We'll use the syntax `(require <package_name>)`:
+We will create another file called `test.rkt` in the same folder as `utils.rkt`. We'll use the syntax `require`:
 
 ```racket
 (require "utils.rkt")
@@ -744,7 +738,7 @@ I> ### Definition 10
 I>
 I> Scope refers to the visibility of the definitions, or which parts of the program can use them.
 
-`my-number` is defined at the same level as, and before `add-to-my-number`, so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition, and not accessible to anything outside it.
+`my-number` is defined at the same level as, and before `add-to-my-number` so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition and not accessible to anything outside it.
 
 Using the `let` syntax we can introduce variables that are visible only in a certain section:
 
@@ -765,7 +759,7 @@ This creates variables `var-1` and `var-2` visible only in the "our code" part.
 . . y: undefined;
 ```
 
-There is another syntax `letrec`, which is very similar to `let`, where in addition the variables will be visible in the variable scope:
+There is another syntax `letrec` which is very similar to `let`, where in addition the variables will be visible in the variable scope:
 
 ```racket
 > (letrec ((x 1) (y (+ x 1))) y)
@@ -785,18 +779,26 @@ For example, compare the result of these two evaluations:
 2
 ```
 
-In the second example, we have a `let` within a `let`. The inner `let` is defining an `x`, and so is the outer `let`. However, the `x` within the inner `let` will be used in the inner `let`'s body.
+In the second example we have a `let` within a `let`. The inner `let` is defining an `x` and so is the outer `let`. However, the `x` within the inner `let` will be used in the inner `let`'s body.
 
-The way we defined `my-foldl` earlier exposed `iter` to the global scope. We can rewrite it as follows, making `iter` visible only within `my-foldl`, and also using variable shadowing for `l` and `i`:
+Finally, let's consider another example:
 
 ```racket
-(define (my-foldl op i l)
-  (define (iter l i)
-    (cond ((eq? '() l) i)
-          (else
-           (iter (cdr l) (op (car l) i)))))
-  (iter l i))
+(define a-number 3)
+(define (test-1 x) (+ a-number x))
+(define (test-2 a-number) (+ a-number a-number))
 ```
+
+Interacting:
+
+```racket
+> (test-1 4)
+7
+> (test-2 4)
+8
+```
+
+`test-1` is using `a-number` from the global scope. `test-2` is using variable shadowing for `my-number` so it is the same as saying `(define (test-2 x) (+ x x))`.
 
 ### 2.4.12. Structures
 
@@ -804,7 +806,7 @@ I> ### Definition 12
 I>
 I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
 
-In Racket, there's a special syntax `struct` which allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient, since it will automatically provide procedures to construct a data type and retrieve its values.
+In Racket there's a special syntax `struct` that allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient since it will automatically provide procedures to construct a data type and retrieve its values.
 
 For example, given the following definition:
 
@@ -847,8 +849,8 @@ We can use the automatically generated procedures to extract values from objects
 
 The point of this chapter was to get a basic understanding of the Racket programming language. Here's what we learned in this chapter, briefly:
 
-1. Lisp is a family of programming languages, and Racket belongs to the Lisp family
-1. Lisps have no syntax compared to standard programming languages, and syntax is defined differently in Lisp, through S-expressions
+1. Lisp is a family of programming languages and Racket belongs to the Lisp family
+1. Lisps have no syntax compared to standard programming languages and syntax is defined differently in Lisp, through S-expressions
 1. Lisp evaluation is very similar to substitution in mathematics
 1. There are several primitive types: symbols, booleans, characters, strings, lists
 1. Lists are a special kind of pairs
