@@ -6,7 +6,7 @@ Lisp, originating from 1958, stands for LISt Processing. Unlike standard program
 
 There are three important notions in a Lisp:
 
-1. Primitives or axioms, starting points. As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations upon the numbers, such as `+`, `*`, etc.
+1. Primitives or axioms, starting points. As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations upon the numbers, such as `+` and `*`.
 1. Composition or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
 1. Abstraction or capturing the composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
 
@@ -16,7 +16,7 @@ I> A data structure is a collection of values, the relationships among them, and
 
 As we have mentioned, an example of a data structure is numbers together with the plus and multiplication functions.
 
-From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, transaction amount, etc.
+From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, and transaction amount.
 
 There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, appending two lists, etc.
 
@@ -55,7 +55,7 @@ I>
 I> 1. _Symbols_, which can be combined into sentences
 I> 1. _Grammar_, which is a set of rules that tells us which sentences are well-formed
 
-The definition of a language also reflects programming languages where they have a special grammar - syntax. For example, the C programming language has a special syntax - you have to follow specific rules when writing program statements. 
+The definition of a language also reflects programming languages where they have a special grammar - syntax. For example, the C programming language has a special syntax - you have to follow specific rules when writing program statements.
 
 I> ### Definition 5
 I>
@@ -76,7 +76,7 @@ while (x > 0) {
 
 It is not important to understand what this code does, rather how such programs are represented internally in programming languages.
 
-Lisps do not have the restriction of a special syntax like C has, for example. What we will write as code will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap with existing ones.
+Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap with existing ones.
 
 Due to this minimalism, building a cryptocurrency (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book, we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
@@ -99,7 +99,7 @@ Scheme, the programming language from which Racket was influenced and based upon
 There are two main approaches to work with Racket:
 
 1. Using the graphical user interface (GUI), which is the recommended way and the way that we will use throughout this book
-1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager, etc) for more advanced users
+1. Using the command line utilities (`racket` - the interpreter/compiler, `raco` - the package manager) for more advanced users
 
 ## 2.3. Configuration and installation
 
@@ -109,7 +109,7 @@ Racket can be downloaded and installed via https://download.racket-lang.org. The
 
 The upper text area part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interaction area where we interact with the definitions.
 
-The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples, etc. which is also available in offline-mode but is optional for this book.
+The Help Desk under `Help > Help Desk` contains useful information such as quick introduction, reference manuals, examples which is also available in offline-mode but is optional for this book.
 
 ## 2.4. Tutorial
 
@@ -138,7 +138,7 @@ We immediately notice how powerful substitution as a concept is.
 
 ### 2.4.1. Primitive types
 
-In the evaluation we've done above, what we get as a result is a number. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
+In the evaluation we've done above, we get a number as a result. So the value 7 has a type of number. While this may be implicit in Racket, we have a way to check what the type of a value is, as we will see later with the help of predicates.
 
 Racket has some primitive types, such as:
 
@@ -175,7 +175,7 @@ We'll cover symbols, lists, and functions in the following sections.
 
 ### 2.4.2. Lists, evaluation, quotes
 
-In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to evaluate `(list 1 2 3)`:
+In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to evaluate `(list 1 2 3)` in the interactions area:
 
 ```racket
 > (list 1 2 3)
@@ -186,7 +186,7 @@ In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to 
 
 For additional information on `list` (or any other function), you can click on the word using the mouse and press the F1 button. This will open Racket's manuals screen that will give you an option to pick a function that you want information for. Usually, it's the first match on this list. Clicking on it will show the following:
 
-![DrRacket manual for `list`](images/drracket-docs.png)
+![Racket manual for `list`](images/drracket-docs.png)
 
 Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2.
 
@@ -318,7 +318,7 @@ Procedures can also take more than one argument:
 (define (add x y) (+ x y))
 ```
 
-### 2.4.6. Comparison procedures
+### 2.4.6. Conditional procedures
 
 There are useful procedures that produce boolean output, such as checking whether a value is a number, or whether a number is greater than another:
 
@@ -848,7 +848,7 @@ We can use the automatically generated procedures to extract values from objects
 The point of this chapter was to get a basic understanding of the Racket programming language. Here's what we learned in this chapter, briefly:
 
 1. Lisp is a family of programming languages, and Racket belongs to the Lisp family
-1. Lisps have no syntax compared to standard programming languages, and syntax is defined differently in Lisp, through S-exprs
+1. Lisps have no syntax compared to standard programming languages, and syntax is defined differently in Lisp, through S-expressions
 1. Lisp evaluation is very similar to substitution in mathematics
 1. There are several primitive types: symbols, booleans, characters, strings, lists
 1. Lists are a special kind of pairs
