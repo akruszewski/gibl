@@ -56,6 +56,8 @@ In contrast, in a peer-to-peer network - which represents a decentralized system
 
 With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask the newcomer to prove that they can be trusted. We need to modify our system to support a kind of trust.
 
+TODO from Panicz: I think that it could be helpful to make some analogy regarding what people attribute their value to. for example, why people think that gold is valuable, or that money is valuable, or that currencies in massive RPG games are valuable - that people devote their time to something.
+
 I> ### Definition 6
 I>
 I> A proof of work is data that is time-consuming to calculate, and easy for others to verify.
