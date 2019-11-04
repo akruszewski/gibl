@@ -106,8 +106,6 @@ Instead, we want to use what is called an asymmetric algorithm or public-key cry
 
 ### 1.2.2. Asymmetric-key algorithm
 
-![Asymmetric-key algorithm](images/asymmetric-algo.png)
-
 This algorithm scheme has a neat property where only the private key can decode a message, and the public key can encode a message.
 
 We have two functions:
@@ -115,11 +113,13 @@ We have two functions:
 1. {$$}E(x, k){/$$}, that encrypts a message {$$}x{/$$} given a public key {$$}k{/$$}
 1. {$$}D(x, k){/$$}, that decrypts a message {$$}x{/$$} given a private key {$$}k{/$$}
 
+![Asymmetric-key algorithm](images/asymmetric-algo.png)
+
 Recall the modulo operation - {$$}a \bmod b{/$$} represents the remainder when {$$}a{/$$} is divided by {$$}b{/$$}. Here's one example of a basic algorithm based on addition and modulo operations:
 
 1. Pick one random number, for example 100. This will represent a common, publicly available key
 1. We generate a random private key in the range {$$}(1, 100){/$$}, for example 97
-1. We generate a public key, pub = 100 - private = 3
+1. We generate a public key by subtracting the common key from the private: {$$}100 - 97 = 3{/$$}
 1. To encrypt data, add it to the public key and take modulo 100. {$$}E(x, k) = (x + k) \bmod 100{/$$}
 1. To decrypt data, we use the same logic but with our private key, so {$$}D(x, k) = (x + k) \bmod 100{/$$}
 
