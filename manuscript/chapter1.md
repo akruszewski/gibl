@@ -26,9 +26,13 @@ I> A ledger is a book that contains a record of transactions.
 
 Further, at the end of every day, you all sit together and refer to the ledger to do the calculations to settle up. If you spent more than you received, you put that money in the pot, otherwise, you take that money out.
 
-Every peer in the system has a *wallet* of a kind, that resembles the balance for them. Note that we have to go through all existing records to do calculations[^ch1n1]. 
+Every peer in the system has a *wallet* of a kind, that resembles the balance for them. Note that we have to go through all existing records to do calculations[^ch1n1].
 
 A problem that might appear with this kind of system is that anyone can add a transaction. For example, Bob can add a transaction where Alice pays him a few dollars, without Alice approving. We need to re-think our system such that all transactions will be verified/signed.
+
+I> ### Definition 4
+I>
+I> A digital signature is a way to verify the authenticity of digital messages or documents.
 
 For signing and verifying transactions we will rely on digital signatures. For now, let's assume that anyone who adds information to the ledger also adds a signature with each record, and others have no way to modify the signature, but only to verify it. We will cover the details in section 1.2.
 
@@ -40,7 +44,7 @@ We need a way to decentralize the ledger, such that at any given time any of the
 
 You are connected to your friends, and so are they to you. Informally, this makes a peer-to-peer network.
 
-I> ### Definition 4
+I> ### Definition 5
 I>
 I> A peer-to-peer network is formed when two or more computers are connected.
 
@@ -50,13 +54,13 @@ For example, when you are accessing a web page on the Internet using a browser, 
 
 With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? We need to modify our system to support a kind of trust.
 
-I> ### Definition 5
+I> ### Definition 6
 I>
 I> A proof of work is data that is time-consuming to calculate, and easy for others to verify.
 
 For each record, we will also include a special number (or a hash) that will represent *proof of work*, in that it will provide proof that the transaction is valid. We will cover the details in section 1.3.
 
-At the end of the day, we agree that we will trust the ledger who has put most of the work in it. So if Bob has some errands to run, he can catch up the next day by trusting the rest of the peers in the network.
+At the end of the day, we agree that we will trust the ledger who has put most of the work in it. If Bob has some errands to run, he can catch up the next day by trusting the rest of the peers in the network.
 
 In addition to all this, we want the transactions to have an order, so every record will also contain a link to the previous record.
 
@@ -72,15 +76,15 @@ Before we talk about encryption, we first have to recall what functions are.
 
 ![A function](images/function.png)
 
-I> ### Definition 6
+I> ### Definition 7
 I>
 I> Functions are mathematical entities that assign unique outputs to given inputs.
 
-For example, you might have a function that accepts as input a person, and as output returns the person's age or name.
+For example, you might have a function that accepts as input a person, and as output returns the person's age or name. Another example is the function {$$}f(x) = x + 1{/$$}. There are many inputs this function can accept: 1, 2, 3.14. For example, when we input 2 it gives us an output of 3, since {$$}f(2) = 2 + 1 = 3{/$$}.
 
-I> ### Definition 7
+I> ### Definition 8
 I>
-I> Encryption is a two-way function; what is encrypted can be decrypted with the proper key. It is a method of encoding values such that only authorized persons can view the original content.
+I> Encryption is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
 
 ### 1.2.1. Symmetric-key algorithm
 
@@ -92,6 +96,8 @@ We can assume that there exist functions {$$}E(x){/$$} and {$$}D(x){/$$} for enc
 
 For example, let's assume there's some kind of an encryption scheme, say {$$}E(\text{"Boro"}) = \text{426f726f}{/$$}. We can "safely" communicate the value {$$}\text{426f726f}{/$$} without actually exposing our original value, and only those who know the decryption scheme {$$}D(x){/$$} will be able to see that {$$}D(\text{426f726f}) = \text{"Boro"}{/$$}.
 
+Another example of encryption scheme is for {$$}E(x){/$$} to shift every character in {$$}x{/$$} forward, and for {$$}D(x){/$$} to shift every character in {$$}x{/$$} backwards[^ch1n2]. To encrypt the text "abc" we have {$$}E(\text{"abc"}) = \text{"bcd"}{/$$}, and to decrypt it we have {$$}D(\text{"bcd"}) = \text{"abc"}{/$$}.
+
 However, the scheme described above makes a symmetric algorithm, meaning that we have to share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks.
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
@@ -102,32 +108,49 @@ Instead, we want to use what is called an asymmetric algorithm or public-key cry
 
 ![Asymmetric-key algorithm](images/asymmetric-algo.png)
 
-This algorithm scheme has a neat property where only the private key can decode a message, and the public key can encode a message. A message can be signed with the sender's private key and can be verified by anyone who has access to the sender's public key.
+This algorithm scheme has a neat property where only the private key can decode a message, and the public key can encode a message.
 
 We have two functions:
 
-1. {$$}S(x, k){/$$}, that signs a message {$$}x{/$$} given a private key {$$}k{/$$}
-1. {$$}V(x, s, k){/$$}, that verifies a message {$$}x{/$$}, given signature {$$}s{/$$} and public key {$$}k{/$$}
+1. {$$}E(x, k){/$$}, that encrypts a message {$$}x{/$$} given a public key {$$}k{/$$}
+1. {$$}D(x, k){/$$}, that decrypts a message {$$}x{/$$} given a private key {$$}k{/$$}
 
 As we said earlier, each record will also include a special number (or a hash). This hash will be what is produced by {$$}S(x, k){/$$}. We will use the verify function to confirm a record's ownership.
+
+Here's one example of such a basic algorithm based adding/modulo operation:
+
+1. Pick one random number, for example 100. This will represent a common, publicly available key
+1. We generate a random private key in the range {$$}(1, 100){/$$}, for example 97
+1. We generate a public key, pub = 100 - private = 3
+1. To encrypt data, add it to the public key and take modulo 100. {$$}E(x, k) = (x + k) % 100{/$$}
+1. To decrypt data, we use the same logic but with our private key, so {$$}D(x, k) = (x + k) % 100{/$$}
+
+For example, suppose we want to encrypt 5. Then {$$}E(x, 3) = (5 + 3) % 100 = 8{/$$}. To decrypt 8, we have {$$}D(8, 97) = (8 + 97) % 100 = 105 % 100 = 5{/$$}.
+
+This example uses a very simple generation pair {$$}(x + k) % c{/$$}. But, in practice this algorithm is not known, or if it is known then it will take a lot of time to compute.
+
+We can use this scheme to define digital signatures:
+
+1. {$$}S(x, k){/$$}, that signs a message {$$}x{/$$} given a private key {$$}k{/$$}
+1. {$$}V(x, s, k){/$$}, that verifies a message {$$}x{/$$}, given signature {$$}s{/$$} and public key {$$}k{/$$}
 
 In the wallet, we will store the public and the private keys. These keys will be used to receive or spend money. With the private key, it is possible to write new blocks (or transactions) to the blockchain, effectively spending money. With the public key, others can send currency to the wallet and verify signatures.
 
 ## 1.3. Hashing
 
-I> ### Definition 8
+I> ### Definition 9
 I>
 I> Hashing is a one-way function that encodes text without a way to retrieve the original contents back.
 
-Hashing, however, is simpler than the encryption schemes described above.
+Hashing, however, is simpler than the encryption schemes described above. One example of a hashing function is one that returns the length of characters. For example the hashing function {$$}H{/$$} produces {$$}H(\text{"abc"}) = 3{/$$}, but also {$$}H(\text{"bcd"}) = 3{/$$}. This means that we don't have a way to retrieve the original contents just by using the return value 3.
 
 As we mentioned earlier, the reason to use such a technique is that they have some interesting properties, such as providing us with the so-called notion proof-of-work.
 
-I> ### Definition 9
+I> ### Definition 10
 I>
 I> Mining is a validation of transactions. For this effort, successful miners obtain new coins as a reward.
 
-Hashcash is one kind of a proof-of-work system[^ch1n2]. The Hashcash algorithm is what we will use to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
+Hashcash is one kind of a proof-of-work system[^ch1n3]. The Hashcash algorithm is what we will use to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
 
 Hashing functions have another useful property that allows connecting two or more distinct blocks by having the information `current-hash` and `previous-hash` in each block.
 
@@ -179,4 +202,6 @@ Here's what we learned in this chapter, briefly:
 
 [^ch1n1]: There is a way we can optimize this with so-called *unspent transaction outputs* (UTXOs), which we will discuss in detail later.
 
-[^ch1n2]: Hashcash was initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa.
+[^ch1n2]: This is known as Caesar cipher.
+
+[^ch1n3]: Hashcash was initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa.
