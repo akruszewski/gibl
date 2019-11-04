@@ -2,7 +2,7 @@
 
 This book aims to be accessible to novices that have no prior experience in programming but have some basic working experience with computers. It will also assume some experience with high school mathematics, such as functions. Thus, this book is designed to be self-contained.
 
-One of the reasons for writing this book is that I could not find a single book that explained how to implement blockchain from scratch, covering all the details. I had to do a lot of research on the internet to come up with a complete picture of what blockchain is, how one can implement it, and what it is good for.
+One of the reasons for writing this book is that I could not find a single book that explained how to implement blockchain from scratch, covering all the details. I had to do a lot of research on the Internet to come up with a complete picture of what blockchain is, how one can implement it, and what it is good for.
 
 Since it's easy to get distracted by the amount of information, every section will contain a summary to serve as a recall. Moving back and forth between chapters until information sticks can be useful in aiding understanding.
 
