@@ -54,7 +54,7 @@ In contrast, in a peer-to-peer network - which represents a decentralized system
 
 ![A decentralized ledger](images/decentralized-ledger.png)
 
-With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? We need to modify our system to support a kind of trust.
+With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask the newcomer to prove that they can be trusted. We need to modify our system to support a kind of trust.
 
 I> ### Definition 6
 I>
