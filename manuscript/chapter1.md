@@ -74,6 +74,10 @@ If everybody agreed to use this ledger as a source of truth, there would be no n
 
 To understand digital signatures and proof of work, we will be looking at encryption and hashing respectively. Fortunately for us, the programming language that we will be using has built-in functions for encryption and hashing. We don't have to dig too deep into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
 
+X> ### Exercise 1
+X>
+X> TODO: Note how we started with a ledger and gradually built a system. Now what?
+
 ## 1.2. Encryption
 
 Before we talk about encryption, we first have to recall what functions are.
@@ -105,6 +109,14 @@ Another example of encryption scheme is for {$$}E(x){/$$} to shift every charact
 However, the scheme described above makes a symmetric algorithm, meaning that we have to share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks.
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
+
+X> ### Exercise 2
+X>
+X> Check the three properties one by one to ensure Caesar cipher is compatible with them.
+
+X> ### Exercise 3
+X>
+X> Come up with your own encryption scheme, based on substitution.
 
 ### 1.2.2. Asymmetric-key algorithm
 
@@ -140,6 +152,10 @@ As we said earlier, each record will also include a special number (or a hash). 
 
 In the wallet, we will store the public and the private keys. These keys will be used to receive or spend money. With the private key, it is possible to write new blocks (or transactions) to the blockchain, effectively spending money. With the public key, others can send currency to the wallet and verify signatures.
 
+X> ### Exercise 4
+X>
+X> Use the algorithm we defined to sign a message and verify it.
+
 ## 1.3. Hashing
 
 I> ### Definition 9
@@ -161,6 +177,10 @@ Hashing functions have another useful property that allows connecting two or mor
 The hash of the block is based on the block's data itself, so to verify a hash we can just hash the block's data and compare it to `current-hash`.
 
 Two or more blocks (or transactions) that are connected form a blockchain. The validity of each transaction will depend on the validity of the blockchain.
+
+X> ### Exercise 5
+X>
+X> Come up with your own hashing function.
 
 ## 1.4. Bitcoin
 
