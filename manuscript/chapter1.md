@@ -184,7 +184,23 @@ X> ### Exercise 6
 X>
 X> Come up with your own hashing function.
 
-## 1.4. Bitcoin
+## 1.4. Smart contracts
+
+I> ### Definition 11
+I>
+I> A smart contract is a self-executing contract with the conditions of an agreement between a buyer and a seller being directly written into lines of code.
+
+A blockchain is programmable if the transactions themselves can be programmed by users. For example, users (not necessarily programmers) can write a script to add additional requirements that must be satisfied before sending money. It could look something like this:
+
+```text
+if (user has more than 10 money)
+   then approve transaction
+   else disapprove transaction
+```
+
+Smart contracts are implemented as a computation that takes place on the blockchain. We will implement a very basic functionality of smart contracts.
+
+## 1.5. Bitcoin
 
 Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper authored by Satoshi Nakamoto titled "Bitcoin: A Peer-to-Peer Electronic Cash System" was published on a cryptography mailing list. Bitcoin's white paper consists of 9 pages, however, it is a mostly theoretical explanation of the design, and as such may be a bit overwhelming to newcomers.
 
@@ -192,21 +208,21 @@ The Bitcoin software is open source code and was released in January 2009 on Sou
 
 Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin - with some parts simplified.
 
-## 1.5. Example workflows
+## 1.6. Example workflows
 
-### 1.5.1. Adding a block to a blockchain
-
-TODO
-
-### 1.5.2. Mining a block
+### 1.6.1. Adding a block to a blockchain
 
 TODO
 
-### 1.5.3. Checking wallet balance
+### 1.6.2. Mining a block
 
 TODO
 
-### 1.5.4. Sending money
+### 1.6.3. Checking wallet balance
+
+TODO
+
+### 1.6.4. Sending money
 
 TODO
 

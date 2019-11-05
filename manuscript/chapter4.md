@@ -1,6 +1,8 @@
-# 4. Peer-to-peer implementation
+# 4. Extending the blockchain
 
-## 4.1. `peer-to-peer.rkt`
+## 4.1. Peer-to-peer implementation
+
+### 4.1.1. `peer-to-peer.rkt`
 
 ```racket
 (require "blockchain.rkt")
@@ -245,9 +247,9 @@ Finally
          run-peer)
 ```
 
-## 4.2. Updated `main-helper.rkt`
+### 4.1.2. Updating existing code
 
-Modify `main-helper.rkt` to also include peer-to-peer implementation:
+Also need to modify `main-helper.rkt` to include peer-to-peer implementation:
 
 ```racket
 ; ...
@@ -260,7 +262,7 @@ Modify `main-helper.rkt` to also include peer-to-peer implementation:
          format-transaction print-block print-blockchain print-wallets)
 ```
 
-## 4.3. `main-p2p.rkt`
+### 4.1.3. `main-p2p.rkt`
 
 ```racket
 (require "./main-helper.rkt")
@@ -362,6 +364,90 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 
 (mine-loop)
 ```
+
+## 4.2. Smart contracts implementation
+
+Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write a little script to add additional requirements that must be satisfied before sending money.
+
+In chapter 4 we created an executable and we can send it to our friends, but they can no longer change the code. So non-programmers can adjust the logic in the code without changing the original code - transactions programmable
+
+### 4.2.1. `smart-contracts.rkt`
+
+```racket
+(require "transaction.rkt")
+```
+
+Now we have this procedure...
+
+```racket
+(define (valid-transaction-with-contract? t contract)
+  (and (eval-contract t contract)
+       (valid-transaction? t)))
+```
+
+Now we have this procedure...
+
+```racket
+(define (eval-contract t c)
+  (define (eval-binary op l r)
+    (op (eval-contract t l)
+        (eval-contract t r)))
+  (match c
+    [(? number? x) x]
+    [(? string? x) x]
+    [`() #t]
+    [`(if ,co ,tr ,fa) (if (eval-contract t co) (eval-contract t tr) (eval-contract t fa))]
+    [`from (transaction-from t)]
+    [`to (transaction-to t)]
+    [`'value (transaction-value t)]
+    [`(* ,l ,r) (eval-binary l r)]
+    [`(+ ,l ,r) (eval-binary l r)]
+    [`(- ,l ,r) (eval-binary l r)]
+    [`(= ,l ,r) (eval-binary equal? l r)]
+    [`(> ,l ,r) (eval-binary > l r)]
+    [`(< ,l ,r) (eval-binary < l r)]
+    [`(and ,l ,r) (eval-binary (lambda (l r) (and l r)) l r)] ; convert this to procedure since and is syntax
+    [`(or ,l ,r) (eval-binary (lambda (l r) (or l r)) l r)]
+    [else #f]))
+```
+
+And provide the outputs:
+
+```racket
+(provide (all-from-out "transaction-io.rkt")
+         valid-transaction-with-contract?)
+```
+
+### 4.2.2. Updating existing code
+
+Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to accept contracts:
+
+```racket
+(define (send-money-blockchain b from to value c)
+  (letrec ([my-ts
+            (filter (lambda (t) (equal? from (transaction-io-owner t)))
+                    (blockchain-utxo b))]
+           [t (make-transaction from to value my-ts)])
+    (if (transaction? t)
+        (let ([processed-transaction (process-transaction t)])
+          (if (and (>= (balance-wallet-blockchain b from) value)
+                   (valid-transaction? processed-transaction c))
+              (add-transaction-to-blockchain b processed-transaction)
+              b))
+        (add-transaction-to-blockchain b '()))))
+```
+
+We update `main-helper.rkt` to `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
+
+```racket
+(define (file->contract file)
+  (with-handlers ([exn:fail? (lambda (exn) '())])
+    (read (open-input-file file))))
+```
+
+A contract in our implementation is just an S-expression.
+
+Finally, we update `mine-loop` in `main-p2p.rkt` as follows:
 
 ## Summary
 
