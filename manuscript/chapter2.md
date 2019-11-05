@@ -94,11 +94,18 @@ X> Think of a different data structure besides numbers, which we already mention
 
 X> ### Exercise 2
 X>
-X> TODO: Recursion
+X> Evaluate {$$}sum(3), sum(5), and sum(1){/$$} given the following definition:
+X>
+X> {$$}sum(n) = \left\{ \begin{array}{ll} 0\text{, if } n = 0 \\	n + sum(n - 1)\text{, otherwise} \end{array} \right.{/$$}
 
 X> ### Exercise 3
 X>
-X> TODO: Something about validity of S-expressions
+X> Which of the following S-expressions are valid?
+X>
+X> 1. `hello`
+X> 2. `123`
+X> 3. `(hello 123)`
+X> 4. `(hello (123)`
 
 ## 2.2. Why Racket
 
@@ -229,7 +236,7 @@ Recall that S-expressions can be either a symbol or a list. Since we discussed e
 
 X> ### Exercise 4
 X>
-X> Create your own list in Racket that contains a mixture of different types (numbers, strings). The list should have at least 2 elements.
+X> Create a list in Racket that contains a mixture of different types (numbers, strings). The list should have at least 2 elements.
 
 X> ### Exercise 5
 X>
@@ -483,7 +490,7 @@ Finally, `equal?` will compare structures recursively, supporting lists:
 
 X> ### Exercise 10
 X>
-X> Represent `is-large` using the `if` syntax
+X> Represent `is-large` using the `if` syntax.
 
 X> ### Exercise 11
 X>
@@ -635,7 +642,9 @@ Using the substitution method `(my-cons 10 20)` evaluates to `(lambda (z) (if (=
 
 X> ### Exercise 13
 X>
-X> TODO
+X> Implement a procedure so that when evaluated, it returns a procedure that returns a constant number.
+X>
+X> Hint: `(lambda () 1)` is a procedure that accepts no parameters and returns a constant number.
 
 ### 2.4.9. General higher-order procedures
 
@@ -737,15 +746,17 @@ This function works in a similar way with `foldr`, except that the result is cap
 
 X> ### Exercise 14
 X>
-X> TODO: map
+X> Implement a procedure so that it calls a procedure that's passed in the arguments.
+X>
+X> Hint: `(... (lambda () 1))` should return 1.
 
 X> ### Exercise 15
 X>
-X> TODO: filter
+X> Use DrRacket's feature to follow definitions on `my-map`, `my-filter`, `my-foldr` and `my-foldl` to get a better understanding of how they work.
 
 X> ### Exercise 16
 X>
-X> TODO: foldr and foldl
+X> Pick some operators and predicates, and use `my-map`, `my-filter`, `my-foldr` and `my-foldl` with them on lists to see what they evaluate to.
 
 ### 2.4.10. Packages
 
@@ -755,7 +766,7 @@ I> A package in Racket resembles a set of definitions someone has written for ot
 
 For example, if we want to use hashing functions we would pick a package that implements these and use them. This allows us to put our focus on the design of our system instead of re-defining everything.
 
-Packages can be browsed at http://pkgs.racket-lang.org. They can be installed from the DrRacket GUI - we will be provided with an option to install a package when we try to use one that is available in the packages repository. Alternatively they can be installed using `raco pkg install <package_name>` from the command line. We will take the advantage of packages later.
+Packages can be browsed at http://pkgs.racket-lang.org. They can be installed from the DrRacket GUI - we will be provided with an option to install a package when we try to use one that is available in the packages repository. Alternatively they can be installed using `raco pkg install <package_name>` from the command line. We will take advantage of packages later.
 
 To export objects from a package we use the syntax `provide`. As an example, let's create a few procedures and then save their definitions in a file called `utils.rkt` by clicking on `File > Save Definitions` on the top menu.
 
@@ -866,11 +877,7 @@ Interacting:
 
 X> ### Exercise 17
 X>
-X> TODO: Use `my-foldl` with DrRacket's feature to follow definitions and try to understand how it
-
-X> ### Exercise 18
-X>
-X> TODO: ANother exercise with scoping
+X> Use DrRacket's feature to follow definitions on `test-1` and `test-2`.
 
 ### 2.4.12. Structures
 
@@ -917,7 +924,7 @@ We can use the automatically generated procedures to extract values from objects
 #f
 ```
 
-X> ### Exercise 19
+X> ### Exercise 18
 X>
 X> Create a person structure that contains a first name, last name and age.
 
@@ -935,6 +942,6 @@ The point of this chapter was to get a basic understanding of the Racket program
 
 [^ch2n1]: We will cover details about macros in Appendix B.
 
-[^ch2n2]: Actually the empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list.
+[^ch2n2]: The empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list.
 
 [^ch2n3]: The right fold exhibits a recursive process (think `my-length`), while the left one exhibits an iterative one (think `my-length-iter`).
