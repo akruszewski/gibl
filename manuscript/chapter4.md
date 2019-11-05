@@ -364,3 +364,5 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 ```
 
 ## Summary
+
+Produce executable that you can share to your friends so that everyone can use it.
