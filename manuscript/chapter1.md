@@ -8,7 +8,7 @@ I> Cryptocurrency is a digital currency in which encryption techniques are used 
 
 I> ### Definition 2
 I>
-I> Blockchain is a system in which a record of transactions made in a cryptocurrency system is maintained across several computers that are linked in a peer-to-peer network.
+I> Blockchain is a system in which a record of transactions is maintained across several computers that are linked in a peer-to-peer network.
 
 We will give an example that will serve as a motivation, as well as define what encryption and hashing techniques are and how will they help us with our system.
 

@@ -78,7 +78,7 @@ It is not important to understand what this code does, rather how such programs 
 
 Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap.
 
-Due to this minimalism, building a cryptocurrency (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
+Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
 I> ### Definition 6
 I>

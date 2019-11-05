@@ -1,6 +1,6 @@
 # 3. Blockchain implementation
 
-Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a cryptocurrency.
+Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a blockchain.
 
 TODO: Might use some procedures that we haven't introduced but we will introduce them as we go through the code. For additional help you can use Racket's manuals.
 
@@ -641,6 +641,6 @@ And export
 
 Components are orthogonal. This means that every component is independent of one another, that is, wallet's implementation does not call procedures in block for example, and that a block can be used independently of wallet.
 
-But when combined we get a cryptocurrency system.
+But when combined we get a blockchain system.
 
 What are the gains?

@@ -8,7 +8,7 @@ As a consequence, when you visit a webpage on the Internet, this webpage can tel
 
 I> ### Definition 1
 I>
-I> Cryptojacking is the unauthorized use of someone else's computer to mine cryptocurrency.
+I> Cryptojacking is the unauthorized use of someone else's computer to mine blocks.
 
 Recall that miners get reward (coins) for mining. In this case, your computer's resources are used for the purpose of mining. This serves as a motivation for cryptojacking.
 
