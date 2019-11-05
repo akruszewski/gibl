@@ -88,6 +88,18 @@ S-expressions form the syntax of a Lisp. Thus, the word syntax has a special mea
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
+X> ### Exercise 1
+X>
+X> Think of a different data structure besides numbers, which we already mentioned.
+
+X> ### Exercise 2
+X>
+X> TODO: Recursion
+
+X> ### Exercise 3
+X>
+X> TODO: Something about validity of S-expressions
+
 ## 2.2. Why Racket
 
 Racket (formerly known as PLT Scheme) is a Lisp. It's not just Lisp, rather a Lisp, since there are many Lisp implementations, but we found this one to be particularly easy for entry-level programmers.
@@ -215,6 +227,14 @@ This allows for the creation of new symbols and is especially important for the 
 
 Recall that S-expressions can be either a symbol or a list. Since we discussed evaluation, lists, and symbols in this section, at this point in the book we have covered the core of a Lisp.
 
+X> ### Exercise 4
+X>
+X> Create your own list in Racket that contains a mixture of different types (numbers, strings). The list should have at least 2 elements.
+
+X> ### Exercise 5
+X>
+X> Note that `list` is a function and `quote` is a syntax. Read the manual for both using the F1 key.
+
 ### 2.4.3. Pairs
 
 Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result, it returns a pair:
@@ -243,6 +263,14 @@ The motivation for using a list is that it will allow us, for example, to link s
 
 We notice how in Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction.
 
+X> ### Exercise 6
+X>
+X> Represent the same list you created in exercise 5 using `cons`.
+
+X> ### Exercise 7
+X>
+X> Use a combination of `car` and `cdr` for the list from exercise 6 to get the second element in the list.
+
 ### 2.4.4. Adding definitions
 
 So far we worked only in the interactions area in DrRacket. Let's try to do something useful in the definitions area.
@@ -263,6 +291,10 @@ If our definitions have references we can hover over the symbol's name using the
 ![Following references in DrRacket](images/drracket-refs.png)
 
 Definitions can be saved to a file for later usage by navigating to `File > Save Definitions` on the top menu.
+
+X> ### Exercise 8
+X>
+X> Store the list from exercise 7 in a definition and then use `car` and `cdr` on that list in the interactions area.
 
 ### 2.4.5. Procedures and functions
 
@@ -318,6 +350,10 @@ Procedures can also take more than one argument:
 (define add (lambda (x y) (+ x y)))
 (define (add x y) (+ x y))
 ```
+
+X> ### Exercise 9
+X>
+X> In exercise 7 you retrieved the second element from a list (`(car (cdr l))`). Define a procedure that does the same thing.
 
 ### 2.4.6. Conditional procedures
 
@@ -445,6 +481,14 @@ Finally, `equal?` will compare structures recursively, supporting lists:
 #t
 ```
 
+X> ### Exercise 10
+X>
+X> Represent `is-large` using the `if` syntax
+
+X> ### Exercise 11
+X>
+X> Represent the following logic using `cond`: return `'foo` if the value is a string or a number, and `'bar` otherwise.
+
 ### 2.4.7. Recursive procedures
 
 Procedures, just like data structures, can also be recursive. We already saw an example with the factorial procedure, in that it calls itself to make a computation or a loop. For example, here's how we could define factorial in Racket:
@@ -548,6 +592,10 @@ I> 1. An iterative process is a process where the current state of calculation i
 
 In the examples above, `list-length` generates a recursive process since it needs to go down to the base case, and then build its way back up to do the calculations that were "deferred". In contrast, `list-length-iter` generates an iterative process, since the results are captured in the arguments.
 
+X> ### Exercise 12
+X>
+X> The way we implemented `fact` - it represents a recursive procedure that generates a recursive process. Rework it so that it is still a recursive procedure such that it generates an iterative process.
+
 ### 2.4.8. Procedures that return procedures
 
 We can also construct procedures that return other procedures as a result. For example:
@@ -584,6 +632,10 @@ Evaluating:
 Note how we define `my-cons` to return another procedure that accepts a parameter, and then based on that parameter we either return the first parameter or the second one.
 
 Using the substitution method `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our procedure "captures" data in a sense. Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
+
+X> ### Exercise 13
+X>
+X> TODO
 
 ### 2.4.9. General higher-order procedures
 
@@ -682,6 +734,18 @@ This function works in a similar way with `foldr`, except that the result is cap
 = (my-foldl + 6 '())
 = 6
 ```
+
+X> ### Exercise 14
+X>
+X> TODO: map
+
+X> ### Exercise 15
+X>
+X> TODO: filter
+
+X> ### Exercise 16
+X>
+X> TODO: foldr and foldl
 
 ### 2.4.10. Packages
 
@@ -800,6 +864,14 @@ Interacting:
 
 `test-1` is using `a-number` from the global scope. `test-2` is using variable shadowing for `my-number` so it is the same as saying `(define (test-2 x) (+ x x))`.
 
+X> ### Exercise 17
+X>
+X> TODO: Use `my-foldl` with DrRacket's feature to follow definitions and try to understand how it
+
+X> ### Exercise 18
+X>
+X> TODO: ANother exercise with scoping
+
 ### 2.4.12. Structures
 
 I> ### Definition 12
@@ -844,6 +916,10 @@ We can use the automatically generated procedures to extract values from objects
 > (document? "test")
 #f
 ```
+
+X> ### Exercise 19
+X>
+X> Create a person structure that contains a first name, last name and age.
 
 ## Summary
 
