@@ -210,6 +210,8 @@ For additional information on `list` (or any other function), you can click on t
 
 Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2, and we write `(f 2)`.
 
+In Racket, parentheses, brackets and braces have the same effect. Thus  `(list 1 2 3)` is the same as `[list 1 2 3]`, and is the same as `{list 1 2 3}`. This visual distinction may be useful to group evaluations when there are a lot of parentheses.
+
 However, now as a result we get `'(1 2 3)`. Let's try to understand what happened here. If `(list 1 2 3)` had returned `(1 2 3)` this wouldn't have made much sense since as (we discussed above) this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
 
 To understand how this affects the evaluation model better, let's consider an example where you say either of these statements to someone:
