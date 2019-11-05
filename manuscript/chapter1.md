@@ -210,21 +210,13 @@ Although there are many cryptocurrency models and each one of them differs sligh
 
 ## 1.6. Example workflows
 
-### 1.6.1. Adding a block to a blockchain
+We will list a few important workflows that our system will use, among others.
 
-TODO
+**Mining a block** creates a new block, using Hashcash to calculate `current-hash` of the block. It also contains `previous-hash` that is a link to the previous block in the blockchain.
 
-### 1.6.2. Mining a block
+**Checking a wallet balance** for a person A will first filter all blocks in the blockchain (sender = A or receiver = A), and then sum them to calculate the balance. The more our blockchain grows the longer this operation will take. For that purpose we will use unspent transaction outputs or the UTXO model. This model is a list of transactions containing information about the owner and the amount of money. Thus, every transaction will consume elements from this list.
 
-TODO
-
-### 1.6.3. Checking wallet balance
-
-TODO
-
-### 1.6.4. Sending money
-
-TODO
+**Adding a block to a blockchain** consists of sending money from A to B. One pre-requisite is that A has enough money - we check this using the wallet balance workflow. We proceed by creating a transaction (sender = A, receiver = B) and signing it. Then we mine a block using this transaction and update the UTXO with the rewards.
 
 ## Summary
 
@@ -240,7 +232,7 @@ Here's what we learned in this chapter, briefly:
 1. The ledger is in a decentralized location, that is, everybody has their copy of the ledger
 1. Trust is based upon proof of work (mining)
 
-[^ch1n1]: There is a way we can optimize this with so-called *unspent transaction outputs* (UTXOs), which we will discuss in detail later.
+[^ch1n1]: There is a way we can optimize this with so-called *unspent transaction outputs* (UTXOs).
 
 [^ch1n2]: This is known as Caesar cipher.
 
