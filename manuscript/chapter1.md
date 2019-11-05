@@ -56,8 +56,6 @@ In contrast, in a peer-to-peer network - which represents a decentralized system
 
 With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask the newcomer to prove that they can be trusted. We need to modify our system to support a kind of trust.
 
-TODO from Panicz: I think that it could be helpful to make some analogy regarding what people attribute their value to. for example, why people think that gold is valuable, or that money is valuable, or that currencies in massive RPG games are valuable - that people devote their time to something.
-
 I> ### Definition 6
 I>
 I> A proof of work is data that is time-consuming to calculate, and easy for others to verify.
@@ -70,13 +68,17 @@ In addition to all this, we want the transactions to have an order, so every rec
 
 ![A chain of blocks - blockchain](images/blockchain.png)
 
-If everybody agreed to use this ledger as a source of truth, there would be no need to exchange physical money at all. Everybody can just use the ledger to put or retrieve money to it.
+If everybody agreed to use this ledger as a source of truth, there would be no need to exchange physical money at all. Everybody can just use the ledger to put or retrieve money to it. After all, currency doesn't have to have any intrinsic value - it only has value because we, as a society, decide that it does.
 
 To understand digital signatures and proof of work, we will be looking at encryption and hashing respectively. Fortunately for us, the programming language that we will be using has built-in functions for encryption and hashing. We don't have to dig too deep into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
 
 X> ### Exercise 1
 X>
-X> TODO: Note how we started with a ledger and gradually built a system. Now what?
+X> Observe how we started with a simple definition of a ledger and gradually built up to a complex system. We will use the same approach in programming.
+
+X> ### Exercise 2
+X>
+X> Think about why do people think that gold is valuable, or that money is valuable, or that currencies in online games are valuable?
 
 ## 1.2. Encryption
 
@@ -110,13 +112,13 @@ However, the scheme described above makes a symmetric algorithm, meaning that we
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
 
-X> ### Exercise 2
+X> ### Exercise 3
 X>
 X> Check the three properties one by one to ensure Caesar cipher is compatible with them.
 
-X> ### Exercise 3
+X> ### Exercise 4
 X>
-X> Come up with your own encryption scheme, based on substitution.
+X> Come up with an encryption scheme, based on substitution.
 
 ### 1.2.2. Asymmetric-key algorithm
 
@@ -152,7 +154,7 @@ As we said earlier, each record will also include a special number (or a hash). 
 
 In the wallet, we will store the public and the private keys. These keys will be used to receive or spend money. With the private key, it is possible to write new blocks (or transactions) to the blockchain, effectively spending money. With the public key, others can send currency to the wallet and verify signatures.
 
-X> ### Exercise 4
+X> ### Exercise 5
 X>
 X> Use the algorithm we defined to sign a message and verify it.
 
@@ -178,7 +180,7 @@ The hash of the block is based on the block's data itself, so to verify a hash w
 
 Two or more blocks (or transactions) that are connected form a blockchain. The validity of each transaction will depend on the validity of the blockchain.
 
-X> ### Exercise 5
+X> ### Exercise 6
 X>
 X> Come up with your own hashing function.
 
@@ -186,7 +188,7 @@ X> Come up with your own hashing function.
 
 Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper authored by Satoshi Nakamoto titled "Bitcoin: A Peer-to-Peer Electronic Cash System" was published on a cryptography mailing list. Bitcoin's white paper consists of 9 pages, however, it is a mostly theoretical explanation of the design, and as such may be a bit overwhelming to newcomers.
 
-The bitcoin software is open source code and was released in January 2009 on SourceForge. As a result of that, anyone can clone the source code and make their blockchain, thus implementing a separate cryptocurrency. Such cryptocurrencies are usually called altcoins. The design of a bitcoin includes a decentralized network (peer-to-peer network), block (mining), blockchain, transactions, and wallets, each of which we will look in detail in this book.
+The Bitcoin software is open source code and was released in January 2009 on SourceForge. As a result of that, anyone can clone the source code and make their blockchain, thus implementing a separate cryptocurrency. Such cryptocurrencies are usually called altcoins. The design of a Bitcoin includes a decentralized network (peer-to-peer network), block (mining), blockchain, transactions, and wallets, each of which we will look in detail in this book.
 
 Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin - with some parts simplified.
 
