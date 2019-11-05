@@ -94,7 +94,7 @@ X> Think of a different data structure besides numbers, which we already mention
 
 X> ### Exercise 2
 X>
-X> Evaluate {$$}sum(3), sum(5), and sum(1){/$$} given the following definition:
+X> Evaluate {$$}sum(3){/$$}, {$$}sum(5){/$$}, and {$$}sum(1){/$$} given the following definition:
 X>
 X> {$$}sum(n) = \left\{ \begin{array}{ll} 0\text{, if } n = 0 \\	n + sum(n - 1)\text{, otherwise} \end{array} \right.{/$$}
 
