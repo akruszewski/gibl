@@ -25,8 +25,6 @@ We will make a procedure that generates a wallet by generating random public and
              (pk-key->datum privkey 'PrivateKeyInfo))
             (bytes->hex-string
              (pk-key->datum pubkey 'SubjectPublicKeyInfo)))))
-
-(provide (struct-out wallet) make-wallet)
 ```
 
 `get-pk`, `generate-private-key`, `pk-key->public-only-key`, `bytes->hex-string` all come from the `crypto` package. We need to make sure to require it at the top of the file:
@@ -35,6 +33,14 @@ We will make a procedure that generates a wallet by generating random public and
 (require crypto)
 (require crypto/all)
 ```
+
+We export everything:
+
+```racket
+(provide (struct-out wallet) make-wallet)
+```
+
+TODO: Explain `struct-out`
 
 Here's an example of one generated wallet:
 
@@ -147,13 +153,13 @@ This procedure will keep increasing the `nonce` until the block is valid. We cha
    target previous-hash (current-milliseconds) transaction 1))
 ```
 
-We provide these functions
+We provide these structures and procedures:
 
 ```racket
 (provide (struct-out block) mine-block valid-block? mined-block?)
 ```
 
-And make sure we require all the necessary packages:
+And make sure we require all the necessary packages, at the top of the fiile:
 
 ```racket
 (require (only-in file/sha1 hex-string->bytes))
@@ -164,11 +170,57 @@ And make sure we require all the necessary packages:
 
 TODO: Explain `only-in` syntax
 
-## 3.3. Transactions
+## 3.3. `utils.rkt`
+
+This file will contain common procedures that will be used by other components.
+
+Now we have this procedure that returns true if the predicate satisfies all members of the list:
+
+```racket
+(define (true-for-all? pred list)
+  (cond
+    [(empty? list) #t]
+    [(pred (first list)) (true-for-all? pred (rest list))]
+    [else #f]))
+```
+
+Now we have this procedure for exporting a struct to a file:
+
+```racket
+(define (struct->file object file)
+  (let ([out (open-output-file file #:exists 'replace)])
+    (write (serialize object) out)
+    (close-output-port out)))
+```
+
+Now we have this procedure for importing struct contents from a file:
+
+```racket
+(define (file->struct file)
+  (letrec ([in (open-input-file file)]
+           [result (read in)])
+    (close-input-port in)
+    (deserialize result)))
+```
+
+We provide these procedures:
+
+```racket
+(provide hex-string->bytes true-for-all? struct->file file->struct)
+```
+
+And make sure we require all the necessary packages:
+
+```racket
+(require racket/serialize)
+```
+
+
+## 3.4. Transactions
 
 In this section we will implement signing and verifying signatures.
 
-### 3.3.1. `transaction-io.rkt`
+### 3.4.1. `transaction-io.rkt`
 
 A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. Think of this as the UTXO model implementation. This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
 
@@ -219,14 +271,14 @@ A `transaction-io` structure is valid if its hash is equal to the hash othe valu
             (transaction-io-timestamp t-in))))
 ```
 
-Finally, we use `provide` to export the procedures:
+Finally, we export the procedures:
 
 ```racket
 (provide (struct-out transaction-io)
          make-transaction-io valid-transaction-io?)
 ```
 
-### 3.3.2. TODO: `transaction.rkt`
+### 3.4.2. TODO: `transaction.rkt`
 
 Explain this code.
 
@@ -348,7 +400,7 @@ Finally
          make-transaction process-transaction valid-transaction?)
 ```
 
-## 3.4. TODO: `blockchain.rkt`
+## 3.5. TODO: `blockchain.rkt`
 
 UTXO Why? Performance reasons.
 
@@ -461,47 +513,6 @@ Finally
          (struct-out blockchain)
          init-blockchain send-money-blockchain
          balance-wallet-blockchain valid-blockchain?)
-```
-
-## 3.5. `utils.rkt`
-
-```racket
-(require racket/serialize)
-```
-
-Now we have this procedure that returns true if the predicate satisfies all members of the list:
-
-```racket
-(define (true-for-all? pred list)
-  (cond
-    [(empty? list) #t]
-    [(pred (first list)) (true-for-all? pred (rest list))]
-    [else #f]))
-```
-
-Now we have this procedure for exporting a struct to a file:
-
-```racket
-(define (struct->file object file)
-  (let ([out (open-output-file file #:exists 'replace)])
-    (write (serialize object) out)
-    (close-output-port out)))
-```
-
-Now we have this procedure for importing struct contents from a file:
-
-```racket
-(define (file->struct file)
-  (letrec ([in (open-input-file file)]
-           [result (read in)])
-    (close-input-port in)
-    (deserialize result)))
-```
-
-Finally
-
-```racket
-(provide hex-string->bytes true-for-all? struct->file file->struct)
 ```
 
 ## 3.6. Integrating components
