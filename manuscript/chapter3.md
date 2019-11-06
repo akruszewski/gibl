@@ -1,6 +1,6 @@
 # 3. Blockchain implementation
 
-Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures that we haven't introduced earlier. For additional details on these procedures you are advised to use Racket's manuals.
+Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures. For some of them we will give a brief explanation. For others, if you are curious, you can get additional details from Racket's manuals.
 
 ## 3.1. `wallet.rkt`
 
@@ -27,7 +27,9 @@ We will make a procedure that generates a wallet by generating random public and
              (pk-key->datum pubkey 'SubjectPublicKeyInfo)))))
 ```
 
-`get-pk`, `generate-private-key`, `pk-key->public-only-key`, `bytes->hex-string` all come from the `crypto` package. We need to make sure to require it at the top of the file:
+`get-pk`, `generate-private-key`, `pk-key->public-only-key`, `bytes->hex-string` all come from the `crypto` package. `bytes->hex-string` converts a hex string (think numbers for example) to bytes, e.g. `"0102030304" -> "Hello"`.
+
+We need to make sure to require it at the top of the file:
 
 ```racket
 (require crypto)
@@ -94,7 +96,7 @@ We will use the SHA hashing algorithm.[^ch4n2] Here's how we can calculate a blo
 
 There are a few things to note here:
 
-1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes and then append all these bytes together before hashing them
+1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes using `string->bytes/utf-8` and then append all these bytes together before hashing them
 1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store our blockchain to a data file
 1. `number->string` converts a number to a string, so for example `3 -> "3"`
 1. We use `serialize` on a transaction. This procedure accepts an object and returns a S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
@@ -180,7 +182,7 @@ Now we have this procedure that returns true if the predicate satisfies all memb
 (define (true-for-all? pred list)
   (cond
     [(empty? list) #t]
-    [(pred (first list)) (true-for-all? pred (rest list))]
+    [(pred (car list)) (true-for-all? pred (cdr list))]
     [else #f]))
 ```
 
@@ -193,6 +195,8 @@ Now we have this procedure for exporting a struct to a file:
     (close-output-port out)))
 ```
 
+`open-output-file` returns an object in memory which then we can write to using `write`. When we do that, it will write to the opened file. `close-output-port` closes this object in memory.
+
 Now we have this procedure for importing struct contents from a file:
 
 ```racket
@@ -202,6 +206,8 @@ Now we have this procedure for importing struct contents from a file:
     (close-input-port in)
     (deserialize result)))
 ```
+
+Note that `deserialize` is the opposite of `serialize`. `open-input-file` is similar to `open-output-file`, except that it is using to read from a file using `read`.
 
 We provide these procedures:
 
@@ -214,7 +220,6 @@ And make sure we require all the necessary packages:
 ```racket
 (require racket/serialize)
 ```
-
 
 ## 3.4. Transactions
 
@@ -400,6 +405,8 @@ Finally
          make-transaction process-transaction valid-transaction?)
 ```
 
+TODO: Explain `all-from-out`
+
 ## 3.5. TODO: `blockchain.rkt`
 
 UTXO Why? Performance reasons.
@@ -525,13 +532,21 @@ Finally
 (require "peer-to-peer.rkt")
 
 (require (only-in sha bytes->hex-string))
+```
 
+TODO: Explain `format`, `substring`
+
+```racket
 (define (format-transaction t)
   (format "...~a... sends ...~a... an amount of ~a."
           (substring (wallet-public-key (transaction-from t)) 64 80)
           (substring (wallet-public-key (transaction-to t)) 64 80)
           (transaction-value t)))
+```
 
+TODO: Explain `printf`
+
+```racket
 (define (print-block bl)
   (printf "Block information\n=================\nHash:\t~a\nHash_p:\t~a\nStamp:\t~a\nNonce:\t~a\nData:\t~a\n"
           (block-hash bl)
@@ -539,17 +554,27 @@ Finally
           (block-timestamp bl)
           (block-nonce bl)
           (format-transaction (block-transaction bl))))
+```
 
+TODO: Explain `for`, `newline`
+
+```racket
 (define (print-blockchain b)
   (for ([block (blockchain-blocks b)])
     (print-block block)
     (newline)))
+```
 
+```racket
 (define (print-wallets b wallet-a wallet-b)
   (printf "\nWallet A balance: ~a\nWallet B balance: ~a\n\n"
           (balance-wallet-blockchain b wallet-a)
           (balance-wallet-blockchain b wallet-b)))
+```
 
+Export:
+
+```racket
 (provide (all-from-out "blockchain.rkt")
          (all-from-out "utils.rkt")
          (all-from-out "peer-to-peer.rkt")
@@ -557,6 +582,8 @@ Finally
 ```
 
 ### 3.6.2. `main.rkt`
+
+This is where we will put all the components together and use them. We start by checking if the file `blockchain.data` exists using `file-exists?`. This file will contain contents from a previous blockchain, if it exists. If it doesn't, it will just proceed creating one.
 
 ```racket
 (require "./main-helper.rkt")
@@ -576,21 +603,21 @@ We initialize wallets:
 (define wallet-b (make-wallet))
 ```
 
-We initialize transactions:
+We initialize transactions by creating the first (genesis) transaction:
 
 ```racket
 (printf "Making genesis transaction...\n")
 (define genesis-t (make-transaction scheme-coin-base wallet-a 100 '()))
 ```
 
-We initialize unspent transactions (store our genesis transaction):
+We initialize the unspent transactions - our genesis transaction:
 
 ```racket
 (define utxo (list
               (make-transaction-io 100 wallet-a)))
 ```
 
-Here's the blockchain initiation
+Finally, we initiate the blockchain by mining the genesis transaction:
 
 ```racket
 (printf "Mining genesis block...\n")
@@ -598,7 +625,7 @@ Here's the blockchain initiation
 (print-wallets blockchain wallet-a wallet-b)
 ```
 
-Make a second transaction
+Making a second transaction:
 
 ```racket
 (printf "Mining second transaction...\n")
@@ -606,7 +633,9 @@ Make a second transaction
 (print-wallets blockchain wallet-a wallet-b)
 ```
 
-Make a third transaction
+`set!` is just like a `define`, except that when something is already defined we cannot use `define` to change its value.
+
+Making a third transaction:
 
 ```racket
 (printf "Mining third transaction...\n")
@@ -614,7 +643,7 @@ Make a third transaction
 (print-wallets blockchain wallet-a wallet-b)
 ```
 
-Attempt to make a fourth transaction
+Attempting to make a fourth transaction:
 
 ```racket
 (printf "Attempting to mine fourth (not-valid) transaction...\n")
@@ -622,13 +651,13 @@ Attempt to make a fourth transaction
 (print-wallets blockchain wallet-a wallet-b)
 ```
 
-Check validity
+Checking blockchain validity:
 
 ```racket
 (printf "Blockchain is valid: ~a\n\n" (valid-blockchain? blockchain))
 ```
 
-Print contents
+Print every block from the blockchain:
 
 ```racket
 (for ([block (blockchain-blocks blockchain)])
@@ -636,7 +665,7 @@ Print contents
   (newline))
 ```
 
-And export
+And export the blockchain to `blockchain.data` which can be re-used later.
 
 ```racket
 (struct->file blockchain "blockchain.data")
@@ -645,8 +674,8 @@ And export
 
 ## Summary
 
-Components are orthogonal. This means that every component is independent of one another, that is, wallet's implementation does not call procedures in block for example, and that a block can be used independently of wallet.
+We built every component one by one, gradually. Some components are orthogonal - this means that some components are independent of one another, for example, wallet's implementation does not call procedures in block, and a block can be used independently of wallet.
 
-But when combined we get a blockchain system.
+But when we combine all of them together we get a blockchain system.
 
-What are the gains?
+What are the gains? We will be able to extend our system with peer-to-peer functionality and smart contracts without touching the basic components.
