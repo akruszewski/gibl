@@ -1,16 +1,10 @@
 # 3. Blockchain implementation
 
-Now that we have equipped ourselves with the ability to write computer programs, we will introduce ourselves to the components (or the data structures) of what makes a blockchain.
-
-TODO: Might use some procedures that we haven't introduced but we will introduce them as we go through the code. For additional help you can use Racket's manuals.
+Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures that we haven't introduced earlier. For additional details on these procedures you are advised to use Racket's manuals.
 
 ## 3.1. `wallet.rkt`
 
-We will start with the most basic data structure - a wallet.
-
-It is a structure that contains a public and a private key.
-
-So it should have this form:
+We will start with the most basic data structure - a wallet. As we mentioned earlier, it is a structure that will contain a public and a private key. It will have a form of:
 
 ```racket
 (struct wallet
@@ -18,7 +12,9 @@ So it should have this form:
   #:prefab)
 ```
 
-Together with a procedure that generates a wallet. Make wallet by generating random public and private keys.
+The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and its contents in a single reference. It also has some other neat properties as we will see later.
+
+We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA[^ch4n1] algorithm.
 
 ```racket
 (define (make-wallet)
@@ -33,11 +29,20 @@ Together with a procedure that generates a wallet. Make wallet by generating ran
 (provide (struct-out wallet) make-wallet)
 ```
 
-Let's explain the code above. Additional dependencies are
+`get-pk`, `generate-private-key`, `pk-key->public-only-key`, `bytes->hex-string` all come from the `crypto` package. We need to make sure to require it at the top of the file:
 
 ```racket
 (require crypto)
 (require crypto/all)
+```
+
+Here's an example of one generated wallet:
+
+```racket
+> (make-wallet)
+'#s(wallet
+    "3082015502010030..."
+    "305c300d06092a86...")
 ```
 
 ## 3.2. `block.rkt`
@@ -47,37 +52,30 @@ We know that a block should contain the current hash, the previous hash, data, a
 ```racket
 (struct block
   (hash previous-hash data timestamp))
+  #:prefab
 ```
 
-SHA is a type of a hashing algorithm that allows us to confirm that the block is really what it claims to be.
-
-In general, blocks can contain any data, not just transactions. But we are limiting it to transactions for now
+The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now:
 
 ```racket
-(struct block
-  (hash previous-hash transaction timestamp nonce)
-  #:transparent)
-```
-
-And so on
-
-The full code, explain it. Provide code without `utils.rkt` and with `utils.rkt`
-
-```racket
-(require "utils.rkt")
-(require (only-in sha sha256))
-(require (only-in sha bytes->hex-string))
-(require racket/serialize)
-
-(define difficulty 2)
-(define target (bytes->hex-string (make-bytes difficulty 32)))
-
 (struct block
   (hash previous-hash transaction timestamp nonce)
   #:prefab)
 ```
 
-Now we have this procedure for calculating block hash:
+Our block also contains a transaction which is roughly of the following form:
+
+```racket
+(struct transaction
+  (signature from to value)
+  #:prefab)
+```
+
+I> ### Definition
+I>
+I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file.
+
+We will use the SHA hashing algorithm.[^ch4n2] Here's how we can calculate a block's hash:
 
 ```racket
 (define (calculate-block-hash previous-hash timestamp transaction nonce)
@@ -88,7 +86,15 @@ Now we have this procedure for calculating block hash:
            (string->bytes/utf-8 (number->string nonce))))))
 ```
 
-Now we have this procedure that determines block validity when the hash is corrcet
+There are a few things to note here:
+
+1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes and then append all these bytes together before hashing them
+1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store our blockchain to a data file
+1. `number->string` converts a number to a string, so for example `3 -> "3"`
+1. We use `serialize` on a transaction. This procedure accepts an object and returns a S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
+1. Finally, we store the hash as a hex string. Think of hex as a way to store a string from readable characters to numbers, e.g. `"Hello" -> "0102030304"`.
+
+Now that we have a way to calculate a block's hash, we also need a way to verify one. To do that we just hash the block's contents again and compare this hash to the one stored in the block:
 
 ```racket
 (define (valid-block? bl)
@@ -99,7 +105,14 @@ Now we have this procedure that determines block validity when the hash is corrc
                                 (block-nonce bl))))
 ```
 
-Now we have this procedure. A block is mined if the hash matches the target, given the difficulty.
+At this point we will start implementing the Hashcash algorithm.
+
+```racket
+(define difficulty 2)
+(define target (bytes->hex-string (make-bytes difficulty 32)))
+```
+
+We set the `difficulty` to 2, and thus the `target` will generate `difficulty` number of bytes using `make-bytes`. Thus, a block will be considered mined if the hash matches the target, given the difficulty:
 
 ```racket
 (define (mined-block? hash)
@@ -107,7 +120,13 @@ Now we have this procedure. A block is mined if the hash matches the target, giv
           (subbytes (hex-string->bytes target) 1 difficulty)))
 ```
 
-Now we have this Hashcash implementation procedure:
+A couple of things to note here:
+
+1. `hex-string->bytes` is just a way to convert a hex string, e.g. `"0102030304" -> #"\1\2\3\3\4"`
+1. `subbytes` takes a list of bytes, a starting and an end point and returns that sublist
+1. Thus, given a random hash we consider it to be valid if its first two (in this case, per `difficulty`) bytes match the `target`
+
+The actual Hashcash procedure:
 
 ```racket
 (define (make-and-mine-block
@@ -120,7 +139,7 @@ Now we have this Hashcash implementation procedure:
          target previous-hash timestamp transaction (+ nonce 1)))))
 ```
 
-Now we have this procedure which is a wrapper around `make-and-mine-block`.
+This procedure will keep increasing the `nonce` until the block is valid. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining. Lastly, we have a small helper procedure:
 
 ```racket
 (define (mine-block transaction previous-hash)
@@ -128,33 +147,46 @@ Now we have this procedure which is a wrapper around `make-and-mine-block`.
    target previous-hash (current-milliseconds) transaction 1))
 ```
 
-Finally
+We provide these functions
 
 ```racket
 (provide (struct-out block) mine-block valid-block? mined-block?)
 ```
 
-## 3.3. Transactions
-
-Public / private key explanation
-
-Signing and verifying signatures
-
-### 3.3.1. `transaction-io.rkt`
-
-Explain this code
+And make sure we require all the necessary packages:
 
 ```racket
+(require (only-in file/sha1 hex-string->bytes))
 (require (only-in sha sha256))
 (require (only-in sha bytes->hex-string))
 (require racket/serialize)
+```
 
+TODO: Explain `only-in` syntax
+
+## 3.3. Transactions
+
+In this section we will implement signing and verifying signatures.
+
+### 3.3.1. `transaction-io.rkt`
+
+A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. Think of this as the UTXO model implementation. This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
+
+```racket
 (struct transaction-io
   (hash value owner timestamp)
   #:prefab)
 ```
 
-Now we have this procedure for calculating the hash of a `transaction-io` object
+Similarly to a block, we will use the same algorithm for creating a hash, and also rely on serialization:
+
+```racket
+(require (only-in sha sha256))
+(require (only-in sha bytes->hex-string))
+(require racket/serialize)
+```
+
+Similarly to a block, `calculate-transaction-io-hash` will calculate the hash of the given values:
 
 ```racket
 (define (calculate-transaction-io-hash value owner timestamp)
@@ -164,7 +196,7 @@ Now we have this procedure for calculating the hash of a `transaction-io` object
            (string->bytes/utf-8 (number->string timestamp))))))
 ```
 
-Now we have this procedure that makes a `transaction-io` object with calculated hash:
+`make-transaction-io` creates a `transaction-io` structure by using `calculate-transaction-io-hash` to populate the hash, and it also initializes the `timestamp` to `(current-milliseconds)`:
 
 ```racket
 (define (make-transaction-io value owner)
@@ -176,31 +208,32 @@ Now we have this procedure that makes a `transaction-io` object with calculated 
      timestamp)))
 ```
 
-Now we have this procedure that determines `transaction-io` validity when the hash is correct:
+A `transaction-io` structure is valid if its hash is equal to the hash othe value, owner and the timestamp:
 
 ```racket
 (define (valid-transaction-io? t-in)
   (equal? (transaction-io-hash t-in)
           (calculate-transaction-io-hash
-           (transaction-io-value t-in)
-           (transaction-io-owner t-in)
-           (transaction-io-timestamp t-in))))
+            (transaction-io-value t-in)
+            (transaction-io-owner t-in)
+            (transaction-io-timestamp t-in))))
 ```
 
-Finally
+Finally, we use `provide` to export the procedures:
 
 ```racket
 (provide (struct-out transaction-io)
          make-transaction-io valid-transaction-io?)
 ```
 
-### 3.3.2. `transaction.rkt`
+### 3.3.2. TODO: `transaction.rkt`
 
 Explain this code.
 
 ```racket
 (require "transaction-io.rkt")
 (require "utils.rkt")
+(require (only-in file/sha1 hex-string->bytes))
 (require "wallet.rkt")
 (require crypto)
 (require crypto/all)
@@ -315,7 +348,7 @@ Finally
          make-transaction process-transaction valid-transaction?)
 ```
 
-## 3.4. `blockchain.rkt`
+## 3.4. TODO: `blockchain.rkt`
 
 UTXO Why? Performance reasons.
 
@@ -338,7 +371,7 @@ Now we have this procedure for initialization of the blockchain:
               utxo))
 ```
 
-In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a function to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
+In Bitcoin, the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. As we will see in the code, we will come up with a procedure to determine the reward that is supposed to be given to the owner depending on the state of the blockchain at that point in time.
 
 Now we have this procedure. We start with 50 coins initially, and halve them on every 210000 blocks.
 
@@ -434,44 +467,6 @@ Finally
 
 ```racket
 (require racket/serialize)
-
-(define ASCII-ZERO (char->integer #\0))
-```
-
-Now we have this procedure that converts a hexadecimal character matching [0-9A-Fa-f] to a number from 0 to 15:
-
-```racket
-(define (hex-char->number c)
-  (if (char-numeric? c)
-      (- (char->integer c) ASCII-ZERO)
-      (match c
-        [(or #\a #\A) 10]
-        [(or #\b #\B) 11]
-        [(or #\c #\C) 12]
-        [(or #\d #\D) 13]
-        [(or #\e #\E) 14]
-        [(or #\f #\F) 15]
-        [_ (error 'hex-char->number "invalid hex char: ~a\n" c)])))
-```
-
-Now we have this procedure that converts a hex string to bytes:
-
-```racket
-(define (hex-string->bytes str)
-  (list->bytes (hex-string->bytelist str)))
-
-(define (hex-string->bytelist str)
-  (with-input-from-string
-      str
-    (thunk
-     (let loop ()
-       (define c1 (read-char))
-       (define c2 (read-char))
-       (cond [(eof-object? c1) null]
-             [(eof-object? c2) (list (hex-char->number c1))]
-             [else (cons (+ (* (hex-char->number c1) 16)
-                            (hex-char->number c2))
-                         (loop))])))))
 ```
 
 Now we have this procedure that returns true if the predicate satisfies all members of the list:

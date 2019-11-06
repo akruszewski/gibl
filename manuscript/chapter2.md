@@ -168,6 +168,8 @@ Racket has some primitive types, such as:
 1. Booleans - `#t` (for True), `#f` (for False)
 1. Characters - or single letters: `#\A`, `#\B`, `#\C`
 1. Strings - or list of characters: `"Hello"`, `"World"`
+1. Byte - similar to character and represented in terms of a number `72`, `101`
+1. Bytes - list of byte: `#"Hello", `#"World"`
 
 ```racket
 > 123
@@ -180,6 +182,10 @@ Racket has some primitive types, such as:
 #\A
 > "Hello World"
 "Hello World"
+> 72
+72
+> (bytes 72 101 108 108 111)
+#"Hello"
 ```
 
 Each evaluation above has a specific type attached to the value produced:
@@ -188,6 +194,7 @@ Each evaluation above has a specific type attached to the value produced:
 1. The second and third evaluations have a type of boolean
 1. The fourth evaluation has a type of character
 1. The fifth evaluation has a type of string
+1. The sixth and seventh evaluation have a type of byte and bytes
 
 We'll cover symbols, lists, and functions in the following sections.
 
@@ -376,6 +383,10 @@ There are useful procedures that produce boolean output such as checking whether
 > (character? #\A)
 #t
 > (string? "hello")
+#t
+> (byte? 72)
+#t
+> (bytes? #"Hello")
 #t
 > (procedure? add-one)
 #t
