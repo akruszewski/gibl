@@ -4,6 +4,8 @@
 
 ### 4.1.1. `peer-to-peer.rkt`
 
+TODO: Try refactoring some procedures. They are too big and use `define` within `define` (need to use `let`), etc.
+
 ```racket
 (require "blockchain.rkt")
 (require "block.rkt")
@@ -375,6 +377,8 @@ In chapter 4 we created an executable and we can send it to our friends, but the
 
 ### 4.2.1. `smart-contracts.rkt`
 
+TODO: Test this code first and if all is good `git push` to `scheme-coin`
+
 ```racket
 (require "transaction.rkt")
 ```
@@ -391,33 +395,37 @@ Now we have this procedure...
 
 ```racket
 (define (eval-contract t c)
-  (define (eval-binary op l r)
-    (op (eval-contract t l)
-        (eval-contract t r)))
-  (match c
-    [(? number? x) x]
-    [(? string? x) x]
-    [`() #t]
-    [`(if ,co ,tr ,fa) (if (eval-contract t co) (eval-contract t tr) (eval-contract t fa))]
-    [`from (transaction-from t)]
-    [`to (transaction-to t)]
-    [`'value (transaction-value t)]
-    [`(* ,l ,r) (eval-binary l r)]
-    [`(+ ,l ,r) (eval-binary l r)]
-    [`(- ,l ,r) (eval-binary l r)]
-    [`(= ,l ,r) (eval-binary equal? l r)]
-    [`(> ,l ,r) (eval-binary > l r)]
-    [`(< ,l ,r) (eval-binary < l r)]
-    [`(and ,l ,r) (eval-binary (lambda (l r) (and l r)) l r)] ; convert this to procedure since and is syntax
-    [`(or ,l ,r) (eval-binary (lambda (l r) (or l r)) l r)]
-    [else #f]))
+  (let ([eval-binary
+         (lambda (op l r)
+           (op (eval-contract t l)
+               (eval-contract t r)))])
+    (match c
+      [(? number? x) x]
+      [(? string? x) x]
+      [`() #t]
+      [`true #t]
+      [`false #f]
+      [`(if ,co ,tr ,fa) (if (eval-contract t co) (eval-contract t tr) (eval-contract t fa))]
+      [`from (transaction-from t)]
+      [`to (transaction-to t)]
+      [`value (transaction-value t)]
+      [`(* ,l ,r) (eval-binary l r)]
+      [`(+ ,l ,r) (eval-binary l r)]
+      [`(- ,l ,r) (eval-binary l r)]
+      [`(= ,l ,r) (eval-binary equal? l r)]
+      [`(> ,l ,r) (eval-binary > l r)]
+      [`(< ,l ,r) (eval-binary < l r)]
+      [`(and ,l ,r) (eval-binary (lambda (l r) (and l r)) l r)] ; convert this to procedure since and is syntax
+      [`(or ,l ,r) (eval-binary (lambda (l r) (or l r)) l r)]
+      [else #f])))
 ```
+
+TODO: Show some `eval-contract` examples
 
 And provide the outputs:
 
 ```racket
-(provide (all-from-out "transaction-io.rkt")
-         valid-transaction-with-contract?)
+(provide valid-transaction-with-contract?)
 ```
 
 ### 4.2.2. Updating existing code
@@ -433,13 +441,13 @@ Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to acce
     (if (transaction? t)
         (let ([processed-transaction (process-transaction t)])
           (if (and (>= (balance-wallet-blockchain b from) value)
-                   (valid-transaction? processed-transaction c))
+                   (valid-transaction-with-contract? processed-transaction c))
               (add-transaction-to-blockchain b processed-transaction)
               b))
         (add-transaction-to-blockchain b '()))))
 ```
 
-We update `main-helper.rkt` to `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
+We update `blockchain.rkt` to `(require "smart-contracts.rkt")` and provide . Then we update `utils.rkt` to add this helper procedure for reading contracts:
 
 ```racket
 (define (file->contract file)
@@ -447,20 +455,13 @@ We update `main-helper.rkt` to `(require "smart-contracts.rkt")`. Then we update
     (read (open-input-file file))))
 ```
 
-A contract in our implementation is just an S-expression.
+Make sure to add `file->contract` to the list of `provide` in `utils.rkt`.
 
-Finally, we update `mine-loop` in `main-p2p.rkt` as follows:
+Note that a contract in our implementation is just an S-expression.
 
-```
-(define (mine-loop)
-  (let ([newer-blockchain
-         ; This blockchain includes a new block
-         (send-money-blockchain (get-blockchain) wallet-a wallet-a 1 (file->contract "contract.script"))])
-    (set-peer-context-data-blockchain! peer-context newer-blockchain)
-    (displayln "Mined a block!")
-    (sleep 5)
-    (mine-loop)))
-```
+Finally, we need to update every usage of `(send-money-blockchain ...)` to `(send-money-blockchain ... (file->contract "contract.script"))`. This entails updating `main.rkt` and `main-p2p.rkt`.
+
+TODO: Test
 
 ## Summary
 

@@ -1,6 +1,10 @@
 # 3. Blockchain implementation
 
+TODO: For some procedures make sure we give examples on their outputs for specific inputs.
+
 Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures. For some of them we will give a brief explanation. For others, if you are curious, you can get additional details from Racket's manuals.
+
+Before we start, recall that at the top of every file you have to put `#lang racket`, as we mentioned in the previous chapter.
 
 ## 3.1. `wallet.rkt`
 
