@@ -195,7 +195,7 @@ A blockchain is programmable if the transactions themselves can be programmed by
 ```text
 if (user has more than 10 money)
    then approve transaction
-   else disapprove transaction
+   else reject transaction
 ```
 
 Smart contracts are implemented as a computation that takes place on the blockchain. We will implement a very basic functionality of smart contracts.

@@ -365,6 +365,8 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 (mine-loop)
 ```
 
+TODO: Create executable
+
 ## 4.2. Smart contracts implementation
 
 Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write a little script to add additional requirements that must be satisfied before sending money.
@@ -448,6 +450,17 @@ We update `main-helper.rkt` to `(require "smart-contracts.rkt")`. Then we update
 A contract in our implementation is just an S-expression.
 
 Finally, we update `mine-loop` in `main-p2p.rkt` as follows:
+
+```
+(define (mine-loop)
+  (let ([newer-blockchain
+         ; This blockchain includes a new block
+         (send-money-blockchain (get-blockchain) wallet-a wallet-a 1 (file->contract "contract.script"))])
+    (set-peer-context-data-blockchain! peer-context newer-blockchain)
+    (displayln "Mined a block!")
+    (sleep 5)
+    (mine-loop)))
+```
 
 ## Summary
 

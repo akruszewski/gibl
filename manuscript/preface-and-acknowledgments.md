@@ -26,6 +26,6 @@ TODO: Thanks to:
 
 Thanks to my family, coworkers, and friends for all the support they give to me.
 
-Finally, thank you for purchasing this book! I hope that you will learn new techniques in reading this book and that it will spark up some more interest in Lisp and Blockchain.
+Finally, thank you for purchasing this book! I hope that you will learn new techniques in reading this book and that it will spark up some more interest in Lisp and blockchain.
 
 * * *
