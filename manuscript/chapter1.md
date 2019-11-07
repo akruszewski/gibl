@@ -206,7 +206,7 @@ Bitcoin is the world's first cryptocurrency. In November 2008, a link to a paper
 
 The Bitcoin software is open source code and was released in January 2009 on SourceForge. As a result of that, anyone can clone the source code and make their blockchain, thus implementing a separate cryptocurrency. Such cryptocurrencies are usually called altcoins. The design of a Bitcoin includes a decentralized network (peer-to-peer network), block (mining), blockchain, transactions, and wallets, each of which we will look in detail in this book.
 
-Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we'll be building upon in this book will look pretty similar to Bitcoin - with some parts simplified.
+Although there are many cryptocurrency models and each one of them differs slightly in implementation details, the cryptocurrency we will be building upon in this book will look pretty similar to Bitcoin - with some parts simplified.
 
 ## 1.6. Example workflows
 

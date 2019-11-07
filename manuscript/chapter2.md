@@ -78,7 +78,7 @@ It is not important to understand what this code does, rather how such programs 
 
 Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap.
 
-Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we'll see the interesting properties that composition offers and how easily we can maintain and extend our code.
+Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we will see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
 I> ### Definition 6
 I>
@@ -196,7 +196,7 @@ Each evaluation above has a specific type attached to the value produced:
 1. The fifth evaluation has a type of string
 1. The sixth and seventh evaluation have a type of byte and bytes
 
-We'll cover symbols, lists, and functions in the following sections.
+We will cover symbols, lists, and functions in the following sections.
 
 ### 2.4.2. Lists, evaluation, quotes
 
@@ -230,7 +230,7 @@ In the first example, you expect your friend to tell you their name. In the seco
 
 There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell Racket to return the actual list `(1 2 3)` instead of evaluating it.
 
-There is a special list, called the empty list and is denoted as `(list)`, or `(quote ())` or simply `'()`. We will later see why this list is special when we'll talk about recursion.
+There is a special list, called the empty list and is denoted as `(list)`, or `(quote ())` or simply `'()`. We will later see why this list is special when we will talk about recursion.
 
 Also, note that we can use `quote` on any set of symbols:
 
@@ -790,7 +790,7 @@ To export objects from a package we use the syntax `provide`. As an example, let
 (provide sum-list)
 ```
 
-We will create another file called `test.rkt` in the same folder as `utils.rkt`. We'll use the syntax `require`:
+We will create another file called `test.rkt` in the same folder as `utils.rkt`. We will use the syntax `require`:
 
 ```racket
 (require "utils.rkt")
