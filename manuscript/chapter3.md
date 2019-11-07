@@ -46,9 +46,9 @@ We export everything:
 (provide (struct-out wallet) make-wallet)
 ```
 
-TODO: Explain `struct-out`
+`struct-out` is just exporting the struct together with the procedures it generates.
 
-Here's an example of one generated wallet:
+Here's one example of one generated wallet:
 
 ```racket
 > (make-wallet)
@@ -67,7 +67,7 @@ We know that a block should contain the current hash, the previous hash, data, a
   #:prefab
 ```
 
-The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now:
+The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the purposes of the Hashcash algorithm - we will use this field in a moment:
 
 ```racket
 (struct block
@@ -82,6 +82,15 @@ Our block also contains a transaction which is roughly of the following form:
   (signature from to value)
   #:prefab)
 ```
+
+Here's one way to generate a block, manually:
+
+```racket
+> (block "123456" "234" (transaction "BoroS" "Boro" "You" "a book") 1 1)
+'#s(block "123456" "234" #s(transaction "BoroS" "Boro" "You" "a book") 1 1)
+```
+
+For example, this block makes a transaction from `"Boro"` to `"You'` with the value of `"a book"`, with a timestamp 1.
 
 I> ### Definition
 I>
@@ -105,6 +114,13 @@ There are a few things to note here:
 1. `number->string` converts a number to a string, so for example `3 -> "3"`
 1. We use `serialize` on a transaction. This procedure accepts an object and returns a S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
 1. Finally, we store the hash as a hex string. Think of hex as a way to store a string from readable characters to numbers, e.g. `"Hello" -> "0102030304"`.
+
+As an example, this is how we calculate the hash of our earlier example block:
+
+```racket
+> (calculate-block-hash "234" 1 (transaction "BoroS" "Boro" "You" "a book") 1)
+"5e2889a76a464ea19a493a74d2da991a78626fc1fa9070340c2284ad92f4dd17"
+```
 
 Now that we have a way to calculate a block's hash, we also need a way to verify one. To do that we just hash the block's contents again and compare this hash to the one stored in the block:
 
@@ -142,22 +158,38 @@ The actual Hashcash procedure:
 
 ```racket
 (define (make-and-mine-block
-         target previous-hash timestamp transaction nonce)
+         previous-hash timestamp transaction nonce)
   (let ([hash (calculate-block-hash
                previous-hash timestamp transaction nonce)])
     (if (mined-block? hash)
         (block hash previous-hash transaction timestamp nonce)
         (make-and-mine-block
-         target previous-hash timestamp transaction (+ nonce 1)))))
+         previous-hash timestamp transaction (+ nonce 1)))))
 ```
 
-This procedure will keep increasing the `nonce` until the block is valid. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining. Lastly, we have a small helper procedure:
+This procedure will keep increasing the `nonce` until the block is valid. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining.
+
+For example, here's how we can mine the earlier block we gave as an example:
+
+```racket
+> (define mined-block (make-and-mine-block "234" 1 (transaction "BoroS" "Boro" "You" "a book") 1))
+> (block-nonce mined-block)
+337
+> (block-previous-hash mined-block)
+"234"
+> (block-hash mined-block)
+"e920d627196658b64e349c1d3d6f2de1ab308d98d1c48130ee36df47ef25ee9a"
+```
+
+Lastly, we have a small helper procedure:
 
 ```racket
 (define (mine-block transaction previous-hash)
   (make-and-mine-block
-   target previous-hash (current-milliseconds) transaction 1))
+   previous-hash (current-milliseconds) transaction 1))
 ```
+
+`current-milliseconds` is a procedure that returns the current time in milliseconds since midnight UTC, January 1, 1970.
 
 We provide these structures and procedures:
 
@@ -174,7 +206,7 @@ And make sure we require all the necessary packages, at the top of the fiile:
 (require racket/serialize)
 ```
 
-TODO: Explain `only-in` syntax
+The `only-in` syntax imports only specific objects from a package, that we specify, instead of importing everything.
 
 ## 3.3. `utils.rkt`
 
@@ -409,7 +441,7 @@ Finally
          make-transaction process-transaction valid-transaction?)
 ```
 
-TODO: Explain `all-from-out`
+The `all-from-out` syntax specifies all objects that we import (and that are exported) from the target. In this case, besides the file exporting the `transaction` structure with a couple of procedures, it also exports everything from `transaction-io.rkt`.
 
 ## 3.5. TODO: `blockchain.rkt`
 
