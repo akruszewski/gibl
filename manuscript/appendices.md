@@ -147,3 +147,139 @@ However, instead of relying on `gensym`, the preferred way in Racket is to use `
     (set! a b)
     (set! b tmp)))
 ```
+
+## Appendix C: Text editor
+
+Writing is important, so we will write a text editor. Cool!
+
+Explain the struct
+
+```racket
+(struct ed (buffer position) #:prefab)
+```
+
+We will define evaluations. Start by defining the procedure:
+
+```racket
+(define (eval-ed e c)
+  (match c
+```
+
+We define line reading:
+
+```racket
+    [`n (list (ed-position e)
+              (list-ref (ed-buffer e) (sub1 (ed-position e))))]
+    [`p (string-join (ed-buffer e) "\n")]
+```
+
+Line movement:
+
+```racket
+    [`+ (let ([next-pos (add1 (ed-position e))])
+          (ed (ed-buffer e) (if (<= next-pos (length (ed-buffer e))) next-pos (ed-position e))))]
+    [`- (let ([prev-pos (sub1 (ed-position e))])
+          (ed (ed-buffer e) (if (> prev-pos 0) prev-pos (ed-position e))))]
+    [(? number? new-pos)
+     (ed (ed-buffer e) (if (and (> new-pos 0)
+                                (<= new-pos (length (ed-buffer e))))
+                           new-pos
+                           (ed-position e)))]
+```
+
+We now define insertion and deletion:
+
+```racket
+    [`(i ,str)
+     (ed (insert-at (ed-buffer e) (ed-position e) str) (add1 (ed-position e)))]
+    [`d (ed (remove-at (ed-buffer e) (ed-position e))
+            (if (= (ed-position e) (length (ed-buffer e)))
+                (sub1 (length (ed-buffer e)))
+                (ed-position e)))]
+```
+
+Line copying:
+
+```racket
+    [`(t ,from ,to)
+     (if (not (and (> from 0)
+                   (<= from (length (ed-buffer e)))
+                   (> to 0)
+                   (<= to (length (ed-buffer e)))))
+         (ed (ed-buffer e) (ed-position e))
+         (ed (insert-at (ed-buffer e) to (list-ref (ed-buffer e) (sub1 from))) (add1 to)))]
+```
+
+And finally, all other cases:
+
+```racket
+    [_ error "Unknown command"]))
+```
+
+Together with these helper procedures:
+
+```racket
+(define (insert-at lst pos x)
+  (define-values (before after) (split-at lst pos))
+  (append before (cons x after)))
+
+(define (remove-at lst pos)
+  (append (take lst (sub1 pos))
+          (drop lst pos)))
+
+(define (make-ed buffer)
+  (ed buffer (length buffer)))
+```
+
+We will now interact with our editor. Start by creating a "file" and printing line:
+
+```racket
+> (define sample-file (make-ed '("line one" "line two" "line three")))
+> (eval-ed sample-file 'n)
+'(3 "line three")
+```
+
+Test the line movement:
+
+```racket
+> (set! sample-file (eval-ed sample-file '-))
+> (eval-ed sample-file 'n)
+'(2 "line two")
+> (set! sample-file (eval-ed sample-file '2))
+> (eval-ed sample-file 'n)
+'(2 "line two")
+> (set! sample-file (eval-ed sample-file '+))
+> (eval-ed sample-file 'n)
+'(3 "line three")
+```
+
+Test insertion, together with printing the whole "file":
+
+```racket
+> (set! sample-file (eval-ed sample-file '(i "line four")))
+> (eval-ed sample-file 'n)
+'(4 "line four")
+> (eval-ed sample-file 'p)
+"line one\nline two\nline three\nline four"
+```
+
+We test deletion next:
+
+```racket
+> (set! sample-file (eval-ed sample-file '2))
+> (set! sample-file (eval-ed sample-file 'd))
+> (eval-ed sample-file 'n)
+'(2 "line three")
+> (eval-ed sample-file 'p)
+"line one\nline three\nline four"
+```
+
+And finally, line copying:
+
+```racket
+> (set! sample-file (eval-ed sample-file '(t 1 2)))
+> (eval-ed sample-file 'n)
+'(3 "line one")
+> (eval-ed sample-file 'p)
+"line one\nline three\nline one\nline four"
+```
