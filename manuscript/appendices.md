@@ -213,7 +213,7 @@ Line copying:
 And finally, all other cases:
 
 ```racket
-    [_ error "Unknown command"]))
+    [_ "Unknown command"]))
 ```
 
 Together with these helper procedures:
