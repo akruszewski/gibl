@@ -6,9 +6,13 @@ Now that we have equipped ourselves with the ability to write computer programs,
 
 Before we start, recall that at the top of every file you have to put `#lang racket`, as we mentioned in the previous chapter.
 
+I> ### Definition
+I>
+I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserializatoin is the opposite process - converting a stream of bytes into an object.
+
 ## 3.1. `wallet.rkt`
 
-We will start with the most basic data structure - a wallet. As we mentioned earlier, it is a structure that will contain a public and a private key. It will have a form of:
+We will start with the most basic data structure - a wallet. As we discussed earlier, it is a structure that contains a public and a private key. It will have the form of:
 
 ```racket
 (struct wallet
@@ -16,7 +20,7 @@ We will start with the most basic data structure - a wallet. As we mentioned ear
   #:prefab)
 ```
 
-The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and its contents in a single reference. It also has some other neat properties as we will see later.
+The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. We can serialize/deserialize these kinds of structures.
 
 We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA[^ch4n1] algorithm.
 
@@ -33,7 +37,7 @@ We will make a procedure that generates a wallet by generating random public and
 
 `get-pk`, `generate-private-key`, `pk-key->public-only-key`, `bytes->hex-string` all come from the `crypto` package. `bytes->hex-string` converts a hex string (think numbers for example) to bytes, e.g. `"0102030304" -> "Hello"`.
 
-We need to make sure to require it at the top of the file:
+We need to make sure to require necessary packages:
 
 ```racket
 (require crypto)
@@ -46,9 +50,9 @@ We export everything:
 (provide (struct-out wallet) make-wallet)
 ```
 
-`struct-out` is just exporting the struct together with the procedures it generates.
+The `struct-out` syntax is just exporting the struct together with the procedures it generates.
 
-Here's one example of one generated wallet:
+Here's an example of a generated wallet:
 
 ```racket
 > (make-wallet)
@@ -67,7 +71,7 @@ We know that a block should contain the current hash, the previous hash, data, a
   #:prefab
 ```
 
-The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the purposes of the Hashcash algorithm - we will use this field in a moment:
+The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the purposes of the Hashcash algorithm - we will see the purpose of this field in a moment:
 
 ```racket
 (struct block
@@ -92,11 +96,7 @@ Here's one way to generate a block, manually:
 
 For example, this block makes a transaction from `"Boro"` to `"You'` with the value of `"a book"`, with a timestamp 1.
 
-I> ### Definition
-I>
-I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file.
-
-We will use the SHA hashing algorithm.[^ch4n2] Here's how we can calculate a block's hash:
+Next, we will implement a procedure that calculates a block's hash. We will use the SHA hashing algorithm[^ch4n2]. Here's how we can do that:
 
 ```racket
 (define (calculate-block-hash previous-hash timestamp transaction nonce)
@@ -197,7 +197,7 @@ We provide these structures and procedures:
 (provide (struct-out block) mine-block valid-block? mined-block?)
 ```
 
-And make sure we require all the necessary packages, at the top of the fiile:
+And make sure we require all the necessary packages:
 
 ```racket
 (require (only-in file/sha1 hex-string->bytes))
@@ -212,7 +212,7 @@ The `only-in` syntax imports only specific objects from a package, that we speci
 
 This file will contain common procedures that will be used by other components.
 
-Now we have this procedure that returns true if the predicate satisfies all members of the list:
+A procedure that we will use often is `true-for-all?` that returns true if a predicate satisfies all members of the list, and false otherwise:
 
 ```racket
 (define (true-for-all? pred list)
@@ -221,6 +221,14 @@ Now we have this procedure that returns true if the predicate satisfies all memb
     [(pred (car list)) (true-for-all? pred (cdr list))]
     [else #f]))
 ```
+
+Here's an example how we can use it:
+
+```racket
+> (true-for-all? (lambda (x) (> x 3)) '(1 2 3))
+#f
+> (true-for-all? (lambda (x) (> x 3)) '(4 5 6))
+#t
 
 Now we have this procedure for exporting a struct to a file:
 
@@ -231,9 +239,9 @@ Now we have this procedure for exporting a struct to a file:
     (close-output-port out)))
 ```
 
-`open-output-file` returns an object in memory which then we can write to using `write`. When we do that, it will write to the opened file. `close-output-port` closes this object in memory.
+`open-output-file` returns an object in memory which then we can write to using `write`. When we do that, it will write to the opened file. `close-output-port` closes this object in memory. Thus, this procedure will serialize a struct and then write the serialized contents to a file.
 
-Now we have this procedure for importing struct contents from a file:
+The following procedure is exactly the opposite of `struct->file`, given a file it will return a struct by opening the file, reading its contents and deserializing its contents.
 
 ```racket
 (define (file->struct file)
@@ -243,7 +251,7 @@ Now we have this procedure for importing struct contents from a file:
     (deserialize result)))
 ```
 
-Note that `deserialize` is the opposite of `serialize`. `open-input-file` is similar to `open-output-file`, except that it is using to read from a file using `read`.
+`deserialize` is the opposite of `serialize`. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
 
 We provide these procedures:
 
@@ -259,11 +267,13 @@ And make sure we require all the necessary packages:
 
 ## 3.4. Transactions
 
-In this section we will implement signing and verifying signatures.
+In this section we will implement the procedures for signing and verifying signatures.
 
 ### 3.4.1. `transaction-io.rkt`
 
-A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. Think of this as the UTXO model implementation. This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
+A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. The transaction input will be the blockchain address from which the money was sent, and the transaction output will be the blockchain address to which the money was sent.
+
+This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
 
 ```racket
 (struct transaction-io
@@ -277,11 +287,7 @@ Similarly to a block, we will use the same algorithm for creating a hash, and al
 (require (only-in sha sha256))
 (require (only-in sha bytes->hex-string))
 (require racket/serialize)
-```
 
-Similarly to a block, `calculate-transaction-io-hash` will calculate the hash of the given values:
-
-```racket
 (define (calculate-transaction-io-hash value owner timestamp)
   (bytes->hex-string (sha256 (bytes-append
            (string->bytes/utf-8 (number->string value))
@@ -301,7 +307,7 @@ Similarly to a block, `calculate-transaction-io-hash` will calculate the hash of
      timestamp)))
 ```
 
-A `transaction-io` structure is valid if its hash is equal to the hash othe value, owner and the timestamp:
+A `transaction-io` structure is valid if its hash is equal to the hash of the value, owner and the timestamp:
 
 ```racket
 (define (valid-transaction-io? t-in)
@@ -319,9 +325,11 @@ Finally, we export the procedures:
          make-transaction-io valid-transaction-io?)
 ```
 
-### 3.4.2. TODO: `transaction.rkt`
+### 3.4.2. `transaction.rkt`
 
-Explain this code.
+This file will contain procedures for signing and verifying transactions. It will also use transaction inputs and outputs and store them in a single transaction.
+
+Here's everything that we will need to `require`:
 
 ```racket
 (require "transaction-io.rkt")
@@ -331,19 +339,35 @@ Explain this code.
 (require crypto)
 (require crypto/all)
 (require racket/serialize)
+```
+
+A transaction contains a signature, sender, receiver, value and a list of inputs and outputs (`transaction-io` objects).
 
 (struct transaction
   (signature from to value inputs outputs)
   #:prefab)
 ```
 
-In addition, we need to use all crypto factories for converting the key between `hex<->pk-key`:
+TODO: Some more details? In addition, we need to use all crypto factories for converting the key between `hex<->pk-key`:
 
 ```racket
 (use-all-factories!)
 ```
 
-Now we have this procedure that returns digested signature of a transaction data:
+We will need a procedure that makes an empty, unsigned and unprocessed (no input outputs) transaction:
+
+```racket
+(define (make-transaction from to value inputs)
+  (transaction
+   ""
+   from
+   to
+   value
+   inputs
+   '()))
+```
+
+Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them together. However, in this case we will use except an asymmetric-key algorithm:
 
 ```racket
 (define (sign-transaction from to value)
@@ -359,20 +383,9 @@ Now we have this procedure that returns digested signature of a transaction data
        (string->bytes/utf-8 (number->string value)))))))
 ```
 
-Now we have this procedure that makes an empty, unprocessed and unsigned transaction:
+`digest/sign` is the procedure that does the encryption. It accepts a private key, an algorithm and bytes, and it returns encrypted data.
 
-```racket
-(define (make-transaction from to value inputs)
-  (transaction
-   ""
-   from
-   to
-   value
-   inputs
-   '()))
-```
-
-Now we have this procedure for processing transactions. It sums all the inputs with `inputs-sum`, calculates the `leftover` and then generates new outputs to be used in the new signed and processed transaction `new-outputs`:
+We will implement a procedure for processing transactions. It sums all the inputs with `inputs-sum`, calculates the `leftover` and then generates new outputs to be used in the new signed and processed transaction `new-outputs`. In other words, based on our inputs it will create outputs that contain the leftover money:
 
 ```racket
 (define (process-transaction t)
@@ -398,7 +411,9 @@ Now we have this procedure for processing transactions. It sums all the inputs w
      (remove-duplicates (append new-outputs outputs)))))
 ```
 
-Now we have this procedure that checks the signature validity of a transaction:
+TODO: We use `remove-duplicates` to make sure all outputs are unique because why?
+
+we have a procedure that checks a transaction's signature:
 
 ```racket
 (define (valid-transaction-signature? t)
@@ -412,6 +427,8 @@ Now we have this procedure that checks the signature validity of a transaction:
       (string->bytes/utf-8 (number->string (transaction-value t))))
      (hex-string->bytes (transaction-signature t)))))
 ```
+
+`digest/verify` is the opposite of `digest/sign` - in that instead of signing, it actually checks if a signature is valid.
 
 Now we have this procedure that determines transaction validity when:
 
@@ -445,18 +462,24 @@ The `all-from-out` syntax specifies all objects that we import (and that are exp
 
 ## 3.5. TODO: `blockchain.rkt`
 
-UTXO Why? Performance reasons.
+We'll need to `require` a bunch of stuff:
 
 ```racket
 (require "block.rkt")
 (require "transaction.rkt")
 (require "utils.rkt")
 (require "wallet.rkt")
+```
 
+Our structure will contain a list of blocks, and utxo:
+
+```racket
 (struct blockchain
   (blocks utxo)
   #:prefab)
 ```
+
+Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial ballance of wallets.
 
 Now we have this procedure for initialization of the blockchain:
 
@@ -710,8 +733,10 @@ And export the blockchain to `blockchain.data` which can be re-used later.
 
 ## Summary
 
-We built every component one by one, gradually. Some components are orthogonal - this means that some components are independent of one another, for example, wallet's implementation does not call procedures in block, and a block can be used independently of wallet.
+We built every component one by one, gradually. Some components are orthogonal - they are independent of one another. For example, wallet's implementation does not call procedures in block, and a block can be used independently of wallet. When we combine all of the components we get a nicely designed blockchain system.
 
-But when we combine all of them together we get a blockchain system.
+This design allows to extend our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without ichanging the basic components.
 
-What are the gains? We will be able to extend our system with peer-to-peer functionality and smart contracts without touching the basic components.
+[^ch4n1]: TODO: Something about the RSA algorithm.
+
+[^ch4n2]: TODO: Something about the SHA algorithm.
