@@ -91,7 +91,8 @@ Here's one way to generate a block, manually:
 
 ```racket
 > (block "123456" "234" (transaction "BoroS" "Boro" "You" "a book") 1 1)
-'#s(block "123456" "234" #s(transaction "BoroS" "Boro" "You" "a book") 1 1)
+'#s(block "123456" "234" #s(transaction "BoroS" "Boro" "You" "a book")
+1 1)
 ```
 
 For example, this block makes a transaction from `"Boro"` to `"You'` with the value of `"a book"`, with a timestamp 1.
@@ -118,7 +119,8 @@ There are a few things to note here:
 As an example, this is how we calculate the hash of our earlier example block:
 
 ```racket
-> (calculate-block-hash "234" 1 (transaction "BoroS" "Boro" "You" "a book") 1)
+> (calculate-block-hash "234" 1 (transaction "BoroS" "Boro" "You"
+  "a book") 1)
 "5e2889a76a464ea19a493a74d2da991a78626fc1fa9070340c2284ad92f4dd17"
 ```
 
@@ -172,7 +174,8 @@ This procedure will keep increasing the `nonce` until the block is valid. We cha
 For example, here's how we can mine the earlier block we gave as an example:
 
 ```racket
-> (define mined-block (make-and-mine-block "234" 1 (transaction "BoroS" "Boro" "You" "a book") 1))
+> (define mined-block (make-and-mine-block "234" 1 (transaction "BoroS"
+  "Boro" "You" "a book") 1))
 > (block-nonce mined-block)
 337
 > (block-previous-hash mined-block)
@@ -607,7 +610,8 @@ TODO: Explain `printf`
 
 ```racket
 (define (print-block bl)
-  (printf "Block information\n=================\nHash:\t~a\nHash_p:\t~a\nStamp:\t~a\nNonce:\t~a\nData:\t~a\n"
+  (printf "Block information\n=================
+Hash:\t~a\nHash_p:\t~a\nStamp:\t~a\nNonce:\t~a\nData:\t~a\n"
           (block-hash bl)
           (block-previous-hash bl)
           (block-timestamp bl)
