@@ -181,10 +181,11 @@ Line movement:
     [`- (let ([prev-pos (sub1 (ed-position e))])
           (ed (ed-buffer e) (if (> prev-pos 0) prev-pos (ed-position e))))]
     [(? number? new-pos)
-     (ed (ed-buffer e) (if (and (> new-pos 0)
-                                (<= new-pos (length (ed-buffer e))))
-                           new-pos
-                           (ed-position e)))]
+     (ed (ed-buffer e)
+         (if
+          (and (> new-pos 0) (<= new-pos (length (ed-buffer e))))
+          new-pos
+          (ed-position e)))]
 ```
 
 We now define insertion and deletion:
