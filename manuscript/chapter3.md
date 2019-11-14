@@ -2,11 +2,11 @@
 
 Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures. For some of them we will give a brief explanation. For others, if you are curious, you can get additional details from Racket's manuals.
 
-Before we start recall that at the top of every file you have to put `#lang racket` as we mentioned in the previous chapter.
+Before we start, recall that at the top of every file you have to put `#lang racket` as we mentioned in the previous chapter.
 
 I> ### Definition 1
 I>
-I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserializatoin is the opposite process - converting a stream of bytes into an object.
+I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserialization is the opposite process - converting a stream of bytes into an object.
 
 ## 3.1. `wallet.rkt`
 
@@ -18,7 +18,7 @@ We will start with the most basic data structure - a wallet. As we discussed ear
   #:prefab)
 ```
 
-The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. In addition we can serialize/deserialize these kinds of structures.
+The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. Also, we can serialize/deserialize these kinds of structures.
 
 I> ### Definition 2
 I>
@@ -45,7 +45,7 @@ All of these procedures come from the `crypto` package:
 1. `pk-key->datum` - returns a public/private key such that it is easily serializable by the next procedure in this list
 1. `bytes->hex-string` - converts a hex string (think numbers for example) to bytes, e.g. `"0102030304" -> "Hello"`
 
-We need to make sure to require necessary packages:
+We need to make sure to require the necessary packages:
 
 ```racket
 (require crypto)
@@ -69,6 +69,10 @@ Here's an example of a generated wallet:
     "305c300d06092a86...")
 ```
 
+X> ### Exercise 1
+X>
+X> Extract the private and the public key of a wallet. The code should look something like `(wallet-?? (make-wallet))`.
+
 ## 3.2. `block.rkt`
 
 A block should contain the current hash, the previous hash, data, and timestamp when it was generated:
@@ -79,7 +83,7 @@ A block should contain the current hash, the previous hash, data, and timestamp 
   #:prefab
 ```
 
-The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the purposes of the Hashcash algorithm - we will see the purpose of this field in a moment:
+The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the Hashcash algorithm - we will see the purpose of this field in a moment:
 
 ```racket
 (struct block
@@ -107,7 +111,7 @@ For example, this block makes a transaction from `"Boro"` to `"You"` with the va
 
 I> ### Definition 3
 I>
-I> SHA is a hashing algorithm which takes an input and produces a hash value.
+I> SHA is a hashing algorithm that takes an input and produces a hash value.
 
 Next, we will implement a procedure that calculates a block's hash. We will use the SHA hashing algorithm. Here's how we can do that:
 
@@ -125,7 +129,7 @@ There are a few things to note here:
 1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store our blockchain to a data file
 1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes using `string->bytes/utf-8` and then append all these bytes together before hashing them
 1. `number->string` converts a number to a string, so for example `3 -> "3"` and `~a` does the opposite
-1. We use `serialize` on a transaction. This procedure accepts an object and returns a S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
+1. We use `serialize` on a transaction. This procedure accepts an object and returns an S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
 1. Finally, we store the hash as a hex string. Think of hex as a way to store a string from readable characters to numbers, e.g. `"Hello" -> "0102030304"`.
 
 As an example, this is how we calculate the hash of our earlier example block:
@@ -165,7 +169,7 @@ We set the `difficulty` to 2, and thus the `target` will contain `difficulty` nu
 A couple of things to note here:
 
 1. `hex-string->bytes` is just a way to convert a hex string, e.g. `"0102030304" -> #"\1\2\3\3\4"`
-1. `subbytes` takes a list of bytes, a starting and an end point and returns that sublist
+1. `subbytes` takes a list of bytes, a start, and an end point and returns that sublist
 1. Thus, given a random hash we consider it to be valid if its first two (in this case, per `difficulty`) bytes match the `target`
 
 The actual Hashcash procedure:
@@ -181,7 +185,7 @@ The actual Hashcash procedure:
          previous-hash timestamp transaction (+ nonce 1)))))
 ```
 
-This procedure will keep increasing the `nonce` until the block is valid. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining.
+This procedure keeps increasing the `nonce` until the block is valid. Once the block is valid, we return that block. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining.
 
 For example, here's how we can mine the earlier block we gave as an example:
 
@@ -224,6 +228,24 @@ And make sure we require all the necessary packages:
 ```
 
 The `only-in` syntax imports only specific objects from a package, that we specify, instead of importing everything.
+
+X> ### Exercise 2
+X>
+X> Use `make-and-mine-block` on a block you generated. What's the `nonce` count - i.e. how much "processing" did it take to mine that block?
+
+X> ### Exercise 3
+X>
+X> Use `valid-block?` on the block in the previous exercise. Now use `valid-block?` on that block where its nonce is 1.
+X>
+X> Hint: To generate a "new" block out of existing one `bl` you can use:
+X>
+X> ```racket
+X> (block (block-hash bl)
+X>        (block-previous-hash bl)
+X>        (block-transaction bl)
+X>        (block-timestamp bl)
+X>        (block-nonce bl))
+X> ```
 
 ## 3.3. `utils.rkt`
 
@@ -289,8 +311,6 @@ In this section we will implement the procedures for signing and verifying signa
 
 ### 3.4.1. `transaction-io.rkt`
 
-TODO: For some procedures make sure we give examples on their outputs for specific inputs.
-
 A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. The transaction input will be the blockchain address from which the money was sent, and the transaction output will be the blockchain address to which the money was sent.
 
 This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
@@ -338,6 +358,20 @@ A `transaction-io` structure is valid if its hash is equal to the hash of the va
             (transaction-io-timestamp t-in))))
 ```
 
+Here's an example usage:
+
+```racket
+> (make-transaction-io 123 "Some person")
+'#s(transaction-io "df652a3c15feba2eb9071cfdd810130c971f7fe7494a4710ee62
+2fca11f0d83e" 123 "Some person" 1573765357289)
+> (valid-transaction-io? (transaction-io "df652a3c15feba2eb9071cfdd81013
+0c971f7fe7494a4710ee622fca11f0d83e" 123 "Some person" 1573765357289))
+#t
+> (valid-transaction-io? (transaction-io "badhash" 123 "Some person"
+1573765357289))
+#f
+```
+
 Finally, we export the procedures:
 
 ```racket
@@ -346,8 +380,6 @@ Finally, we export the procedures:
 ```
 
 ### 3.4.2. `transaction.rkt`
-
-TODO: For some procedures make sure we give examples on their outputs for specific inputs.
 
 This file will contain procedures for signing and verifying transactions. It will also use transaction inputs and outputs and store them in a single transaction.
 
@@ -394,7 +426,7 @@ We will need a procedure that makes an empty, unsigned and unprocessed (no input
    '()))
 ```
 
-Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them together. However, in this case we will be using digital signatures.
+Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. However, in this case we will be using digital signatures.
 
 To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent our digital signature.
 
@@ -461,7 +493,7 @@ We have a procedure that checks a transaction's signature:
      (hex-string->bytes (transaction-signature t)))))
 ```
 
-`digest/verify` is the opposite of `digest/sign` - in that instead of signing, it actually checks if a signature is valid.
+`digest/verify` is the opposite of `digest/sign` - in that instead of signing, it checks if a signature is valid.
 
 Lastly, we will need a procedure that determines transaction validity under the following conditions:
 
@@ -493,9 +525,11 @@ Finally, we export:
 
 The `all-from-out` syntax specifies all objects that we import (and that are exported) from the target. In this case, besides the file exporting the `transaction` structure with a couple of procedures, it also exports everything from `transaction-io.rkt`.
 
-## 3.5. `blockchain.rkt`
+X> ### Exercise 4
+X>
+X> Create a transaction, sign it, and verify it using the procedures above.
 
-TODO: For some procedures make sure we give examples on their outputs for specific inputs.
+## 3.5. `blockchain.rkt`
 
 We'll need to `require` a bunch of stuff:
 
@@ -506,7 +540,7 @@ We'll need to `require` a bunch of stuff:
 (require "wallet.rkt")
 ```
 
-Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial ballance of wallets. Thus, our structure will contain a list of blocks and utxo:
+Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial balance of wallets. Thus, our structure will contain a list of blocks and utxo:
 
 ```racket
 (struct blockchain
@@ -532,7 +566,7 @@ One way to initialize a blockchain is as follows:
 > (define blockchain (init-blockchain genesis-t "1337cafe" utxo))
 ```
 
-In the original Bitcoin implementation the block reward started at 50 coins for the first block, and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
+In the original Bitcoin implementation the block reward started at 50 coins for the first block and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
 
 We follow the same algorithm - we start with 50 coins initially, and halve them on every 210000 blocks.
 
@@ -556,7 +590,7 @@ The next procedure will insert a transaction into the blockchain. It should:
 
 1. Mine a block
 1. Create a new utxo based on the processed transaction outputs, inputs and the current utxo
-1. Generate new list of blocks by `cons`-ing the mined block
+1. Generate a new list of blocks by `cons`-ing the mined block
 1. Calculate the rewards based on the current utxo
 
 ```racket
@@ -580,6 +614,8 @@ The next procedure will insert a transaction into the blockchain. It should:
 ```
 
 We are using `set-union` which will produce elements that are found in two sets, and `set-subtract` which will produce elements that are found in the first set but not in the second set.
+
+There is another special thing about `add-transaction-to-blockchain`. Given a blockchain and a transaction, it returns a new - updated blockchain. This newly returned blockchain will be our latest blockchain since the previous one does not contain the transaction.
 
 This procedure will determine the balance of a wallet - the sum of all unspent transactions for the matching owner:
 
@@ -642,6 +678,18 @@ Finally:
          balance-wallet-blockchain valid-blockchain?)
 ```
 
+X> ### Exercise 5
+X>
+X> Create two sets and use `set-subtract`, `set-union` and `set-intersect` on them. Observe the results.
+
+X> ### Exercise 6
+X>
+X> Initialize a blockchain and add a transaction to it using `add-transaction-to-blockchain`.
+
+X> ### Exercise 7
+X>
+X> Use `valid-blockchain?` on the blockchain in the previous exercise (before adding the new transaction, and after adding the new transaction).
+
 ## 3.6. Integrating components
 
 ### 3.6.1. `main-helper.rkt`
@@ -702,9 +750,13 @@ And export the procedures:
          format-transaction print-block print-blockchain print-wallets)
 ```
 
+X> ### Exercise 8
+X>
+X> Create a transaction and use `format-transaction` to see what it outputs. Do the same for block, blockchain, and wallets.
+
 ### 3.6.2. `main.rkt`
 
-This is where we will put all the components together and use them. We start by checking if the file `blockchain.data` exists using `file-exists?`. This file will contain contents from a previous blockchain, if it exists. If it doesn't, it will just proceed creating one.
+This is where we will put all the components together and use them. We start by checking if the file `blockchain.data` exists using `file-exists?`. This file will contain contents from a previous blockchain if it exists. If it doesn't, it will just proceed to create one.
 
 ```racket
 (require "./main-helper.rkt")
@@ -795,8 +847,8 @@ And export the blockchain to `blockchain.data` which can be re-used later.
 
 ## Summary
 
-We built every component one by one, gradually. Some components are orthogonal - they are independent of one another. For example, wallet's implementation does not call procedures in block, and a block can be used independently of wallet. When we combine all of the components we get a nicely designed blockchain system.
+We built every component one by one, gradually. Some components are orthogonal - they are independent of one another. For example, `wallet` implementation does not call any procedures from `block`, and a `block` can be used independently of `wallet`. When we combine all of the components we get a nicely designed blockchain system.
 
-This design allows to extend our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without ichanging the basic components.
+This design allows extending our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without changing the basic components.
 
 [^ch4n1]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
