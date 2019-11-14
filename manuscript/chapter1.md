@@ -145,7 +145,7 @@ For example, suppose we want to encrypt 5. Then {$$}E(x, 3) = (5 + 3) \bmod 100 
 
 This example uses a very simple generation pair {$$}(x + k) \bmod c{/$$}. But, in practice the pair generation algorithm is much more complex and harder to break by attackers.
 
-We can use the same algorithm for digital signatures:
+We can use similar algorithm for digital signatures:
 
 1. {$$}S(x, k){/$$}, that signs a message {$$}x{/$$} given a private key {$$}k{/$$}
 1. {$$}V(x, s, k){/$$}, that verifies a message {$$}x{/$$}, given signature {$$}s{/$$} and public key {$$}k{/$$}

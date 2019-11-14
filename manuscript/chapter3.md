@@ -4,7 +4,7 @@ Now that we have equipped ourselves with the ability to write computer programs,
 
 Before we start recall that at the top of every file you have to put `#lang racket` as we mentioned in the previous chapter.
 
-I> ### Definition
+I> ### Definition 1
 I>
 I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserializatoin is the opposite process - converting a stream of bytes into an object.
 
@@ -20,7 +20,11 @@ We will start with the most basic data structure - a wallet. As we discussed ear
 
 The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. In addition we can serialize/deserialize these kinds of structures.
 
-We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA[^ch4n1] algorithm.
+I> ### Definition 2
+I>
+I> RSA is an asymmetric-key algorithm used to encrypt and decrypt messages.
+
+We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA algorithm.
 
 ```racket
 (define (make-wallet)
@@ -101,7 +105,11 @@ We will discuss transactions in details later. Here's one way to generate a bloc
 
 For example, this block makes a transaction from `"Boro"` to `"You"` with the value of `"a book"`, with a timestamp `1`.
 
-Next, we will implement a procedure that calculates a block's hash. We will use the SHA[^ch4n2] hashing algorithm. Here's how we can do that:
+I> ### Definition 3
+I>
+I> SHA is a hashing algorithm which takes an input and produces a hash value.
+
+Next, we will implement a procedure that calculates a block's hash. We will use the SHA hashing algorithm. Here's how we can do that:
 
 ```racket
 (define (calculate-block-hash previous-hash timestamp transaction nonce)
@@ -363,7 +371,7 @@ A transaction contains a signature, sender, receiver, value and a list of inputs
   #:prefab)
 ```
 
-I> ### Definition
+I> ### Definition 4
 I>
 I> In Racket, a crypto factory is consisted of specific implementations of cryptographic algorithms.
 
@@ -386,7 +394,9 @@ We will need a procedure that makes an empty, unsigned and unprocessed (no input
    '()))
 ```
 
-Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them together. However, in this case we will use an asymmetric-key algorithm:
+Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them together. However, in this case we will be using digital signatures.
+
+To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent our digital signature.
 
 ```racket
 (define (sign-transaction from to value)
@@ -402,7 +412,7 @@ Next, we have a procedure for signing a transaction. It is similar to one of the
        (string->bytes/utf-8 (number->string value)))))))
 ```
 
-`digest/sign` is the procedure that does the encryption. It accepts a private key, an algorithm[^ch4n3] and bytes, and it returns encrypted data.
+`digest/sign` is the procedure that does the hashing and encryption. It accepts a private key, an algorithm[^ch4n1] and bytes, and it returns encrypted data.
 
 Next, we implement a procedure for processing transactions which will:
 
@@ -433,10 +443,8 @@ In other words, based on our inputs it will create outputs that contain the left
      (transaction-to t)
      value
      inputs
-     (remove-duplicates (append new-outputs outputs)))))
+     (append new-outputs outputs))))
 ```
-
-TODO: We use `remove-duplicates` to remove same outputs as we want to keep the outputs unique. We do set operations
 
 We have a procedure that checks a transaction's signature:
 
@@ -533,7 +541,18 @@ We follow the same algorithm - we start with 50 coins initially, and halve them 
   (/ 50 (expt 2 (floor (/ (length blocks) 210000)))))
 ```
 
-Now we have this procedure that inserts a transaction into the blockchain. It should:
+Before implementing the next procedure, we will introduce the notion of a set. In a list there can be repeated elements, but in a set all elements are unique. For example, consider the following code:
+
+```racket
+> (list->set '(1 2 3 4 4))
+(set 1 3 2 4)
+> '(1 2 3 4 4)
+'(1 2 3 4 4)
+```
+
+Using a set over a list will allow us to use operations such as union, subtraction, etc. This is why we will treat `utxo` as a set. 
+
+The next procedure will insert a transaction into the blockchain. It should:
 
 1. Mine a block
 1. Create a new utxo based on the processed transaction outputs, inputs and the current utxo
@@ -559,6 +578,8 @@ Now we have this procedure that inserts a transaction into the blockchain. It sh
      new-blocks
      utxo-rewarded)))
 ```
+
+We are using `set-union` which will produce elements that are found in two sets, and `set-subtract` which will produce elements that are found in the first set but not in the second set.
 
 This procedure will determine the balance of a wallet - the sum of all unspent transactions for the matching owner:
 
@@ -625,15 +646,14 @@ Finally:
 
 ### 3.6.1. `main-helper.rkt`
 
+This file will export everything from `blockchain.rkt`, `utils.rkt` and also provide some printer procedures.
+
 ```racket
 (require "blockchain.rkt")
 (require "utils.rkt")
-(require "peer-to-peer.rkt")
-
-(require (only-in sha bytes->hex-string))
 ```
 
-TODO: Explain `format`, `substring`
+This procedure will convert a transaction object to a printable string. It will use `substring` to only print a subset of the hash (since it may be too big), and it will also use `format`, which is a string formatting procedure.
 
 ```racket
 (define (format-transaction t)
@@ -643,7 +663,7 @@ TODO: Explain `format`, `substring`
           (transaction-value t)))
 ```
 
-TODO: Explain `printf`
+The next procedure will print the details of a block. `printf` is similar to `format` except that it will also display the contents to the standard output:
 
 ```racket
 (define (print-block bl)
@@ -656,7 +676,7 @@ Hash:\t~a\nHash_p:\t~a\nStamp:\t~a\nNonce:\t~a\nData:\t~a\n"
           (format-transaction (block-transaction bl))))
 ```
 
-TODO: Explain `for`, `newline`
+Besides using recursion explicitly, there is a built-in `for` syntax that also allows repetitive computations. To print a blockchain, we will use the `for` syntax to go through all blocks, print them to the standard output, and then use `newline` to add a newline character to make the separation of every block obvious:
 
 ```racket
 (define (print-blockchain b)
@@ -665,6 +685,8 @@ TODO: Explain `for`, `newline`
     (newline)))
 ```
 
+We print wallets similarly:
+
 ```racket
 (define (print-wallets b wallet-a wallet-b)
   (printf "\nWallet A balance: ~a\nWallet B balance: ~a\n\n"
@@ -672,12 +694,11 @@ TODO: Explain `for`, `newline`
           (balance-wallet-blockchain b wallet-b)))
 ```
 
-Export:
+And export the procedures:
 
 ```racket
 (provide (all-from-out "blockchain.rkt")
          (all-from-out "utils.rkt")
-         (all-from-out "peer-to-peer.rkt")
          format-transaction print-block print-blockchain print-wallets)
 ```
 
@@ -778,9 +799,4 @@ We built every component one by one, gradually. Some components are orthogonal -
 
 This design allows to extend our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without ichanging the basic components.
 
-[^ch4n1]: TODO: Something about the RSA algorithm.
-
-[^ch4n2]: TODO: Something about the SHA algorithm.
-
-[^ch4n3]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
-
+[^ch4n1]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
