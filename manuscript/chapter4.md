@@ -51,16 +51,16 @@ Now we have this procedure for getting the sum of nonces of a blockchain. Highes
 
 Now we have this procedure which will server as a handler for updating latest blockchain:
 
-TODO: implement `(define (helper x) (deserialize (read (open-input-string (string-replace-line x "")))))`
+TODO: Talk about `set-...!`, atomic operations, etc.
+
+```racket
+(define (trim-helper x)
+  (deserialize (read (open-input-string (string-replace-line x "")))))
+```
 
 ```racket
 (define (maybe-update-blockchain peer-context line)
-  (let ([current-blockchain
-         (deserialize
-          (read
-           (open-input-string
-            (string-replace line
-                            #rx"(latest-blockchain:|[\r\n]+)" ""))))]
+  (let ([current-blockchain (trim-helper #rx"(latest-blockchain:|[\r\n]+)")]
         [latest-blockchain (peer-context-data-blockchain peer-context)])
     (when (and (valid-blockchain? current-blockchain)
                (> (get-blockchain-effort current-blockchain)
@@ -75,12 +75,7 @@ Together with this handler for updating valid peers:
 
 ```racket
 (define (maybe-update-valid-peers peer-context line)
-  (let ([valid-peers
-         (list->set
-          (deserialize
-           (read
-            (open-input-string
-             (string-replace line #rx"(valid-peers:|[\r\n]+)" "")))))]
+  (let ([valid-peers (list->set (trim-helper #rx"(valid-peers:|[\r\n]+)"))]
         [current-valid-peers (peer-context-data-valid-peers
                               peer-context)])
     (set-peer-context-data-valid-peers!
@@ -98,19 +93,16 @@ Now we have these generic handlers for both client and server: `handler`, `launc
   (define line (read-line in))
   (when (string? line) ; it can be eof
     (cond [(string-prefix? line "get-valid-peers")
-           (begin (display "valid-peers:" out)
-                  (displayln
-                   (serialize
-                    (set->list
-                     (peer-context-data-valid-peers peer-context)))
-                   out)
-                  (handler peer-context in out))]
+           (fprintf out "valid-peers:~a\n"
+                    (serialize
+                     (set->list
+                      (peer-context-data-valid-peers peer-context))))
+           (handler peer-context in out)]
           [(string-prefix? line "get-latest-blockchain")
-           (begin (display "latest-blockchain:" out)
-                  (write (serialize
-                          (peer-context-data-blockchain peer-context))
-                         out)
-                  (handler peer-context in out))]
+           (fprintf out "valid-peers:~a\n"
+                    (serialize
+                     (peer-context-data-blockchain peer-context)))
+           (handler peer-context in out)]
           [(string-prefix? line "latest-blockchain:")
            (begin (maybe-update-blockchain peer-context line)
                   (handler peer-context in out))]
@@ -118,7 +110,7 @@ Now we have these generic handlers for both client and server: `handler`, `launc
            (begin (maybe-update-valid-peers peer-context line)
                   (handler peer-context in out))]
           [(string-prefix? line "exit")
-           (displayln "bye" out)]
+           (fprintf out "bye\n")]
           [else (handler peer-context in out)])))
 ```
 
@@ -148,8 +140,7 @@ Now we have this procedure that will ping all peers in attempt to sync blockchai
     (for [(p (peer-context-data-connected-peers peer-context))]
       (let ([in (peer-info-io-input-port p)]
             [out (peer-info-io-output-port p)])
-        (displayln "get-latest-blockchain" out)
-        (displayln "get-valid-peers" out)
+        (fprintf out "get-latest-blockchain\nget-valid-peers\n")
         (flush-output out)))
     (printf "Peer ~a reports ~a valid peers.\n"
             (peer-context-data-name peer-context)
@@ -186,43 +177,56 @@ Now we have these two generic procedures for server: `accept-and-handle` and `se
     (custodian-shutdown-all main-cust)))
 ```
 
+Now we have `peer-loop` that does ...:
+
+```racket
+(define (peer-loop peer)
+  (begin
+    ;(printf "Trying to connect to ~a:~a...\n" (peer-info-ip peer) (peer-info-port peer))
+    (define-values (in out) (tcp-connect (peer-info-ip peer) (peer-info-port peer)))
+    (printf "'~a' connected to ~a:~a!\n"
+            (peer-context-data-name peer-context) (peer-info-ip peer) (peer-info-port peer))
+    (define current-peer-io (peer-info-io peer in out))
+    ; Add current peer to list of connected peers
+    (set-peer-context-data-connected-peers!
+     peer-context
+     (cons current-peer-io (peer-context-data-connected-peers peer-context)))
+    (launch-handler-thread
+     handler
+     peer-context
+     in
+     out
+     (lambda ()
+       ; Remove peer from list of connected peers
+       (set-peer-context-data-connected-peers!
+        peer-context
+        (set-remove
+         (peer-context-data-connected-peers peer-context)
+         current-peer-io))))))
+```
+
 Now we have this generic procedure for client, `connections-loop`, that makes sure we're connected with all known peers. TODO: break this procedure into smaller parts?
 
 ```racket
-(define (connections-loop peer-context)
+(define (connections-loop)
+  (letrec ([current-connected-peers (list->set (map peer-info-io-pi (peer-context-data-connected-peers peer-context)))]
+           [all-valid-peers (peer-context-data-valid-peers peer-context)]
+           [potential-peers (set-subtract all-valid-peers current-connected-peers)])
+    (for ([peer potential-peers])
+      (thread (lambda ()
+                (with-handlers ([exn:fail? (lambda (exn) #t)])
+                  (peer-loop peer)))))
+    (sleep 10)
+    (connections-loop)))
+```
+
+Now we have this helper procedure:
+
+```racket
+(define (connections-loop-helper peer-context)
   (define conns-cust (make-custodian))
   (parameterize ([current-custodian conns-cust])
-    (define (loop)
-      (letrec ([current-connected-peers (list->set (map peer-info-io-pi (peer-context-data-connected-peers peer-context)))]
-               [all-valid-peers (peer-context-data-valid-peers peer-context)]
-               [potential-peers (set-subtract all-valid-peers current-connected-peers)])
-        (for ([peer potential-peers])
-          (thread (lambda ()
-                    (with-handlers
-                        ([exn:fail?
-                          (lambda (x)
-                            ;(printf "Cannot connect to ~a:~a\n" (peer-info-ip peer) (peer-info-port peer))
-                            #t)])
-                      (begin
-                        ;(printf "Trying to connect to ~a:~a...\n" (peer-info-ip peer) (peer-info-port peer))
-                        (define-values (in out) (tcp-connect (peer-info-ip peer) (peer-info-port peer)))
-                        (printf "'~a' connected to ~a:~a!\n" (peer-context-data-name peer-context) (peer-info-ip peer) (peer-info-port peer))
-                        (define current-peer-io (peer-info-io peer in out))
-                        ; Add current peer to list of connected peers
-                        (set-peer-context-data-connected-peers! peer-context (cons current-peer-io (peer-context-data-connected-peers peer-context)))
-                        (launch-handler-thread handler
-                                               peer-context
-                                               in
-                                               out
-                                               (lambda ()
-                                                 ; Remove peer from list of connected peers
-                                                 (set-peer-context-data-connected-peers! peer-context
-                                                                                         (set-remove
-                                                                                          (peer-context-data-connected-peers peer-context)
-                                                                                          current-peer-io)))))))))
-        (sleep 10)
-        (loop)))
-    (thread loop))
+    (thread connections-loop))
   (lambda ()
     (custodian-shutdown-all conns-cust)))
 ```
@@ -360,7 +364,7 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
          ; This blockchain includes a new block
          (send-money-blockchain (get-blockchain) wallet-a wallet-a 1)])
     (set-peer-context-data-blockchain! peer-context newer-blockchain)
-    (displayln "Mined a block!")
+    (printf "Mined a block!")
     (sleep 5)
     (mine-loop)))
 
