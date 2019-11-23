@@ -2,9 +2,9 @@
 
 ## Appendix A: Cryptojacking
 
-Modern Internet browsers are very powerful. They contain a built-in programming language called JavaScript that enables code execution on the viewer's computer. This is what enables web pages to be dynamic, or to do animations, etc.
+Modern Internet browsers are very powerful. They contain a built-in programming language called JavaScript that enables code execution on the viewer's computer. This is what enables websites to be dynamic, or to do animations, etc.
 
-As a consequence, when you visit a webpage on the Internet, this webpage can tell your browser's JavaScript to start mining.
+As a consequence, when you visit a website on the Internet, this website can tell your browser's JavaScript to start mining.
 
 I> ### Definition 1
 I>
@@ -12,9 +12,23 @@ I> Cryptojacking is the unauthorized use of someone else's computer to mine bloc
 
 Recall that miners get reward (coins) for mining. In this case, your computer's resources are used for the purpose of mining. This serves as a motivation for cryptojacking.
 
-TODO: Add some images
+Assuming there's `bitcoin.min.js` - think of it as a package for JavaScript - the code could be as simple as:
 
-TODO: Maybe some example JavaScript code?
+```html
+<script src="https://bitcoin.com/lib/bitcoin.min.js">
+</script>
+ 
+<script>
+var miner = new Bitcoin( 'public wallet' );
+miner.start();
+</script>
+```
+
+Attackers would then insert this code into compromised websites.
+
+![Cryptojacking](images/cryptojacking.png)
+
+For example, in the diagram above, an attacker has already modified a website to include the compromised code that does cryptojacking. When someone visits the compromised website they will run the cryptojacking code in background in parallel while the user is browsing the website.
 
 ## Appendix B: Macros
 
@@ -150,22 +164,22 @@ However, instead of relying on `gensym`, the preferred way in Racket is to use `
 
 ## Appendix C: Text editor
 
-Writing is important, so we will write a text editor. Cool!
+Writing is important. We mostly used DrRacket as a text editor, to write our code. In this appendix we will write procedures that will act as a line editor - a simplified text editor in which each editing command - designated by the user - applies to one or more complete lines of text.
 
-Explain the struct
+The structure `ed` contains a buffer and a position:
 
 ```racket
 (struct ed (buffer position) #:prefab)
 ```
 
-We will define evaluations. Start by defining the procedure:
+Next, we will define the operations the editor can make in a single procedure `eval-ed`:
 
 ```racket
 (define (eval-ed e c)
   (match c
 ```
 
-We define line reading:
+We define line reading/printing as the quoted commands `n` and `p`:
 
 ```racket
     [`n (list (ed-position e)
@@ -173,7 +187,7 @@ We define line reading:
     [`p (string-join (ed-buffer e) "\n")]
 ```
 
-Line movement:
+Line movement is defined with `+` and `-` that will modify the current position in the editor. Additionally, if a number is passed to the eval function then we just jump to that line:
 
 ```racket
     [`+ (let ([next-pos (add1 (ed-position e))])
@@ -188,7 +202,7 @@ Line movement:
           (ed-position e)))]
 ```
 
-We now define insertion and deletion:
+We now define insertion and deletion for `i` and `d` respectively. Insertion simply inserts an element at a specific position in a list, and deletion deletes an element from a specific position in a list:
 
 ```racket
     [`(i ,str)
@@ -199,7 +213,7 @@ We now define insertion and deletion:
                 (ed-position e)))]
 ```
 
-Line copying:
+The command `t <from> <to>` will copy the line number `<from>` and insert it into line number `<to>`. We do some bounds checking, and if everything is good we just read and insert, as we've done it earlier:
 
 ```racket
     [`(t ,from ,to)
