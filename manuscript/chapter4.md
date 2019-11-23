@@ -293,11 +293,11 @@ Finally, the creation of new blockchain that initializes wallets, transactions, 
 ```racket
 (define (initialize-new-blockchain)
   (begin
-    (define scheme-coin-base (make-wallet))
+    (define coin-base (make-wallet))
 
     (printf "Making genesis transaction...\n")
     (define genesis-t
-      (make-transaction scheme-coin-base wallet-a 100 '()))
+      (make-transaction coin-base wallet-a 100 '()))
 
     (define utxo (list
                   (make-transaction-io 100 wallet-a)))
@@ -381,7 +381,7 @@ In chapter 4 we created an executable and we can send it to our friends, but the
 
 ### 4.2.1. `smart-contracts.rkt`
 
-TODO: Test this code first and if all is good `git push` to `scheme-coin`
+TODO: Test this code first and if all is good `git push` to `racket-coin`
 
 ```racket
 (require "transaction.rkt")

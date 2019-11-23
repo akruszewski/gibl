@@ -559,8 +559,9 @@ We will need a procedure for initialization of the blockchain. It accepts the ge
 One way to initialize a blockchain is as follows:
 
 ```racket
+> (define coin-base (make-wallet))
 > (define wallet-a (make-wallet))
-> (define genesis-t (make-transaction scheme-coin-base wallet-a 100 '()))
+> (define genesis-t (make-transaction coin-base wallet-a 100 '()))
 > (define utxo (list
 >              (make-transaction-io 100 wallet-a)))
 > (define blockchain (init-blockchain genesis-t "1337cafe" utxo))
@@ -771,7 +772,7 @@ This is where we will put all the components together and use them. We start by 
 We initialize wallets:
 
 ```racket
-(define scheme-coin-base (make-wallet))
+(define coin-base (make-wallet))
 (define wallet-a (make-wallet))
 (define wallet-b (make-wallet))
 ```
@@ -780,7 +781,7 @@ We initialize transactions by creating the first (genesis) transaction:
 
 ```racket
 (printf "Making genesis transaction...\n")
-(define genesis-t (make-transaction scheme-coin-base wallet-a 100 '()))
+(define genesis-t (make-transaction coin-base wallet-a 100 '()))
 ```
 
 We initialize the unspent transactions - our genesis transaction:

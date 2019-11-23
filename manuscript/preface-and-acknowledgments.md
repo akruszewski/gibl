@@ -6,7 +6,7 @@ One of the reasons for writing this book is that I could not find a single book 
 
 Since it's easy to get distracted by the amount of information, every section will contain a summary to serve as a recall. Moving back and forth between chapters until information sticks can be useful in aiding understanding.
 
-The recommended approach for the book is to follow along and write the code as it's being explained instead of reading passively. This way you will get the most of it. All of the source code is available for download from github.com/bor0/scheme-coin.
+The recommended approach for the book is to follow along and write the code as it's being explained instead of reading passively. This way you will get the most of it. All of the source code is available for download from github.com/bor0/racket-coin.
 
 Feel free to contact me at buritomath@gmail.com for any questions you might have, and I will do my best to answer. You can also access my blog at bor0.wordpress.com to check out some of my latest work.
 
