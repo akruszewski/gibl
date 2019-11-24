@@ -110,13 +110,14 @@ However, there is a problem in our language implementation. Consider evaluations
 . . +: contract violation
 ```
 
-The problem happens in the matching clause `[`(+ ,l ,r) (+ l r)]`. when we match against `'(+ (+ 1 2) 3))` we end up with `(+ '(+ 1 2) 3)`, so Racket cannot sum a quoted list with a number. The solution to this problem is to *recursively* evaluate every sub-expression. So our match turns from `[`(+ ,l ,r) (+ l r)]` to `[`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]`.
+The problem happens in the matching clause ``[`(+ ,l ,r) (+ l r)]``. when we match against `'(+ (+ 1 2) 3))` we end up with `(+ '(+ 1 2) 3)`, so Racket cannot sum a quoted list with a number. The solution to this problem is to *recursively* evaluate every sub-expression. So our match turns from ``[`(+ ,l ,r) (+ l r)]`` to ``[`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]``.
 
 In this case, the evaluation will happen as follows:
 
 ```racket
 (eval-contract t '(+ (+ 1 2) 3))
-= (eval-contract t (list '+ (eval-contract t '(+ 1 2)) (eval-contract t 3)))
+= (eval-contract t (list '+ (eval-contract t '(+ 1 2))
+    (eval-contract t 3)))
 = (eval-contract t (list '+ (+ 1 2) 3))
 = (eval-contract t (list '+ 3 3))
 = (eval-contract t '(+ 3 3))
@@ -208,8 +209,9 @@ Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to acce
            [t (make-transaction from to value my-ts)])
     (if (transaction? t)
         (let ([processed-transaction (process-transaction t)])
-          (if (and (>= (balance-wallet-blockchain b from) value)
-                   (valid-transaction-contract? processed-transaction c))
+          (if (and
+               (>= (balance-wallet-blockchain b from) value)
+               (valid-transaction-contract? processed-transaction c))
               (add-transaction-to-blockchain b processed-transaction)
               b))
         (add-transaction-to-blockchain b '()))))

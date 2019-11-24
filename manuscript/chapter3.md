@@ -291,7 +291,10 @@ The following procedure is exactly the opposite of `struct->file`, given a file 
     (deserialize result)))
 ```
 
-`deserialize` is the opposite of `serialize`. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
+Few notes here:
+
+1. `deserialize` is the opposite of `serialize`.
+1. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
 
 We provide these procedures:
 
