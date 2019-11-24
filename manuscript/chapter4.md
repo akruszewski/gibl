@@ -1,10 +1,237 @@
 # 4. Extending the blockchain
 
-In the previous chapter we implemented the most basic concepts that form a blockchain. In this chapter we will...
+In the previous chapter we implemented the most basic concepts that form a blockchain. In this chapter we will extend our blockchain with smart contracts and peer-to-peer support.
 
-## 4.1. Peer-to-peer implementation
+## 4.1. Smart contracts implementation
 
-### 4.1.1. `peer-to-peer.rkt`
+Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before sending money.
+
+In section 2.4 we created an executable that we can send to our friends but they can no longer change the code, because they don't have the original code, and even if they did not all users are programmers.
+
+The point of smart contracts is to allow non-programmers to adjust the logic in the code without changing the original code.
+
+### 4.1.1. `smart-contracts.rkt`
+
+Our implementation will depend on transactions:
+
+```racket
+(require "transaction.rkt")
+```
+
+We have to extend our original `valid-transaction?` so that it will also consider contracts when calculating validity:
+
+```racket
+(define (valid-transaction-contract? t contract)
+  (and (eval-contract t contract)
+       (valid-transaction? t)))
+```
+
+We will now implement a procedure that will accept a transaction, a contract (scripting language) and return some value. This value can either be true, false, a number, or a string.
+
+```racket
+(define (eval-contract t c)
+  (match c
+    [(? number? x) x]
+    [(? string? x) x]
+    [`() #t]
+    [`true #t]
+    [`false #f]
+    [`(if ,co ,tr ,fa) (if co tr fa)]
+    [`(+ ,l ,r) (+ l r)]
+    [else #f]))
+```
+
+We used a new syntax `match`. It is similar to `cond` except that it can check more complex structures. For example, if `c` matches `true` then it will return `#t`. If `c` matches a structure of the form `(if X Y Z)` then it will return the evaluation of `(if X Y Z)`.
+
+A few example usages:
+
+```racket
+> (define test-transaction (transaction "BoroS" "Boro" "You" "a book"
+  '() '()))
+> (eval-contract test-transaction 123)
+123
+> (eval-contract test-transaction "Hi")
+"Hi"
+> (eval-contract test-transaction '())
+#t
+> (eval-contract test-transaction 'true)
+#t
+> (eval-contract test-transaction 'false)
+#f
+> (eval-contract test-transaction '(if #t "Hi" "Hey"))
+"Hi"
+> (eval-contract test-transaction '(if #f "Hi" "Hey"))
+"Hey"
+> (eval-contract test-transaction '(+ 1 2))
+3
+```
+
+However, we still haven't used the transaction values in our procedure. Let's extend our scripting language with a few more commands:
+
+```racket
+...
+    [`from (transaction-from t)]
+    [`to (transaction-to t)]
+    [`value (transaction-value t)]
+...
+```
+
+Now we can do something like:
+
+```racket
+> (eval-contract test-transaction 'from)
+"Boro"
+> (eval-contract test-transaction 'to)
+"You"
+> (eval-contract test-transaction 'value)
+"a book"
+```
+
+We will implement a few more operators, so that our scripting language becomes more expressive:
+
+```racket
+...
+    [`(* ,l ,r) (* l r)]
+    [`(- ,l ,r) (- l r)]
+    [`(= ,l ,r) (equal? l r)]
+    [`(> ,l ,r) (> l r)]
+    [`(< ,l ,r) (< l r)]
+    [`(and ,l ,r) (and l r)]
+    [`(or ,l ,r) (or l r)]
+...
+```
+
+However, there is a problem in our language implementation. Consider evaluations of `(+ 1 2)` and `(+ (+ 1 2) 3)` in our language:
+
+```racket
+> (eval-contract test-transaction '(+ 1 2))
+3
+> (eval-contract test-transaction '(+ (+ 1 2) 3))
+. . +: contract violation
+```
+
+The problem happens in the matching clause `[`(+ ,l ,r) (+ l r)]`. when we match against `'(+ (+ 1 2) 3))` we end up with `(+ '(+ 1 2) 3)`, so Racket cannot sum a quoted list with a number. The solution to this problem is to *recursively* evaluate every sub-expression. So our match turns from `[`(+ ,l ,r) (+ l r)]` to `[`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]`.
+
+In this case, the evaluation will happen as follows:
+
+```racket
+(eval-contract t '(+ (+ 1 2) 3))
+= (eval-contract t (list '+ (eval-contract t '(+ 1 2)) (eval-contract t 3)))
+= (eval-contract t (list '+ (+ 1 2) 3))
+= (eval-contract t (list '+ 3 3))
+= (eval-contract t '(+ 3 3))
+= (eval-contract t 6)
+= 6
+```
+
+It is important to recall the distinction between a quoted list and a non-quoted one: the latter will attempt evaluation. In this case we just juggled with the quotation in order to produce the desired results.
+
+We will have to rewrite all of our operators:
+
+```racket
+...
+    [`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]
+    [`(* ,l ,r) (* (eval-contract t l) (eval-contract t r))]
+    [`(- ,l ,r) (- (eval-contract t l) (eval-contract t r))]
+    [`(= ,l ,r) (= (eval-contract t l) (eval-contract t r))]
+    [`(> ,l ,r) (> (eval-contract t l) (eval-contract t r))]
+    [`(< ,l ,r) (< (eval-contract t l) (eval-contract t r))]
+    [`(and ,l ,r) (and (eval-contract t l) (eval-contract t r))]
+    [`(or ,l ,r) (or (eval-contract t l) (eval-contract t r))]
+...
+```
+
+The `if` implementation in our language has the same problem. So we will also change it:
+
+```racket
+...
+    [`(if ,co ,tr ,fa) (if (eval-contract t co)
+                           (eval-contract t tr)
+                           (eval-contract t fa))]
+...
+```
+
+Thus, our final procedure becomes:
+
+```racket
+(define (eval-contract t c)
+  (match c
+    [(? number? x) x]
+    [(? string? x) x]
+    [`() #t]
+    [`true #t]
+    [`false #f]
+    [`(if ,co ,tr ,fa) (if (eval-contract t co)
+                           (eval-contract t tr)
+                           (eval-contract t fa))]
+    [`(+ ,l ,r) (+ l r)]
+    [`from (transaction-from t)]
+    [`to (transaction-to t)]
+    [`value (transaction-value t)]
+    [`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]
+    [`(* ,l ,r) (* (eval-contract t l) (eval-contract t r))]
+    [`(- ,l ,r) (- (eval-contract t l) (eval-contract t r))]
+    [`(= ,l ,r) (= (eval-contract t l) (eval-contract t r))]
+    [`(> ,l ,r) (> (eval-contract t l) (eval-contract t r))]
+    [`(< ,l ,r) (< (eval-contract t l) (eval-contract t r))]
+    [`(and ,l ,r) (and (eval-contract t l) (eval-contract t r))]
+    [`(or ,l ,r) (or (eval-contract t l) (eval-contract t r))]
+    [else #f]))
+```
+
+Now users can supply scripting code such as `(if (= (+ 1 2) 3) from to)`:
+
+```racket
+> (eval-contract test-transaction '(if (= (+ 1 2) 3) from to))
+"Boro"
+> (eval-contract test-transaction '(if (= (+ 1 2) 4) from to))
+"You"
+```
+
+Note that a contract in our implementation is just an S-expression.
+
+Finally, we provide the output which is just the transaction validity check:
+
+```racket
+(provide valid-transaction-contract?)
+```
+
+### 4.1.2. Updating existing code
+
+Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to accept contracts:
+
+```racket
+(define (send-money-blockchain b from to value c)
+  (letrec ([my-ts
+            (filter (lambda (t) (equal? from (transaction-io-owner t)))
+                    (blockchain-utxo b))]
+           [t (make-transaction from to value my-ts)])
+    (if (transaction? t)
+        (let ([processed-transaction (process-transaction t)])
+          (if (and (>= (balance-wallet-blockchain b from) value)
+                   (valid-transaction-contract? processed-transaction c))
+              (add-transaction-to-blockchain b processed-transaction)
+              b))
+        (add-transaction-to-blockchain b '()))))
+```
+
+We update `blockchain.rkt` to also `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
+
+```racket
+(define (file->contract file)
+  (with-handlers ([exn:fail? (lambda (exn) '())])
+    (read (open-input-file file))))
+```
+
+Make sure to add `file->contract` to the list of `provide` in `utils.rkt`.
+
+Finally, we need to update every usage of `(send-money-blockchain ...)` to `(send-money-blockchain ... (file->contract "contract.script"))` in `main.rkt`.
+
+TODO: Test
+
+## 4.2. Peer-to-peer implementation
+
+### 4.2.1. `peer-to-peer.rkt`
 
 TODO: Try refactoring some procedures. They are too big and use `define` within `define` (need to use `let`), etc.
 
@@ -255,7 +482,7 @@ Finally
          run-peer)
 ```
 
-### 4.1.2. Updating existing code
+### 4.2.2. Updating existing code
 
 Also need to modify `main-helper.rkt` to include peer-to-peer implementation:
 
@@ -270,7 +497,7 @@ Also need to modify `main-helper.rkt` to include peer-to-peer implementation:
          format-transaction print-block print-blockchain print-wallets)
 ```
 
-### 4.1.3. `main-p2p.rkt`
+### 4.2.3. `main-p2p.rkt`
 
 ```racket
 (require "./main-helper.rkt")
@@ -375,100 +602,4 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 
 TODO: Create executable
 
-## 4.2. Smart contracts implementation
-
-Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before sending money.
-
-In the previous section we created an executable and we can send it to our friends, but they can no longer change the code. So non-programmers can adjust the logic in the code without changing the original code - transactions programmable.
-
-### 4.2.1. `smart-contracts.rkt`
-
-TODO: Test this code first and if all is good `git push` to `racket-coin`
-
-```racket
-(require "transaction.rkt")
-```
-
-Now we have this procedure...
-
-```racket
-(define (valid-transaction-with-contract? t contract)
-  (and (eval-contract t contract)
-       (valid-transaction? t)))
-```
-
-Now we have this procedure...
-
-```racket
-(define (eval-contract t c)
-  (let ([eval-binary
-         (lambda (op l r)
-           (op (eval-contract t l)
-               (eval-contract t r)))])
-    (match c
-      [(? number? x) x]
-      [(? string? x) x]
-      [`() #t]
-      [`true #t]
-      [`false #f]
-      [`(if ,co ,tr ,fa) (if (eval-contract t co) (eval-contract t tr) (eval-contract t fa))]
-      [`from (transaction-from t)]
-      [`to (transaction-to t)]
-      [`value (transaction-value t)]
-      [`(* ,l ,r) (eval-binary l r)]
-      [`(+ ,l ,r) (eval-binary l r)]
-      [`(- ,l ,r) (eval-binary l r)]
-      [`(= ,l ,r) (eval-binary equal? l r)]
-      [`(> ,l ,r) (eval-binary > l r)]
-      [`(< ,l ,r) (eval-binary < l r)]
-      [`(and ,l ,r) (eval-binary (lambda (l r) (and l r)) l r)] ; convert this to procedure since and is syntax
-      [`(or ,l ,r) (eval-binary (lambda (l r) (or l r)) l r)]
-      [else #f])))
-```
-
-TODO: Show some `eval-contract` examples
-
-And provide the outputs:
-
-```racket
-(provide valid-transaction-with-contract?)
-```
-
-### 4.2.2. Updating existing code
-
-Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to accept contracts:
-
-```racket
-(define (send-money-blockchain b from to value c)
-  (letrec ([my-ts
-            (filter (lambda (t) (equal? from (transaction-io-owner t)))
-                    (blockchain-utxo b))]
-           [t (make-transaction from to value my-ts)])
-    (if (transaction? t)
-        (let ([processed-transaction (process-transaction t)])
-          (if (and (>= (balance-wallet-blockchain b from) value)
-                   (valid-transaction-with-contract? processed-transaction c))
-              (add-transaction-to-blockchain b processed-transaction)
-              b))
-        (add-transaction-to-blockchain b '()))))
-```
-
-We update `blockchain.rkt` to `(require "smart-contracts.rkt")` and provide . Then we update `utils.rkt` to add this helper procedure for reading contracts:
-
-```racket
-(define (file->contract file)
-  (with-handlers ([exn:fail? (lambda (exn) '())])
-    (read (open-input-file file))))
-```
-
-Make sure to add `file->contract` to the list of `provide` in `utils.rkt`.
-
-Note that a contract in our implementation is just an S-expression.
-
-Finally, we need to update every usage of `(send-money-blockchain ...)` to `(send-money-blockchain ... (file->contract "contract.script"))`. This entails updating `main.rkt` and `main-p2p.rkt`.
-
-TODO: Test
-
 ## Summary
-
-Produce executable that you can share to your friends so that everyone can use it.
