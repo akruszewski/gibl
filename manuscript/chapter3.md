@@ -712,7 +712,7 @@ This procedure will convert a transaction object to a printable string. It will 
           (transaction-value t)))
 ```
 
-The next procedure will print the details of a block. `printf` is similar to `format` except that it will also display the contents to the standard output:
+The next procedure will print the details of a block. `printf` is similar to `print`, except that it can be used like `format`:
 
 ```racket
 (define (print-block bl)

@@ -941,6 +941,26 @@ X> ### Exercise 18
 X>
 X> Create a person structure that contains a first name, last name and age.
 
+## 2.4. Creating an executable
+
+The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters we will create an executable so that our blockchain can be used and shared by others.
+
+To create an example executable, we start with the following code:
+
+```racket
+#lang racket
+(print "Hello")
+(read-bytes-line)
+```
+
+This code will just print the text `Hello`. `print` is a procedure that prints some text, and `read-bytes-line` is a procedure that waits for user input. If we did not use `read-bytes-line` it would just print and exit right away, before we are able to read any text.
+
+Next, we choose `Racket > Create Executable`. Select `Distribution` and click `Create`. After doing that, the executable should be created in the target folder.
+
+![Running an executable](images/executable.png)
+
+Running the executable should show something similar to the image above. Pressing the return key will exit.
+
 ## Summary
 
 The point of this chapter was to get a basic understanding of the Racket programming language. Here's what we learned in this chapter, briefly:
@@ -952,6 +972,7 @@ The point of this chapter was to get a basic understanding of the Racket program
 1. Lists are a special kind of pairs
 1. Procedures are a way to capture abstraction. They can accept and return any kind of types including procedures themselves
 1. Packages allow us to re-use code, written either by ourself or someone else
+1. Produced executables can be shared with friends so that everyone can use them
 
 [^ch2n1]: We will cover details about macros in Appendix B.
 
