@@ -4,6 +4,6 @@ Welcome to the Git repository of my second self-published book. You can access t
 
 Feel free to make contributions to it by either filing an issue or a pull request. As a contributor, you can e-mail me if you want to be included in the book.
 
-The book is dedicated to my wife Dijana, and our kids.
+The book is dedicated to my wife Dijana, our kids, and my family.
 
 ISBN: 978-1700138767
