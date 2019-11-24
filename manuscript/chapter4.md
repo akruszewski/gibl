@@ -1,5 +1,7 @@
 # 4. Extending the blockchain
 
+In the previous chapter we implemented the most basic concepts that form a blockchain. In this chapter we will...
+
 ## 4.1. Peer-to-peer implementation
 
 ### 4.1.1. `peer-to-peer.rkt`
@@ -375,9 +377,9 @@ TODO: Create executable
 
 ## 4.2. Smart contracts implementation
 
-Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write a little script to add additional requirements that must be satisfied before sending money.
+Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before sending money.
 
-In chapter 4 we created an executable and we can send it to our friends, but they can no longer change the code. So non-programmers can adjust the logic in the code without changing the original code - transactions programmable
+In the previous section we created an executable and we can send it to our friends, but they can no longer change the code. So non-programmers can adjust the logic in the code without changing the original code - transactions programmable.
 
 ### 4.2.1. `smart-contracts.rkt`
 
