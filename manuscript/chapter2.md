@@ -1021,6 +1021,54 @@ X> ### Exercise 18
 X>
 X> Create a person structure that contains a first name, last name and age.
 
+### 2.4.14. Threads
+
+I> ### Definition 14
+I>
+I> A thread is a sequence of instructions that can execute in parallel.
+
+Racket has a built-in procedure `thread` that accepts a procedure which will be ran in parallel without blocking the next instruction in order.
+
+As usual, we will show an example demonstrating threads. We will implement a procedure `detailed-fact` that will be similar to `fact` but also print whatever it is currently processing.
+
+```racket
+(define (detailed-fact n)
+  (begin
+    (display "Calculating factorial of ")
+    (displayln n)
+    (if (= n 0)
+        1
+        (* n (detailed-fact (- n 1))))))
+```
+
+`display` is a procedure that prints some text, and `displayln` is the same but it also prints a newline. Now we can interact with it as follows:
+
+```racket
+> (begin (detailed-fact 1) (detailed-fact 2))
+Calculating factorial of 1
+Calculating factorial of 0
+Calculating factorial of 2
+Calculating factorial of 1
+Calculating factorial of 0
+```
+
+This is a sequential execution and the results make sense. However, we now turn to parallel execution to see what will happen:
+
+```racket
+> (begin (thread (lambda () (detailed-fact 1))) (thread (lambda () (detailed-fact 2))))
+Calculating factorial of 2
+Calculating factorial of 1
+Calculating factorial of 0
+Calculating factorial of 1
+Calculating factorial of 0
+```
+
+Note how we used `(thread (lambda () ...))` instead of just `(thread ...)`. As we said, `thread` expects a procedure, but in the end of the evaluation `...` would be the output of factorial of some number (for example 3), so `(thread 3)` does not make sense.
+
+In this parallel execution the output is not ordered as it was in the previous case. This means that the `lambda`s within `thread` are being executed in parallel so the order of execution cannot be guaranteed.
+
+We will use threads for parallel processing in our peer-to-peer implementation later, where we will have one thread per peer, so that when we are serving one peer we don't block the serving of other peers.
+
 ## 2.4. Creating an executable
 
 The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters we will create an executable so that our blockchain can be used and shared by others.
@@ -1033,7 +1081,7 @@ To create an example executable, we start with the following code:
 (read-bytes-line)
 ```
 
-This code will just print the text `Hello`. `print` is a procedure that prints some text, and `read-bytes-line` is a procedure that waits for user input. If we did not use `read-bytes-line` it would just print and exit right away, before we are able to read any text.
+This code will just print the text `Hello`. `print` is a procedure that prints some text (similar to `display`), and `read-bytes-line` is a procedure that waits for user input. If we did not use `read-bytes-line` it would just print and exit right away, before we are able to read any text.
 
 Next, we choose `Racket > Create Executable`. Select `Distribution` and click `Create`. After doing that, the executable should be created in the target folder.
 
