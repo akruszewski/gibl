@@ -1,12 +1,12 @@
 # 4. Extending the blockchain
 
-In the previous chapter we implemented the most basic concepts that form a blockchain. In this chapter we will extend our blockchain with smart contracts and peer-to-peer support.
+In the previous chapter, we implemented the most basic concepts that form a blockchain. In this chapter, we will extend our blockchain with smart contracts and peer-to-peer support.
 
 ## 4.1. Smart contracts implementation
 
 Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before sending money.
 
-In section 2.4 we created an executable that we can send to our friends but they can no longer change the code, because they don't have the original code, and even if they did not all users are programmers.
+In section 2.4 we created an executable that we can send to our friends but they can no longer change the code because they don't have the original code, and even if they did not all users are programmers.
 
 The point of smart contracts is to allow non-programmers to adjust the logic in the code without changing the original code.
 
@@ -87,7 +87,7 @@ Now we can do something like:
 "a book"
 ```
 
-We will implement a few more operators, so that our scripting language becomes more expressive:
+We will implement a few more operators so that our scripting language becomes more expressive:
 
 ```racket
 ...
@@ -101,7 +101,7 @@ We will implement a few more operators, so that our scripting language becomes m
 ...
 ```
 
-However, there is a problem in our language implementation. Consider evaluations of `(+ 1 2)` and `(+ (+ 1 2) 3)` in our language:
+However, there is a problem in our language implementation. Consider the evaluations of `(+ 1 2)` and `(+ (+ 1 2) 3)`:
 
 ```racket
 > (eval-contract test-transaction '(+ 1 2))
@@ -125,7 +125,7 @@ In this case, the evaluation will happen as follows:
 = 6
 ```
 
-It is important to recall the distinction between a quoted list and a non-quoted one: the latter will attempt evaluation. In this case we just juggled with the quotation in order to produce the desired results.
+It is important to recall the distinction between a quoted list and a non-quoted one: the latter will attempt evaluation. In this case, we just juggled with the quotation to produce the desired results.
 
 We will have to rewrite all of our operators:
 
@@ -199,7 +199,9 @@ Finally, we provide the output which is just the transaction validity check:
 
 ### 4.1.2. Updating existing code
 
-Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to accept contracts:
+Now that we implemented the smart-contracts logic, the next thing we need to address is the frontend - how will our users use it. For that, we will update our implementation to support contracts by reading from a file. If a file named `contract.script` exists, we will read and parse it (with `read`) and then run the code.
+
+Within `blockchain.rkt` we will slightly rewrite the money sending procedure to accept contracts:
 
 ```racket
 (define (send-money-blockchain b from to value c)
@@ -217,7 +219,7 @@ Now, in `blockchain.rkt` we slightly rewrite the money sending procedure to acce
         (add-transaction-to-blockchain b '()))))
 ```
 
-We update `blockchain.rkt` to also `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
+We will also update `blockchain.rkt` with `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
 
 ```racket
 (define (file->contract file)
@@ -225,11 +227,9 @@ We update `blockchain.rkt` to also `(require "smart-contracts.rkt")`. Then we up
     (read (open-input-file file))))
 ```
 
-Make sure to add `file->contract` to the list of `provide` in `utils.rkt`.
+Make sure to add `file->contract` to the list of `provide`s in `utils.rkt`.
 
 Finally, we need to update every usage of `(send-money-blockchain ...)` to `(send-money-blockchain ... (file->contract "contract.script"))` in `main.rkt`.
-
-TODO: Test
 
 ## 4.2. Peer-to-peer implementation
 
@@ -243,7 +243,7 @@ TODO: Try refactoring some procedures. They are too big and use `define` within 
 (require racket/serialize)
 ```
 
-The `peer-info` structure contains an ip and a port:
+The `peer-info` structure contains an IP and a port:
 
 ```racket
 (struct peer-info
@@ -259,7 +259,7 @@ The `peer-info` structure contains an ip and a port:
   #:prefab)
 ```
 
-`peer-context-data` contains all information needed for a single peer:
+`peer-context-data` contains all the information needed for a single peer:
 
 ```racket
 (struct peer-context-data
@@ -273,14 +273,14 @@ The `peer-info` structure contains an ip and a port:
 
 The list of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
 
-Now we have this procedure for getting the sum of nonces of a blockchain. Highest one has most effort and will win to get updated throughout the peers.
+Now we have this procedure for getting the sum of nonces of a blockchain. The highest one has the most effort and will win to get updated throughout the peers.
 
 ```racket
 (define (get-blockchain-effort b)
   (foldl + 0 (map block-nonce (blockchain-blocks b))))
 ```
 
-Now we have this procedure which will server as a handler for updating latest blockchain:
+Now we have this procedure which will serve as a handler for updating the latest blockchain:
 
 TODO: Talk about `set-...!`, atomic operations, etc.
 
@@ -362,7 +362,7 @@ Now we have this helper procedure to launch handler thread:
      (close-output-port out))))
 ```
 
-Now we have this procedure that will ping all peers in attempt to sync blockchains and update list of valid peers:
+Now we have this procedure that will ping all peers in an attempt to sync blockchains and update list of valid peers:
 
 ```racket
 (define (peers peer-context)
@@ -436,7 +436,7 @@ Now we have `peer-loop` that does ...:
          current-peer-io))))))
 ```
 
-Now we have this generic procedure for client, `connections-loop`, that makes sure we're connected with all known peers. TODO: break this procedure into smaller parts?
+Now we have this generic procedure for the client, `connections-loop`, that makes sure we're connected with all known peers. TODO: break this procedure into smaller parts?
 
 ```racket
 (define (connections-loop)
@@ -505,7 +505,7 @@ Also need to modify `main-helper.rkt` to include peer-to-peer implementation:
 (require "./main-helper.rkt")
 ```
 
-This will convert a string of format `ip:port` to `peer-info` structure:
+This will convert a string of format `IP:port` to `peer-info` structure:
 
 ```racket
 (define (string-to-peer-info s)
@@ -519,7 +519,7 @@ This will create a new wallet for us to use:
 (define wallet-a (make-wallet))
 ```
 
-Finally, the creation of new blockchain that initializes wallets, transactions, unspect transactions and blockchain:
+Finally, the creation of new blockchain that initializes wallets, transactions, unspent transactions, and blockchain:
 
 ```racket
 (define (initialize-new-blockchain)
@@ -538,7 +538,7 @@ Finally, the creation of new blockchain that initializes wallets, transactions, 
     b))
 ```
 
-Some command line parsing (what's a command line to a newbie?)
+Some command-line parsing (what's a command line to a newbie?)
 
 ```racket
 (define args (vector->list (current-command-line-arguments)))

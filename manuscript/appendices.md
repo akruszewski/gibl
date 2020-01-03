@@ -10,7 +10,7 @@ I> ### Definition 1
 I>
 I> Cryptojacking is the unauthorized use of someone else's computer to mine blocks.
 
-Recall that miners get reward (coins) for mining. In this case, your computer's resources are used for the purpose of mining. This serves as a motivation for cryptojacking.
+Recall that miners get a reward (coins) for mining. In this case, your computer's resources are used for mining. This serves as a motivation for cryptojacking.
 
 Assuming there's `bitcoin.min.js` - think of it as a package for JavaScript - the code could be as simple as:
 
@@ -28,17 +28,17 @@ Attackers would then insert this code into compromised websites.
 
 ![Cryptojacking](images/cryptojacking.png)
 
-For example, in the diagram above, an attacker has already modified a website to include the compromised code that does cryptojacking. When someone visits the compromised website they will run the cryptojacking code in background in parallel while the user is browsing the website.
+For example, in the diagram above, an attacker has already modified a website to include the compromised code that does cryptojacking. When someone visits the compromised website they will run the cryptojacking code in the background in parallel while the user is browsing the website.
 
 ## Appendix B: Macros
 
-So far we've been writing our definitions and interacted with them, but what if we had a way to write a piece of code that, when executed, would write a code itself? Macros are a way to do exactly that.
+So far we've been writing our definitions and interacted with them, but what if we had a way to write a piece of code that, when executed, would write code itself? Macros are a way to do exactly that.
 
 I> ### Definition 2
 I>
 I> A macro is a syntactic extension to a programming language. This means that we can write (or introduce our own) keywords in the programming language itself.
 
-There is another special syntax in Lisp named `define-macro` which allows us to create a macro. It accepts a name of a macro, parameters (which are optional), and as a result it should return a quoted list of Lisp commands.
+There is another special syntax in Lisp named `define-macro` which allows us to create a macro. It accepts the name of a macro, parameters (which are optional), and as a result, it should return a quoted list of Lisp commands.
 
 When we run our definitions (or compile them), Racket will replace all occurrences of the macro call with the actual code that we made it produce.
 
@@ -75,10 +75,10 @@ We can notice a couple of things from the code above:
 
 1. We required a library that contains the `define-macro` syntax
 1. We've implemented our own `if` both as a macro and as a function
-1. In the interactions area we've used a function called `display`, which prints stuff to the output
+1. In the interactions area, we've used a function called `display`, which prints stuff to the output
 1. We see that the macro and the function produce two different outputs
 
-The macro and the function behave differently, as expected. However, in the case of `if`, it makes sense implementing it as a macro rather than a function. It does not make sense to evaluate the `else` case if we are sure that the first case will match.
+The macro and the function behave differently, as expected. However, in the case of `if`, it makes sense of implementing it as a macro rather than a function. It does not make sense to evaluate the `else` case if we are sure that the first case will match.
 
 The way we've written our macro makes things much more explicit in terms of execution and substitution. We can also write it as follows, which is a bit more implicit:
 
@@ -89,7 +89,7 @@ The way we've written our macro makes things much more explicit in terms of exec
 
 ### Hygienic macros
 
-The way we've written our macros earlier are not a good practice in Racket. To see why, consider the following example:
+The way we've written our macros earlier is not a good practice in Racket. Consider the following example:
 
 ```racket
 (define-macro (swap a b)
@@ -131,7 +131,7 @@ To see what happened, we can expand the macro by hand. The macro translates to:
 '(let ((tmp 2)) (set! 2 2) (set! 2 tmp))
 ```
 
-As we can see, it is hard to control accidental capture of local identifiers. We can get around the problem using `gensym` which returns a unique symbol every time it's called:
+As we can see, it is hard to control the accidental capture of local identifiers. We can get around the problem using `gensym` which returns a unique symbol every time it's called:
 
 ```racket
 (define-macro (swap a b)
@@ -164,7 +164,7 @@ However, instead of relying on `gensym`, the preferred way in Racket is to use `
 
 ## Appendix C: Text editor
 
-Writing is important. We mostly used DrRacket as a text editor, to write our code. In this appendix we will write procedures that will act as a line editor - a simplified text editor in which each editing command - designated by the user - applies to one or more complete lines of text.
+Writing is important. We mostly used DrRacket as a text editor, to write our code. In this appendix, we will write procedures that will act as a line editor - a simplified text editor in which each editing command - designated by the user - applies to one or more complete lines of text.
 
 The structure `ed` contains a buffer and a position:
 
