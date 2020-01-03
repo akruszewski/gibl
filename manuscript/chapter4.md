@@ -306,8 +306,8 @@ Here's a list of commands that peers will send to each other:
 | ----------------------- | --------------------- | ----- |
 | `get-valid-peers`       | `valid-peers:X`       | A peer may request a list of valid peers. The response will be `X` - valid peers. Note that this response will automatically trigger the command `valid-peers` |
 | `get-latest-blockchain` | `latest-blockchain:X` | A peer may request the latest blockchain from another peer. The response will be `X` - latest blockchain. This triggers the command `latest-blockchain`.
-| `latest-blockchain`     | `X`                   | When a peer gets this request it will update the blockchain, given it is valid. |
-| `valid-peers`           | `X`                   | When a peer gets this request it will update the list of valid peers. |
+| `latest-blockchain:X`   |                       | When a peer gets this request it will update the blockchain, given it is valid. |
+| `valid-peers:X`         |                       | When a peer gets this request it will update the list of valid peers. |
 
 Here is our handler implementation. It will accept a `peer-context`, and an input/output ports. Given those it will read the input (command) and send the appropriate output (evaluated command) back to the peer:
 
@@ -392,7 +392,11 @@ This procedure is just a helper one that will remove a command (prefix) from a s
         (string-replace line x "")))))
 ```
 
-Now we concluded our `handler` implementation. In the case where one peer connects to it, here's what should happen:
+We concluded our `handler` implementation.
+
+#### 4.2.1.3. Server implementation
+
+In the case where one peer connects to the server, here's what should happen:
 
 1. Our program will wait for the peer to send some command
 1. It will use the `handler` procedure to trasnform the necessary data
@@ -400,49 +404,30 @@ Now we concluded our `handler` implementation. In the case where one peer connec
 
 However, if more than one peer connects, then our procedure will "block", in the sense that the second peer will have to wait for the first one to be served, and the third will have to wait for the second, etc.
 
-To resolve this issue, we turn to threads. We will implement a helper procedure `launch-handler-thread` for that purpose. It will accept a `handler` procedure, `peer-context` for transforming data, input/output ports and a "callback" function to allow for post-processing once the handler finishes execution.
+To resolve this issue, we turn to threads. `accept-and-handle` is the main procedure that will serve the incoming clientts. It accepts a new connection and a peer context and launches `handler` in a thread:
 
 ```racket
-(define (launch-handler-thread handler peer-context in out cb)
-  (define-values (local-ip remote-ip) (tcp-addresses in))
-  (define current-peer (peer-info
-                        remote-ip
-                        (peer-context-data-port peer-context)))
-  (define current-peer-io (peer-info-io current-peer in out))
-  (thread
-   (lambda ()
-     (handler peer-context in out)
-     (cb)
-     (close-input-port in)
-     (close-output-port out))))
-```
-
-We use a new procedure `tcp-addresses` that returns an IP address and a port number, given an input port.
-
-TODO: Talk a little bit about dead lock, and Racket set operations being atomic
-
-#### 4.2.1.3. Server implementation
-
-Now we have these two generic procedures for server: `accept-and-handle` and `serve`.
-
-`accept-and-handle` accepts a new connection:
-
-```racket
-(define (accept-and-handle listener handler peer-context)
+(define (accept-and-handle listener peer-context)
   (define-values (in out) (tcp-accept listener))
-  (launch-handler-thread handler peer-context in out void))
+  (thread
+     (lambda ()
+       (handler peer-context in out)
+       (close-input-port in)
+       (close-output-port out))))
 ```
 
-`serve` is the main server listener:
+We use a new procedure `tcp-accept` that accepts a connection and returns input and output ports, and using the `define-values` syntax we store both of these values.
+
+`peers/serve` is the main server listener. This is straight copy-pasted from the Racket documentation, and the curious reader can navigate to the documentation and read more about the implementation details. In short, a custodian is a kind of container that makes sure there are no bogus threads or input/output ports in the memory and takes care of this for us.
 
 ```racket
-(define (serve peer-context)
+(define (peers/serve peer-context)
   (define main-cust (make-custodian))
   (parameterize ([current-custodian main-cust])
     (define listener
       (tcp-listen (peer-context-data-port peer-context) 5 #t))
     (define (loop)
-      (accept-and-handle listener handler peer-context)
+      (accept-and-handle listener peer-context)
       (loop))
     (thread loop))
   (lambda ()
@@ -451,14 +436,14 @@ Now we have these two generic procedures for server: `accept-and-handle` and `se
 
 #### 4.2.1.4. Client implementation
 
-Now we have `peer-loop` that tries to connect to other peers. It is the opposite of `serve`, in that it does not accepts new connections, rather tries to make a new connection:
+Now we have `connect-and-handle` that tries to connect to other peers. It is similar to `accept-and-handle`, but kind of dual, in that it does not accept new connections, rather tries to make a new connection:
 
 ```racket
-(define (peer-loop peer)
+(define (connect-and-handle peer)
   (begin
     (define-values (in out)
                    (tcp-connect (peer-info-ip peer)
-                   (peer-info-port peer)))
+                                (peer-info-port peer)))
     (printf "'~a' connected to ~a:~a!\n"
             (peer-context-data-name peer-context)
             (peer-info-ip peer)
@@ -469,24 +454,39 @@ Now we have `peer-loop` that tries to connect to other peers. It is the opposite
      peer-context
      (cons current-peer-io
            (peer-context-data-connected-peers peer-context)))
-    (launch-handler-thread
-     handler
-     peer-context
-     in
-     out
-     (lambda ()
-       ; Remove peer from list of connected peers
-       (set-peer-context-data-connected-peers!
-        peer-context
-        (set-remove
-         (peer-context-data-connected-peers peer-context)
-         current-peer-io))))))
+    (thread
+         (lambda ()
+           (handler peer-context in out)
+           (close-input-port in)
+           (close-output-port out)
+           ; Remove peer from list of connected peers once handler is finished
+           (set-peer-context-data-connected-peers!
+            peer-context
+            (set-remove
+             (peer-context-data-connected-peers peer-context)
+             current-peer-io))))))
 ```
 
-Now we have this generic procedure for the client, `connections-loop`, that makes sure we're connected with all known peers. TODO: break this procedure into smaller parts?
+Now we have this generic procedure for the client, `peers/connect`, that makes sure we're connected with all known peers. We use threads, again, for the same reason as in the server - we do not want this procedure to block the program from connecting to other clients while it tries to connect to one. This procedure is dual to `peers/serve`.
 
 ```racket
-(define (connections-loop)
+(define (peers/connect peer-context)
+  (define main-cust (make-custodian))
+  (parameterize ([current-custodian main-cust])
+    (define (loop)
+      (let ([potential-peers (get-potential-peers peer-context)])
+        (connect-and-handle peer))
+        (sleep 10)
+        (loop))
+    (thread loop))
+  (lambda ()
+    (custodian-shutdown-all main-cust)))
+```
+
+To implement `get-potential-peers`, we first get the list of connected and valid peers from the peer context. The valid peers that are not in the list of connected peers are potential peers we can make new connections with.
+
+```racket
+(define (get-potential-peers peer-context)
   (letrec ([current-connected-peers
             (list->set
              (map peer-info-io-pi
@@ -494,31 +494,15 @@ Now we have this generic procedure for the client, `connections-loop`, that make
            [valid-peers (peer-context-data-valid-peers peer-context)]
            [potential-peers (set-subtract valid-peers
                                           current-connected-peers)])
-    (for ([peer potential-peers])
-      (thread (lambda ()
-                (with-handlers ([exn:fail? (lambda (exn) #t)])
-                  (peer-loop peer)))))
-    (sleep 10)
-    (connections-loop)))
-```
-
-Now we have this helper procedure:
-
-```racket
-(define (connections-loop-helper peer-context)
-  (define conns-cust (make-custodian))
-  (parameterize ([current-custodian conns-cust])
-    (thread connections-loop))
-  (lambda ()
-    (custodian-shutdown-all conns-cust)))
+    potential-peers))
 ```
 
 #### 4.2.1.5. Integrating implementations
 
-Now we have this procedure that will ping all peers in an attempt to sync blockchains and update list of valid peers:
+Now we have this procedure that will ping all peers (that have connected to us, or we connected with them) in an attempt to sync blockchains and update list of valid peers:
 
 ```racket
-(define (peers peer-context)
+(define (peers/sync-data peer-context)
   (define (loop)
     (sleep 10)
     (for [(p (peer-context-data-connected-peers peer-context))]
@@ -535,17 +519,17 @@ Now we have this procedure that will ping all peers in an attempt to sync blockc
     (kill-thread t)))
 ```
 
-Now we have this helper procedure for running a peer-to-peer connection. It 
+The following procedure is the entry point, where everything is launched together:
 
 ```racket
 (define (run-peer peer-context)
   (begin
-    (serve peer-context)
-    (peers peer-context)
-    (connections-loop peer-context)))
+    (peers/serve peer-context)
+    (peers/connect peer-context)
+    (peers/sync-data peer-context)
 ```
 
-Finally
+Finally, we export the necessary objects:
 
 ```racket
 (provide (struct-out peer-context-data)
