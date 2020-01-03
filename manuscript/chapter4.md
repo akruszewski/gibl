@@ -233,6 +233,10 @@ Finally, we need to update every usage of `(send-money-blockchain ...)` to `(sen
 
 ## 4.2. Peer-to-peer implementation
 
+In section 3.6.2 we used DrRacket to execute our blockchain implementation. That's okay for testing purposes, however, if we wanted to share our implementation with other users and ask them to use it, is kind of inconvenient as in our implementation there was no way to share data between different users.
+
+In this section we will implement peer-to-peer support so that users who are interested in our implementation can "join" the system/community.
+
 ### 4.2.1. `peer-to-peer.rkt`
 
 TODO: Try refactoring some procedures. They are too big and use `define` within `define` (need to use `let`), etc.
@@ -602,6 +606,15 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 (mine-loop)
 ```
 
-TODO: Create executable
+## 4.3. Putting everything together
+
+As a recap, we did the following:
+
+1. Section 2.4: We created an executable in DrRacket.
+1. Section 3.6.2: We executed our basic blockchain implementation.
+1. Section 4.1: We implemented smart contracts.
+1. Section 4.2: We implemented peer-to-peer support.
+
+In this section we will create the final executable, and then use it to test our blockchain implementation with p2p, and also test smart contracts.
 
 ## Summary
