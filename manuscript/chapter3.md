@@ -297,6 +297,7 @@ Few notes here:
 
 1. `deserialize` is the opposite of `serialize`.
 1. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
+1. `read` will read and return data from `in`
 
 We provide these procedures:
 
