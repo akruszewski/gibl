@@ -191,9 +191,13 @@ Line movement is defined with `+` and `-` that will modify the current position 
 
 ```racket
     [`+ (let ([next-pos (add1 (ed-position e))])
-          (ed (ed-buffer e) (if (<= next-pos (length (ed-buffer e))) next-pos (ed-position e))))]
+          (ed (ed-buffer e) (if (<= next-pos (length (ed-buffer e)))
+                                next-pos
+                                (ed-position e))))]
     [`- (let ([prev-pos (sub1 (ed-position e))])
-          (ed (ed-buffer e) (if (> prev-pos 0) prev-pos (ed-position e))))]
+          (ed (ed-buffer e) (if (> prev-pos 0)
+                                prev-pos
+                                (ed-position e))))]
     [(? number? new-pos)
      (ed (ed-buffer e)
          (if
@@ -222,7 +226,10 @@ The command `t <from> <to>` will copy the line number `<from>` and insert it int
                    (> to 0)
                    (<= to (length (ed-buffer e)))))
          (ed (ed-buffer e) (ed-position e))
-         (ed (insert-at (ed-buffer e) to (list-ref (ed-buffer e) (sub1 from))) (add1 to)))]
+         (ed (insert-at (ed-buffer e)
+                        to
+                        (list-ref (ed-buffer e) (sub1 from)))
+             (add1 to)))]
 ```
 
 And finally, all other cases:
