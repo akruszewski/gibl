@@ -409,6 +409,8 @@ A few words on the newly used procedures:
 1. `tcp-addresses` - returns an IP address and a port number, given an input port
 1. `thread` - We will have one handler/thread per peer, so that when we are serving one peer we don't block the serving of other peers
 
+TODO: Talk a little bit about dead lock, and Racket set operations being atomic
+
 #### 4.2.1.4. Server implementation
 
 Now we have these two generic procedures for server: `accept-and-handle` and `serve`.
