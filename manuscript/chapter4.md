@@ -237,9 +237,20 @@ In section 3.6.2 we used DrRacket to execute our blockchain implementation. That
 
 In this section we will implement peer-to-peer support so that users who are interested in our implementation can "join" the system/community.
 
-TODO: Before we dive into the implementation, it's worth discussing our plan for the architecture a little bit. Draw diagram.
+Before we dive into the implementation, we will give a high overview of the architecture we will build.
+
+![Peer-to-peer architecture](images/p2p-architecture.png)
+
+Every peer node (in the peers list) will be consisted of a `peer-context-data` and a generic handler for transforming this contextual data. Further there will be two ways to establish a communication with other peers:
+
+1. A peer will accept new connections from other peers
+1. A peer will try to connect/make new connections to other peers
+
+Whenever a connection is established, peers will communicate with each other through the generic handler, parsing and evaluating commands such as syncing/updating the blockchain, updating the list of peers, etc.
 
 ### 4.2.1. `peer-to-peer.rkt`
+
+To start, we will add dependecies for the block implementation, and also rely on serialization for sending data to other peers:
 
 ```racket
 (require "blockchain.rkt")
@@ -249,9 +260,7 @@ TODO: Before we dive into the implementation, it's worth discussing our plan for
 
 #### 4.2.1.1. Peer context structure
 
-We will implement structures that will hold information about the peers so that we will have a reference to send data to the correct channels.
-
-To start, the `peer-info` structure contains an IP and a port of a peer:
+We will implement structures that hold information about the peers so that we will have a reference to send data to the correct channels. The `peer-info` structure contains an IP and a port of a peer:
 
 ```racket
 (struct peer-info
@@ -383,7 +392,15 @@ This procedure is just a helper one that will remove a command (prefix) from a s
         (string-replace line x "")))))
 ```
 
-Together with another helper procedure:
+Now we concluded our `handler` implementation. In the case where one peer connects to it, here's what should happen:
+
+1. Our program will wait for the peer to send some command
+1. It will use the `handler` procedure to trasnform the necessary data
+1. It will send the transformed data back to the peer
+
+However, if more than one peer connects, then our procedure will "block", in the sense that the second peer will have to wait for the first one to be served, and the third will have to wait for the second, etc.
+
+To resolve this issue, we turn to threads. We will implement a helper procedure `launch-handler-thread` for that purpose. It will accept a `handler` procedure, `peer-context` for transforming data, input/output ports and a "callback" function to allow for post-processing once the handler finishes execution.
 
 ```racket
 (define (launch-handler-thread handler peer-context in out cb)
@@ -400,18 +417,9 @@ Together with another helper procedure:
      (close-output-port out))))
 ```
 
-I> ### Definition 1
-I>
-I> A thread is a sequence of instructions that can execute in parallel.
+We use a new procedure `tcp-addresses` that returns an IP address and a port number, given an input port.
 
-A few words on the newly used procedures:
-
-1. `tcp-addresses` - returns an IP address and a port number, given an input port
-1. `thread` - We will have one handler/thread per peer, so that when we are serving one peer we don't block the serving of other peers
-
-TODO: Talk a little bit about dead lock, and Racket set operations being atomic
-
-#### 4.2.1.4. Server implementation
+#### 4.2.1.3. Server implementation
 
 Now we have these two generic procedures for server: `accept-and-handle` and `serve`.
 
@@ -439,7 +447,7 @@ Now we have these two generic procedures for server: `accept-and-handle` and `se
     (custodian-shutdown-all main-cust)))
 ```
 
-#### 4.2.1.3. Client implementation
+#### 4.2.1.4. Client implementation
 
 Now we have `peer-loop` that tries to connect to other peers. It is the opposite of `serve`, in that it does not accepts new connections, rather tries to make a new connection:
 
@@ -457,7 +465,8 @@ Now we have `peer-loop` that tries to connect to other peers. It is the opposite
     ; Add current peer to list of connected peers
     (set-peer-context-data-connected-peers!
      peer-context
-     (cons current-peer-io (peer-context-data-connected-peers peer-context)))
+     (cons current-peer-io
+           (peer-context-data-connected-peers peer-context)))
     (launch-handler-thread
      handler
      peer-context
@@ -476,9 +485,13 @@ Now we have this generic procedure for the client, `connections-loop`, that make
 
 ```racket
 (define (connections-loop)
-  (letrec ([current-connected-peers (list->set (map peer-info-io-pi (peer-context-data-connected-peers peer-context)))]
-           [all-valid-peers (peer-context-data-valid-peers peer-context)]
-           [potential-peers (set-subtract all-valid-peers current-connected-peers)])
+  (letrec ([current-connected-peers
+            (list->set
+             (map peer-info-io-pi
+                  (peer-context-data-connected-peers peer-context)))]
+           [valid-peers (peer-context-data-valid-peers peer-context)]
+           [potential-peers (set-subtract valid-peers
+                                          current-connected-peers)])
     (for ([peer potential-peers])
       (thread (lambda ()
                 (with-handlers ([exn:fail? (lambda (exn) #t)])
@@ -498,7 +511,7 @@ Now we have this helper procedure:
     (custodian-shutdown-all conns-cust)))
 ```
 
-#### 4.2.1.4. Integrating implementations
+#### 4.2.1.5. Integrating implementations
 
 Now we have this procedure that will ping all peers in an attempt to sync blockchains and update list of valid peers:
 
