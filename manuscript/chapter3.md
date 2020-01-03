@@ -10,6 +10,8 @@ I> Serialization is the process of converting an object into a stream of bytes t
 
 ## 3.1. `wallet.rkt`
 
+In this section we will implement wallets. Wallets will be used by transactions later for determining the source and the destination of sending/receiving money (assets).
+
 We will start with the most basic data structure - a wallet. As we discussed earlier, it is a structure that contains a public and a private key. It will have the form of:
 
 ```racket
@@ -75,7 +77,7 @@ X> Extract the private and the public key of a wallet. The code should look some
 
 ## 3.2. `block.rkt`
 
-A block should contain the current hash, the previous hash, data, and timestamp when it was generated:
+A blockchain is simply a list of blocks. Thus, a block is the building block of a blockchain. It should contain the current hash, the previous hash, data, and timestamp when it was generated:
 
 ```racket
 (struct block
@@ -534,7 +536,7 @@ X> Create a transaction, sign it, and verify it using the procedures above.
 
 ## 3.5. `blockchain.rkt`
 
-We'll need to `require` a bunch of stuff:
+We will now implement the final component - blockchain. We'll need to `require` a bunch of stuff:
 
 ```racket
 (require "block.rkt")
