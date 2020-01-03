@@ -892,9 +892,73 @@ X> ### Exercise 17
 X>
 X> Use DrRacket's feature to follow definitions on `test-1` and `test-2`.
 
-### 2.4.12. Structures
+### 2.4.12. Mutation
 
 I> ### Definition 12
+I>
+I> Mutation allows a value re-definition of a variable.
+
+Mutation can be done using the `set!` syntax. Consider the following definition:
+
+```racket
+(define x 123)
+x
+(define x 1234)
+x
+```
+
+This definition will produce an error `module: identifier already defined in: x`. However, the next definition:
+
+```racket
+(define x 123)
+x
+(set! x 1234)
+x
+```
+
+Will happily print `123` followed by `1234`.
+
+Even though mutation looks powerful, a good Lisp practice is to avoid mutation when possible. The reason for that is that mutation causes side effects, and side effects make reasoning about programs harder. To demonstrate that, consider this definition:
+
+```racket
+(define some-number 123)
+
+(define (add-one)
+  (+ 1 some-number))
+
+(define (add-one-mutation)
+  (begin
+    (set! some-number (+ 1 some-number))
+    some-number))
+```
+
+`begin` allows us to sequence multiple expressions, executing them in order.
+
+Now let's interact with it:
+
+```racket
+> (add-one)
+124
+> (add-one)
+124
+```
+
+So far, so good. No side effects since `add-one` returns the same value every time it's called. However:
+
+```racket
+> (add-one-mutation)
+124
+> (add-one-mutation)
+125
+> (add-one)
+126
+```
+
+This is what makes it hard to reason about programs, they modify the values so some procedures might return different values. Thus, care must be taken when using mutation. We will use mutation in our peer-to-peer implementation later.
+
+### 2.4.13. Structures
+
+I> ### Definition 13
 I>
 I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
 
@@ -935,6 +999,22 @@ We can use the automatically generated procedures to extract values from objects
 #t
 > (document? "test")
 #f
+```
+
+There is also a way to declare mutable structures as follows:
+
+```racket
+(struct document (author title content) #:mutable)
+```
+
+The `#:mutable` keyword will automatically generate `set-<field>!` procedures for every property in the structure. Now we can interact as follows:
+
+```racket
+> (document-author a-document)
+"Boro Sitnikovski"
+> (set-document-author! a-document "Boro")
+> (document-author a-document)
+"Boro"
 ```
 
 X> ### Exercise 18
