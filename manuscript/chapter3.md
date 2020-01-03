@@ -812,7 +812,7 @@ Making a second transaction:
 (print-wallets blockchain wallet-a wallet-b)
 ```
 
-`set!` is just like a `define`, except that when something is already defined we cannot use `define` to change its value.
+`set!` is just like a `define`, except that when something is already defined, we cannot use `define` to re-define/change its value.
 
 Making a third transaction:
 
@@ -849,6 +849,59 @@ And export the blockchain to `blockchain.data` which can be re-used later.
 ```racket
 (struct->file blockchain "blockchain.data")
 (printf "Exported blockchain to 'blockchain.data'...\n")
+```
+
+Once we create `main.rkt`, we run it from the menu `Racket > Run` and it should show the following output:
+
+```
+Making genesis transaction...
+Mining genesis block...
+
+Wallet A balance: 100
+Wallet B balance: 0
+
+Mining second transaction...
+
+Wallet A balance: 130
+Wallet B balance: 20
+
+Mining third transaction...
+
+Wallet A balance: 140
+Wallet B balance: 60
+
+Attempting to mine fourth (not-valid) transaction...
+
+Wallet A balance: 140
+Wallet B balance: 60
+
+Blockchain is valid: #t
+
+Block information
+=================
+Hash:	e720bb198279a76057280bdf8eb667fe1883d0ae263c5d5d1be08697a2f534d1
+Hash_p:	38200563c1f807be2a5d10ec42dd53acae1f6f804b4c93016b87c974817f065d
+Stamp:	1529923610574
+Nonce:	216
+Data:	...bb6573e30a994990... sends ...896a71a68be970f6... an amount of 10.
+
+Block information
+=================
+Hash:	38200563c1f807be2a5d10ec42dd53acae1f6f804b4c93016b87c974817f065d
+Hash_p:	6a20fbe4038bb3b83090e7f767bb24af5164218bba5c751a1858262df2a2a847
+Stamp:	1529923610405
+Nonce:	752
+Data:	...896a71a68be970f6... sends ...bb6573e30a994990... an amount of 20.
+
+Block information
+=================
+Hash:	6a20fbe4038bb3b83090e7f767bb24af5164218bba5c751a1858262df2a2a847
+Hash_p:	7365656467656e65736973
+Stamp:	1529923610332
+Nonce:	220
+Data:	...58d498c68aefe93a... sends ...896a71a68be970f6... an amount of 100.
+
+Exported blockchain to 'blockchain.data'...
 ```
 
 ## Summary
