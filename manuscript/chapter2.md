@@ -1055,7 +1055,8 @@ Calculating factorial of 0
 This is a sequential execution and the results make sense. However, we now turn to parallel execution to see what will happen:
 
 ```racket
-> (begin (thread (lambda () (detailed-fact 1))) (thread (lambda () (detailed-fact 2))))
+> (begin (thread (lambda () (detailed-fact 1))) (thread (lambda ()
+  (detailed-fact 2))))
 Calculating factorial of 2
 Calculating factorial of 1
 Calculating factorial of 0

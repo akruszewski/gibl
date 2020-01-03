@@ -210,7 +210,8 @@ We now define insertion and deletion for `i` and `d` respectively. Insertion sim
 
 ```racket
     [`(i ,str)
-     (ed (insert-at (ed-buffer e) (ed-position e) str) (add1 (ed-position e)))]
+     (ed (insert-at (ed-buffer e) (ed-position e) str)
+         (add1 (ed-position e)))]
     [`d (ed (remove-at (ed-buffer e) (ed-position e))
             (if (= (ed-position e) (length (ed-buffer e)))
                 (sub1 (length (ed-buffer e)))
