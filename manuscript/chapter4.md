@@ -419,6 +419,8 @@ To resolve this issue, we turn to threads. We will implement a helper procedure 
 
 We use a new procedure `tcp-addresses` that returns an IP address and a port number, given an input port.
 
+TODO: Talk a little bit about dead lock, and Racket set operations being atomic
+
 #### 4.2.1.3. Server implementation
 
 Now we have these two generic procedures for server: `accept-and-handle` and `serve`.
