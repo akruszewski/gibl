@@ -248,6 +248,8 @@ Every peer node (in the peers list) will consist of a `peer-context-data` and a 
 
 Whenever a connection is established, peers will communicate with each other through the generic handler, parsing and evaluating commands such as syncing/updating the blockchain, updating the list of peers, etc.
 
+Building communication systems of this type is naturally complex. It is suggested you consult the Racket manuals (by pressing the F1 key) for every procedure that we will be using. Make sure you understand this section well - it will provide you with powerful knowledge. If you know how to build a peer-to-peer system, you will easily be able to build a Web server as well, or any other kind of a server. Going several times through this section should help with understanding the system better.
+
 ### 4.2.1. `peer-to-peer.rkt`
 
 To start, we will add dependencies for the block implementation, and also rely on serialization for sending data to other peers:
@@ -294,7 +296,7 @@ Finally, `peer-context-data` contains all the information needed for a single pe
   #:prefab)
 ```
 
-The list[^ch4n1]  of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
+The list[^ch4n1] of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
 
 #### 4.2.1.2. Generic handler
 
