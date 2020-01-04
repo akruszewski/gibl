@@ -8,6 +8,8 @@ I> ### Definition 1
 I>
 I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserialization is the opposite process - converting a stream of bytes into an object.
 
+TODO: why do we need serialization
+
 ## 3.1. `wallet.rkt`
 
 In this section we will implement wallets. Wallets will be used by transactions later for determining the source and the destination of sending/receiving money (assets).
@@ -24,7 +26,7 @@ The `#:prefab` part is new. A prefab ("previously fabricated") structure type is
 
 I> ### Definition 2
 I>
-I> RSA is an asymmetric-key algorithm used to encrypt and decrypt messages.
+I> RSA is an asymmetric-key algorithm used to encrypt and decrypt messages, similar in nature to the one described in section 1.2.2.
 
 We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA algorithm.
 
@@ -77,7 +79,11 @@ X> Extract the private and the public key of a wallet. The code should look some
 
 ## 3.2. `block.rkt`
 
-A blockchain is simply a list of blocks. Thus, a block is the building block of a blockchain. It should contain the current hash, the previous hash, data, and timestamp when it was generated:
+A blockchain is simply a list of blocks. Thus, a block is the building block of a blockchain.
+
+### 3.2.1. Constructing a valid block
+
+A block should contain the current hash, the previous hash, data, and timestamp when it was generated:
 
 ```racket
 (struct block
@@ -85,7 +91,9 @@ A blockchain is simply a list of blocks. Thus, a block is the building block of 
   #:prefab
 ```
 
-The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be. In general, blocks can contain any data, not just transactions, but we are limiting it to transactions for now. We will also add a `nonce` field for the Hashcash algorithm - we will see the purpose of this field in a moment:
+The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be - it is a valid block.
+
+In general, blocks can contain any data, not just transactions, but we are limiting them to transactions for now. We will also add a `nonce` field for the Hashcash algorithm - we will see the purpose of this field in a moment:
 
 ```racket
 (struct block
@@ -110,6 +118,8 @@ We will discuss transactions in details later. Here's one way to generate a bloc
 ```
 
 For example, this block makes a transaction from `"Boro"` to `"You"` with the value of `"a book"`, with a timestamp `1`.
+
+### 3.2.2. Hashing and verifying a block
 
 I> ### Definition 3
 I>
@@ -152,6 +162,8 @@ Now that we have a way to calculate a block's hash, we also need a way to verify
                                 (block-transaction bl)
                                 (block-nonce bl))))
 ```
+
+### 3.2.3. Hashcash algorithm
 
 At this point we will start implementing the Hashcash algorithm.
 
@@ -248,6 +260,8 @@ X>        (block-transaction bl)
 X>        (block-timestamp bl)
 X>        (block-nonce bl))
 X> ```
+
+TODO: Add more exercises w.r.t. subsections
 
 ## 3.3. `utils.rkt`
 
@@ -452,6 +466,8 @@ To create a digital signature, we use a hashing function (in this case, it is us
 
 `digest/sign` is the procedure that does the hashing and encryption. It accepts a private key, an algorithm[^ch3n1] and bytes, and it returns encrypted data.
 
+### TODO
+
 Next, we implement a procedure for processing transactions which will:
 
 1. Sum all the inputs with `inputs-sum`
@@ -554,6 +570,8 @@ Recall that utxo is just a list of `transaction-io` objects, where it represents
   #:prefab)
 ```
 
+### TODO: Init
+
 We will need a procedure for initialization of the blockchain. It accepts the genesis (first, ever) transaction, genesis hash, and utxo:
 
 ```racket
@@ -572,6 +590,8 @@ One way to initialize a blockchain is as follows:
 >              (make-transaction-io 100 wallet-a)))
 > (define blockchain (init-blockchain genesis-t "1337cafe" utxo))
 ```
+
+### TODO: Reward
 
 In the original Bitcoin implementation the block reward started at 50 coins for the first block and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
 
@@ -592,6 +612,8 @@ Before implementing the next procedure, we will introduce the notion of a set. I
 ```
 
 Using a set over a list will allow us to use operations such as union, subtraction, etc. This is why we will treat `utxo` as a set. 
+
+### TODO: Inserting a transaction
 
 The next procedure will insert a transaction into the blockchain. It should:
 
@@ -652,6 +674,8 @@ The next procedure will send money from one wallet to another by initiating a tr
         (add-transaction-to-blockchain b '()))))
 ```
 
+### TODO: Blockchain validity
+
 Now we have this procedure that determines blockchain validity:
 
 1. All blocks are valid `valid-block?`
@@ -696,6 +720,8 @@ X> Initialize a blockchain and add a transaction to it using `add-transaction-to
 X> ### Exercise 7
 X>
 X> Use `valid-blockchain?` on the blockchain in the previous exercise (before adding the new transaction, and after adding the new transaction).
+
+TODO: Add more exercises w.r.t. subsections
 
 ## 3.6. Integrating components
 
@@ -760,6 +786,8 @@ And export the procedures:
 X> ### Exercise 8
 X>
 X> Create a transaction and use `format-transaction` to see what it outputs. Do the same for block, blockchain, and wallets.
+
+TODO: Add more exercises w.r.t. content
 
 ### 3.6.2. `main.rkt`
 

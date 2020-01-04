@@ -1,5 +1,7 @@
 # 2. Racket programming language
 
+TODO: Add more exercises to each section w.r.t. content
+
 ## 2.1. Introduction to Lisp
 
 Lisp, originating from 1958, stands for LISt Processing. Unlike standard programming languages, it has a fully parenthesized prefix notation. For example, instead of writing `1 + 2`, one would write `(+ 1 2)`.
