@@ -233,7 +233,7 @@ Finally, we need to update every usage of `(send-money-blockchain ...)` to `(sen
 
 ## 4.2. Peer-to-peer implementation
 
-In section 3.6.2 we used DrRacket to execute our blockchain implementation. That's okay for testing purposes, however, if we wanted to share our implementation with other users and ask them to use it, is kind of inconvenient as in our implementation there was no way to share data between different users.
+In section 3.6.2 we used DrRacket to execute our blockchain implementation. That's okay for testing purposes, however, if we wanted to share our implementation with other users and ask them to use it, it's kind of inconvenient as in our implementation there was no way to share data between different users.
 
 In this section we will implement peer-to-peer support so that users who are interested in our implementation can "join" the system/community.
 
@@ -241,7 +241,7 @@ Before we dive into the implementation, we will give a high overview of the arch
 
 ![Peer-to-peer architecture](images/p2p-architecture.png)
 
-Every peer node (in the peers list) will be consisted of a `peer-context-data` and a generic handler for transforming this contextual data. Further there will be two ways to establish a communication with other peers:
+Every peer node (in the peers list) will consist of a `peer-context-data` and a generic handler for transforming this contextual data. Further, there will be two ways to establish communication with other peers:
 
 1. A peer will accept new connections from other peers
 1. A peer will try to connect/make new connections to other peers
@@ -250,7 +250,7 @@ Whenever a connection is established, peers will communicate with each other thr
 
 ### 4.2.1. `peer-to-peer.rkt`
 
-To start, we will add dependecies for the block implementation, and also rely on serialization for sending data to other peers:
+To start, we will add dependencies for the block implementation, and also rely on serialization for sending data to other peers:
 
 ```racket
 (require "blockchain.rkt")
@@ -294,7 +294,7 @@ Finally, `peer-context-data` contains all the information needed for a single pe
   #:prefab)
 ```
 
-The list of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
+The list[^ch4n1]  of valid peers will be updated depending on info retrieved from connected peers. The list of connected peers will be a (not necessarily strict) subset of `valid-peers`. Blockchain will be updated from data with other peers.
 
 #### 4.2.1.2. Generic handler
 
@@ -309,7 +309,7 @@ Here's a list of commands that peers will send to each other:
 | `latest-blockchain:X`   |                       | When a peer gets this request it will update the blockchain, given it is valid. |
 | `valid-peers:X`         |                       | When a peer gets this request it will update the list of valid peers. |
 
-Here is our handler implementation. It will accept a `peer-context`, and an input/output ports. Given those it will read the input (command) and send the appropriate output (evaluated command) back to the peer:
+Here is our handler implementation. It will accept a `peer-context`, and an input/output ports. Given these it will read the input (command) and send the appropriate output (evaluated command) back to the peer:
 
 ```racket
 (define (handler peer-context in out)
@@ -323,9 +323,8 @@ Here is our handler implementation. It will accept a `peer-context`, and an inpu
                       (peer-context-data-valid-peers peer-context))))
            (handler peer-context in out)]
           [(string-prefix? line "get-latest-blockchain")
-           (fprintf out "valid-peers:~a\n"
-                    (serialize
-                     (peer-context-data-blockchain peer-context)))
+           (fprintf out "latest-blockchain:"
+           (write (serialize (peer-context-data-blockchain peer-context)) out)
            (handler peer-context in out)]
           [(string-prefix? line "latest-blockchain:")
            (begin (maybe-update-blockchain peer-context line)
@@ -340,26 +339,28 @@ Here is our handler implementation. It will accept a `peer-context`, and an inpu
 
 We used some new procedures:
 
-1. `flush-output` - an output buffer is filled with bytes. We need to flush (empty) this buffer everytime we want to send a message, to avoid re-sending the previous messages again
+1. `flush-output` - an output buffer is filled with bytes. We need to flush (empty) this buffer every time we want to send a message, to avoid re-sending the previous messages again
 1. `read-line` - similar to `read` except that it will stop `read`ing once a newline is reached
 1. `string-prefix?` - checks to see if a string starts with some other string
 1. `fprintf` - similar to `printf` except that we can also supply the first parameter to be specified to which port to send the message to
 1. `set->list` - converts a set to a list
 
+There's a little trick involved in the `latest-blockchain` case - we used `write` instead of `(fprintf out "latest-blockchain:~a\n")`. The reason for that is that `print` (and thus `printf`, `fprintf`) is used mostly for debugging, not as a tool that we can rely on for output that needs to be formatted in a specific way. For example, `print` prints strings with quotation marks, and this will mess up when we try to deserialize the data we received.
+
 The next step is to implement `maybe-update-blockchain` and `maybe-update-valid-peers`.
 
 ```racket
 (define (maybe-update-blockchain peer-context line)
-  (let ([current-blockchain
+  (let ([latest-blockchain
          (trim-helper line #rx"(latest-blockchain:|[\r\n]+)")]
-        [latest-blockchain (peer-context-data-blockchain peer-context)])
-    (when (and (valid-blockchain? current-blockchain)
-               (> (get-blockchain-effort current-blockchain)
-                  (get-blockchain-effort latest-blockchain)))
+        [current-blockchain (peer-context-data-blockchain peer-context)])
+    (when (and (valid-blockchain? latest-blockchain)
+               (> (get-blockchain-effort latest-blockchain)
+                  (get-blockchain-effort current-blockchain)))
       (printf "Blockchain updated for peer ~a\n"
               (peer-context-data-name peer-context))
       (set-peer-context-data-blockchain! peer-context
-                                         current-blockchain))))
+                                         latest-blockchain))))
 ```
 
 This procedure will update the blockchain only when it is valid and the effort is higher than the current one. Here's how we define the effort:
@@ -387,9 +388,9 @@ This procedure is just a helper one that will remove a command (prefix) from a s
 ```racket
 (define (trim-helper line x)
   (deserialize
-    (read
-      (open-input-string
-        (string-replace line x "")))))
+   (read
+    (open-input-string
+     (string-replace line x "")))))
 ```
 
 We concluded our `handler` implementation.
@@ -399,24 +400,24 @@ We concluded our `handler` implementation.
 In the case where one peer connects to the server, here's what should happen:
 
 1. Our program will wait for the peer to send some command
-1. It will use the `handler` procedure to trasnform the necessary data
+1. It will use the `handler` procedure to transform the necessary data
 1. It will send the transformed data back to the peer
 
 However, if more than one peer connects, then our procedure will "block", in the sense that the second peer will have to wait for the first one to be served, and the third will have to wait for the second, etc.
 
-To resolve this issue, we turn to threads. `accept-and-handle` is the main procedure that will serve the incoming clientts. It accepts a new connection and a peer context and launches `handler` in a thread:
+To resolve this issue, we turn to threads. `accept-and-handle` is the main procedure that will serve the incoming clients. It accepts a new connection and a peer context and launches `handler` in a thread:
 
 ```racket
 (define (accept-and-handle listener peer-context)
   (define-values (in out) (tcp-accept listener))
   (thread
-     (lambda ()
-       (handler peer-context in out)
-       (close-input-port in)
-       (close-output-port out))))
+   (lambda ()
+     (handler peer-context in out)
+     (close-input-port in)
+     (close-output-port out))))
 ```
 
-We use a new procedure `tcp-accept` that accepts a connection and returns input and output ports, and using the `define-values` syntax we store both of these values.
+We use a new procedure `tcp-accept` that accepts a connection and returns input and output ports and using the `define-values` syntax we store both of these values.
 
 `peers/serve` is the main server listener. This is straight copy-pasted from the Racket documentation, and the curious reader can navigate to the documentation and read more about the implementation details. In short, a custodian is a kind of container that makes sure there are no bogus threads or input/output ports in the memory and takes care of this for us.
 
@@ -439,35 +440,34 @@ We use a new procedure `tcp-accept` that accepts a connection and returns input 
 Now we have `connect-and-handle` that tries to connect to other peers. It is similar to `accept-and-handle`, but kind of dual, in that it does not accept new connections, rather tries to make a new connection:
 
 ```racket
-(define (connect-and-handle peer)
+(define (connect-and-handle peer-context peer)
   (begin
     (define-values (in out)
-                   (tcp-connect (peer-info-ip peer)
-                                (peer-info-port peer)))
-    (printf "'~a' connected to ~a:~a!\n"
-            (peer-context-data-name peer-context)
-            (peer-info-ip peer)
-            (peer-info-port peer))
+      (tcp-connect (peer-info-ip peer)
+                   (peer-info-port peer)))
+
     (define current-peer-io (peer-info-io peer in out))
+
     ; Add current peer to list of connected peers
     (set-peer-context-data-connected-peers!
      peer-context
      (cons current-peer-io
            (peer-context-data-connected-peers peer-context)))
+
     (thread
-         (lambda ()
-           (handler peer-context in out)
-           (close-input-port in)
-           (close-output-port out)
-           ; Remove peer from list of connected peers once handler is finished
-           (set-peer-context-data-connected-peers!
-            peer-context
-            (set-remove
-             (peer-context-data-connected-peers peer-context)
-             current-peer-io))))))
+     (lambda ()
+       (handler peer-context in out)
+       (close-input-port in)
+       (close-output-port out)
+       ; Remove peer from list of connected peers once handler is finished
+       (set-peer-context-data-connected-peers!
+        peer-context
+        (set-remove
+         (peer-context-data-connected-peers peer-context)
+         current-peer-io))))))
 ```
 
-Now we have this generic procedure for the client, `peers/connect`, that makes sure we're connected with all known peers. We use threads, again, for the same reason as in the server - we do not want this procedure to block the program from connecting to other clients while it tries to connect to one. This procedure is dual to `peers/serve`.
+Now we have this generic procedure for the client, `peers/connect`, that makes sure we're connected with all known peers. We use threads, again, for the same reason as in the server - we do not want this procedure to block the program from connecting to other clients while it tries to connect to one. This procedure is dual to `peers/serve`, as well as `tcp-connect` to `tcp-accept`.
 
 ```racket
 (define (peers/connect peer-context)
@@ -475,9 +475,11 @@ Now we have this generic procedure for the client, `peers/connect`, that makes s
   (parameterize ([current-custodian main-cust])
     (define (loop)
       (let ([potential-peers (get-potential-peers peer-context)])
-        (connect-and-handle peer))
-        (sleep 10)
-        (loop))
+        (for ([peer potential-peers])
+          (with-handlers ([exn:fail? (lambda (x) #t)])
+            (connect-and-handle peer-context peer))))
+      (sleep 10)
+      (loop))
     (thread loop))
   (lambda ()
     (custodian-shutdown-all main-cust)))
@@ -487,14 +489,12 @@ To implement `get-potential-peers`, we first get the list of connected and valid
 
 ```racket
 (define (get-potential-peers peer-context)
-  (letrec ([current-connected-peers
-            (list->set
-             (map peer-info-io-pi
-                  (peer-context-data-connected-peers peer-context)))]
-           [valid-peers (peer-context-data-valid-peers peer-context)]
-           [potential-peers (set-subtract valid-peers
-                                          current-connected-peers)])
-    potential-peers))
+  (let ([current-connected-peers
+         (list->set
+          (map peer-info-io-pi
+               (peer-context-data-connected-peers peer-context)))]
+        [valid-peers (peer-context-data-valid-peers peer-context)])
+    (set-subtract valid-peers current-connected-peers)))
 ```
 
 #### 4.2.1.5. Integrating implementations
@@ -510,9 +510,10 @@ Now we have this procedure that will ping all peers (that have connected to us, 
             [out (peer-info-io-output-port p)])
         (fprintf out "get-latest-blockchain\nget-valid-peers\n")
         (flush-output out)))
-    (printf "Peer ~a reports ~a valid peers.\n"
+    (printf "Peer ~a reports ~a valid and ~a connected peers.\n"
             (peer-context-data-name peer-context)
-            (set-count (peer-context-data-valid-peers peer-context)))
+            (set-count (peer-context-data-valid-peers peer-context))
+            (set-count (peer-context-data-connected-peers peer-context)))
     (loop))
   (define t (thread loop))
   (lambda ()
@@ -526,7 +527,7 @@ The following procedure is the entry point, where everything is launched togethe
   (begin
     (peers/serve peer-context)
     (peers/connect peer-context)
-    (peers/sync-data peer-context)
+    (peers/sync-data peer-context)))
 ```
 
 Finally, we export the necessary objects:
@@ -539,7 +540,7 @@ Finally, we export the necessary objects:
 
 ### 4.2.2. Updating existing code
 
-Also need to modify `main-helper.rkt` to include peer-to-peer implementation:
+We need to modify `main-helper.rkt` to include our peer-to-peer implementation:
 
 ```racket
 ; ...
@@ -591,7 +592,7 @@ Finally, the creation of new blockchain that initializes wallets, transactions, 
     b))
 ```
 
-Some command-line parsing (what's a command line to a newbie?)
+Some command-line parsing (TODO: what's a command-line?)
 
 ```racket
 (define args (vector->list (current-command-line-arguments)))
@@ -667,3 +668,7 @@ As a recap, we did the following:
 In this section we will create the final executable, and then use it to test our blockchain implementation with p2p, and also test smart contracts.
 
 ## Summary
+
+We added two new important features to our blockchain implementation: smart contracts and peer-to-peer support. This concludes our blockchain implementation. The next steps (to create a real-world blockchain) would be to harden the security, tweak the communication logic and blockchain effort algorithms, etc.
+
+[^ch4n1]: More precisely, a set, since we will use operations such as subtract.
