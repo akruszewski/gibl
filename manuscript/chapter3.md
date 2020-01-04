@@ -297,7 +297,7 @@ Few notes here:
 
 1. `deserialize` is the opposite of `serialize`.
 1. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
-1. `read` will read and return data from `in`
+1. `read` will read and return data from `in` (the opposite of `write`)
 
 We provide these procedures:
 
@@ -450,7 +450,7 @@ To create a digital signature, we use a hashing function (in this case, it is us
        (string->bytes/utf-8 (number->string value)))))))
 ```
 
-`digest/sign` is the procedure that does the hashing and encryption. It accepts a private key, an algorithm[^ch4n1] and bytes, and it returns encrypted data.
+`digest/sign` is the procedure that does the hashing and encryption. It accepts a private key, an algorithm[^ch3n1] and bytes, and it returns encrypted data.
 
 Next, we implement a procedure for processing transactions which will:
 
@@ -911,4 +911,4 @@ We built every component one by one, gradually. Some components are orthogonal -
 
 This design allows extending our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without changing the basic components.
 
-[^ch4n1]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
+[^ch3n1]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
