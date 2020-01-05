@@ -4,13 +4,21 @@ TODO: Add more exercises to each section w.r.t. content
 
 ## 2.1. Introduction to Lisp
 
-Lisp, originating from 1958, stands for LISt Processing. Unlike standard programming languages, it has a fully parenthesized prefix notation. For example, instead of writing `1 + 2`, one would write `(+ 1 2)`.
+Lisp, originating from 1958, stands for LISt Processing, and is a family of programming languages.
+
+Unlike standard programming languages, it has a fully parenthesized prefix notation. For example, instead of writing `1 + 2`, one would write `(+ 1 2)`.
 
 There are three important notions in a Lisp:
 
-1. Primitives or axioms, starting points. As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations upon the numbers, such as `+` and `*`.
+1. Primitives or axioms (starting points or building blocks). As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations on numbers, such as `+` and `*`.
 1. Composition or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
 1. Abstraction or capturing the composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
+
+TODO: Map each of the concepts above to an example in this ch
+
+We will be relying on these concepts repeatedly throughout the book.
+
+## 2.1.1. Data structures
 
 I> ### Definition 1
 I>
@@ -18,22 +26,28 @@ I> A data structure is a collection of values, the relationships among them, and
 
 An example of a data structure is numbers together with the plus and multiplication functions.
 
-From the motivation in the previous section we can see a need of forming such a composite data type, where, for example, a block is a structure that contains a hash, an owner, and transaction amount.
+From the motivation in the previous section we can see a need of forming such a data structure, where, for example, a block is a structure that contains a hash, an owner, and transaction amount.
 
 There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, merging two lists, etc.
 
+## 2.1.2. Recursion
+
+TODO: Next, we will introduce a way to repeatedly transform a data structure according to some specific rules. For example, on a given data structure ... we might want to ...
+
 I> ### Definition 2
 I>
-I> In mathematics and computer science, objects exhibit recursive behavior when they can be defined by two properties:
+I> In mathematics and computer science, objects exhibit *recursive* behavior when they can be defined by two properties:
 I>
 I> 1. A simple base case (or cases) - a terminating case that returns a value without using recursion
 I> 1. A set of rules that reduce all other cases toward the base case
 
-The best example is the factorial function, defined as:
+The best example of a recursive function is the factorial function, defined as:
 
 {$$}fact(n) = \left\{ \begin{array}{ll} 1\text{, if } n = 0 \\	n \cdot fact(n - 1)\text{, otherwise} \end{array} \right.{/$$}
 
-For example, using only substitution we can see that {$$}fact(3){/$$} evaluates to {$$}3 \cdot fact(2){/$$} which is {$$}3 \cdot 2 \cdot fact(1){/$$}, and then finally {$$}3 \cdot 2 \cdot 1 \cdot fact(0){/$$} which is just 6.
+For example, using substitution we can see that {$$}fact(3){/$$} evaluates to {$$}3 \cdot fact(2){/$$} which is {$$}3 \cdot 2 \cdot fact(1){/$$}, and then finally {$$}3 \cdot 2 \cdot 1 \cdot fact(0){/$$} which is just 6.
+
+## 2.1.3. Tree data structure
 
 I> ### Definition 3
 I>
@@ -49,6 +63,10 @@ A family tree is one example of a tree. Another example of a tree is a binary tr
  / \
 1   3
 ```
+
+## 2.1.3. Languages and abstract syntax trees
+
+TODO: Add some introductory paragraph
 
 I> ### Definition 4
 I>
@@ -81,6 +99,10 @@ It is not important to understand what this code does, rather how such programs 
 Lisps do not have the restriction of a special syntax like C has, for example. The code that we will write will be the actual abstract syntax tree. This is why Lisps rely on prefix notation. Thus, Lisps are based on a minimalistic design, so we do not get the overhead of many other languages that have special syntax where sometimes some functionalities overlap.
 
 Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we will see the interesting properties that composition offers and how easily we can maintain and extend our code.
+
+## 2.1.4. S-expressions
+
+TODO: Add some introductory paragraph
 
 I> ### Definition 6
 I>
@@ -132,7 +154,7 @@ The upper text area part is the definitions area, where we usually write our def
 
 The Help Desk under `Help > Help Desk` on the top menu contains useful information such as quick introduction, reference manuals, examples.
 
-## 2.4. Tutorial
+## 2.4. Introduction to Racket
 
 The first thing that Lisp newcomers notice is that there are too many parentheses in Lisp programs. This is true, but it is a direct consequence of that we are writing our abstract syntax tree in a language that has no special syntax.
 
