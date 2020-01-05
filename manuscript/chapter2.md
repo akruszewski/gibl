@@ -14,11 +14,9 @@ There are three important notions in a Lisp:
 1. Composition or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
 1. Abstraction or capturing the composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
 
-TODO: Map each of the concepts above to an example in this ch
-
 We will be relying on these concepts repeatedly throughout the book.
 
-## 2.1.1. Data structures
+### 2.1.1. Data structures and recursion
 
 I> ### Definition 1
 I>
@@ -30,9 +28,7 @@ From the motivation in the previous section we can see a need of forming such a 
 
 There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, merging two lists, etc.
 
-## 2.1.2. Recursion
-
-TODO: Next, we will introduce a way to repeatedly transform a data structure according to some specific rules. For example, on a given data structure ... we might want to ...
+Next, we will introduce a way to repeatedly transform a data structure according to some specific rules. For example, if we have a blockchain data structure we may want to come up with a way to transform it such that, for example, a new block is inserted in it.
 
 I> ### Definition 2
 I>
@@ -46,8 +42,6 @@ The best example of a recursive function is the factorial function, defined as:
 {$$}fact(n) = \left\{ \begin{array}{ll} 1\text{, if } n = 0 \\	n \cdot fact(n - 1)\text{, otherwise} \end{array} \right.{/$$}
 
 For example, using substitution we can see that {$$}fact(3){/$$} evaluates to {$$}3 \cdot fact(2){/$$} which is {$$}3 \cdot 2 \cdot fact(1){/$$}, and then finally {$$}3 \cdot 2 \cdot 1 \cdot fact(0){/$$} which is just 6.
-
-## 2.1.3. Tree data structure
 
 I> ### Definition 3
 I>
@@ -64,9 +58,9 @@ A family tree is one example of a tree. Another example of a tree is a binary tr
 1   3
 ```
 
-## 2.1.3. Languages and abstract syntax trees
+### 2.1.2. Languages and syntax
 
-TODO: Add some introductory paragraph
+In this section we'll take a quick look at the foundations of a Lisp. It is not necessary to remember all of it, but it is a good thing to keep in mind on how Lisps work in general.
 
 I> ### Definition 4
 I>
@@ -100,15 +94,11 @@ Lisps do not have the restriction of a special syntax like C has, for example. T
 
 Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we will see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
-## 2.1.4. S-expressions
-
-TODO: Add some introductory paragraph
+Syntax has a special meaning in Lisps compared to other languages. With macros as part of the core language it's possible to extend this syntax[^ch2n1]. S-expressions form the syntax of a Lisp.
 
 I> ### Definition 6
 I>
-I> The syntactic elements in Lisp are symbolic expressions or S-expressions. S-expressions have a value of either a symbol or a list.
-
-S-expressions form the syntax of a Lisp. Thus, the word syntax has a special meaning in Lisps compared to other languages. With macros as part of the core language it's possible to extend this syntax[^ch2n1].
+I> The syntactic elements in Lisp are symbolic expressions or S-expressions. S-expressions' values are either a symbol or a list.
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
@@ -265,7 +255,7 @@ Also, note that we can use `quote` on any set of symbols:
 
 This allows for the creation of new symbols and is especially important for the creation of macros.
 
-Recall that S-expressions can be either a symbol or a list. Since we discussed evaluation, lists, and symbols in this section, at this point in the book we have covered the core of a Lisp.
+Recall that S-expressions can be either a symbol or a list. Since we discussed evaluation, lists, and symbols in this section, at this point in the book we have covered what makes the core of a Lisp.
 
 X> ### Exercise 4
 X>
@@ -295,13 +285,15 @@ There are two other built-in functions called `car` and `cdr` which are used to 
 2
 ```
 
+Note how we used function composition here, namely, we "composed" `car` and `cons` in the first example, and `cdr` and `cons` in the second example.
+
 Pairs are so important that we can encode any data structure with them. In fact, lists are a special kind of pairs, where `(list 1 2 3)` is equal to `(cons 1 (cons 2 (cons 3 '())))`.
 
 ![An example of a list](images/list.png)
 
 The motivation for using a list is that it will allow us, for example, to link several blocks together to make a blockchain.
 
-We notice how in Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can build abstraction.
+We notice how in Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can capture abstraction. We will talk more about this in section 2.4.13.
 
 X> ### Exercise 6
 X>
