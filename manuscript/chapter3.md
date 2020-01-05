@@ -22,7 +22,7 @@ We will start with the most basic data structure - a wallet. As we discussed ear
   #:prefab)
 ```
 
-The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. Also, we can serialize/deserialize these kinds of structures.
+The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print the structure and all of its contents. In addition we can serialize/deserialize these kinds of structures.
 
 I> ### Definition 2
 I>
@@ -325,6 +325,8 @@ And make sure we require all the necessary packages:
 (require racket/serialize)
 ```
 
+TODO: Exercises
+
 ## 3.4. Transactions
 
 In this section we will implement the procedures for signing and verifying signatures.
@@ -446,6 +448,8 @@ We will need a procedure that makes an empty, unsigned and unprocessed (no input
    '()))
 ```
 
+### TODO Digital signatures
+
 Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. However, in this case we will be using digital signatures.
 
 To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent our digital signature.
@@ -550,6 +554,8 @@ The `all-from-out` syntax specifies all objects that we import (and that are exp
 X> ### Exercise 4
 X>
 X> Create a transaction, sign it, and verify it using the procedures above.
+
+TODO: More exercises
 
 ## 3.5. `blockchain.rkt`
 
