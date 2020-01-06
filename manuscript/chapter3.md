@@ -79,7 +79,7 @@ X> ### Exercise 1
 X>
 X> Create a wallet using `make-wallet` and store it in a variable using `define`.
 
-X> ### Exercise 1
+X> ### Exercise 2
 X>
 X> Extract the private and the public key of the previously created wallet. The code should look something like `(wallet-?? (make-wallet))`.
 
@@ -251,15 +251,15 @@ And make sure we require all the necessary packages:
 
 The `only-in` syntax imports only specific objects from a package, that we specify, instead of importing everything.
 
-X> ### Exercise
+X> ### Exercise 3
 X>
 X> Create a block (with a transaction) using `block` (and `transaction`) and store it in a variable using `define`. Then, calculate its hash using `calculate-block-hash`.
 
-X> ### Exercise 2
+X> ### Exercise 4
 X>
 X> Use `make-and-mine-block` on a block you generated. What's the `nonce` count - i.e. how much "processing" did it take to mine that block?
 
-X> ### Exercise 3
+X> ### Exercise 5
 X>
 X> Use `valid-block?` on the block in the previous exercise. Now use `valid-block?` on that block where its nonce is 1.
 X>
@@ -335,7 +335,7 @@ And make sure we require all the necessary packages:
 (require racket/serialize)
 ```
 
-X> ### Exercise
+X> ### Exercise 6
 X>
 X> Use `struct->file` on some block to store it in a file. Then, use `file->struct` on that same file. Did you get the same block? Nex, use an editor to open the file you created - what do the raw contents look like?
 
@@ -563,7 +563,7 @@ Finally, we export:
 
 The `all-from-out` syntax specifies all objects that we import (and that are exported) from the target. In this case, besides the file exporting the `transaction` structure with a couple of procedures, it also exports everything from `transaction-io.rkt`.
 
-X> ### Exercise 4
+X> ### Exercise 7
 X>
 X> Create a transaction, process it, and verify it using the procedures above.
 X>
@@ -727,19 +727,19 @@ Finally:
          balance-wallet-blockchain valid-blockchain?)
 ```
 
-X> ### Exercise 5
+X> ### Exercise 8
 X>
 X> Create two sets and use `set-subtract`, `set-union` and `set-intersect` on them. Observe the results.
 
-X> ### Exercise 6
+X> ### Exercise 9
 X>
 X> Initialize a blockchain with `init-blockchain` and add a transaction to it using `add-transaction-to-blockchain`.
 
-X> ### Exercise 7
+X> ### Exercise 10
 X>
 X> Use `valid-blockchain?` on the blockchain in the previous exercise (before adding the new transaction, and after adding the new transaction).
 
-X> ### Exercise
+X> ### Exercise 11
 X>
 X> Make a transfer in a blockchain using `send-money-blockchain`.
 
@@ -803,7 +803,7 @@ And export the procedures:
          format-transaction print-block print-blockchain print-wallets)
 ```
 
-X> ### Exercise 8
+X> ### Exercise 12
 X>
 X> Create a transaction and use `format-transaction` to see what it outputs. Repeat the same for block (`print-block`), blockchain (`print-blockchain`), and walles (`print-wallets`).
 
