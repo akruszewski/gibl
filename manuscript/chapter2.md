@@ -43,6 +43,8 @@ The best example of a recursive function is the factorial function, defined as:
 
 For example, using substitution we can see that {$$}fact(3){/$$} evaluates to {$$}3 \cdot fact(2){/$$} which is {$$}3 \cdot 2 \cdot fact(1){/$$}, and then finally {$$}3 \cdot 2 \cdot 1 \cdot fact(0){/$$} which is just 6.
 
+The recursion we just discussed gives the motivation for the following definition.
+
 I> ### Definition 3
 I>
 I> A tree is a hierarchical, recursive data structure that can have two possible values:
