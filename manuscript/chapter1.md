@@ -1,5 +1,7 @@
 # 1. Introduction to Blockchain
 
+TODO: Add more exercises to each section w.r.t. content, e.g. functions
+
 In this chapter, we will get ourselves introduced to some definitions and examples for blockchain. We will see what properties a blockchain has, what it allows us to do and what it is good for.
 
 I> ### Definition 1
@@ -12,7 +14,7 @@ I> Blockchain is a system in which a record of transactions is maintained across
 
 We will give an example that will serve as a motivation, as well as define what encryption and hashing techniques are and how will they help us with our system.
 
-## 1.1. Motivation
+## 1.1. Motivation and basic definitions
 
 Let's assume that you and your friends exchange money often, for example, paying for dinner or drinks. It can be inconvenient to exchange cash all the time.
 
@@ -82,21 +84,33 @@ X> Think about why do people think that gold is valuable, or that money is valua
 
 ## 1.2. Encryption
 
-Before we talk about encryption, we first have to recall what functions are.
+We will start with the following definition:
+
+I> ### Definition 7
+I>
+I> Encryption is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
+
+However, before we talk about encryption, we first have to recall what functions are, since encoding/decoding values is achieved with the usage of them.
+
+### 1.2.1. Functions
 
 ![A function](images/function.png)
 
-I> ### Definition 7
+I> ### Definition 8
 I>
 I> Functions are mathematical entities that assign unique outputs to given inputs.
 
 For example, you might have a function that accepts as input a person, and as output returns the person's age or name. Another example is the function {$$}f(x) = x + 1{/$$}. There are many inputs this function can accept: 1, 2, 3.14. For example, when we input 2 it gives us an output of 3, since {$$}f(2) = 2 + 1 = 3{/$$}.
 
-I> ### Definition 8
-I>
-I> Encryption is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
+One simple way to think of functions is in the form of tables. For a function {$$}f(x){/$$} accepting a single parameter {$$}x{/$$}, we have a two-column table where the first column is the input, and the second column is the output. For a function {$$}f(x, y){/$$} accepting two parameters {$$}x{/$$} and {$$}y{/$$} we have a three-column table where the first and second columns represent the input, and the third column is the output. Thus, to display the function discussed above in the form of a table, it would look like this:
 
-### 1.2.1. Symmetric-key algorithm
+| {$$}\textbf{x}{/$$} | {$$}f(x){/$$} |
+|-------------------- | ------------- |
+| 1                   | 2             |
+| 2                   | 3             |
+| ...                 | ...           |
+
+### 1.2.2. Symmetric-key algorithm
 
 We can assume that there exist functions {$$}E(x){/$$} and {$$}D(x){/$$} for encryption and decryption respectively. We want these functions to have the following properties:
 
@@ -112,15 +126,7 @@ However, the scheme described above makes a symmetric algorithm, meaning that we
 
 ![Symmetric-key algorithm](images/symmetric-algo.png)
 
-X> ### Exercise 3
-X>
-X> Check the three properties one by one to ensure Caesar cipher is compatible with them.
-
-X> ### Exercise 4
-X>
-X> Come up with an encryption scheme, based on substitution.
-
-### 1.2.2. Asymmetric-key algorithm
+### 1.2.3. Asymmetric-key algorithm
 
 To solve the problems that arise with symmetric-key algorithms, we will use what is called an asymmetric algorithm or public-key cryptography. In this scheme, we have two kinds of keys: public and private. We share the public key with the world and keep the private one to ourselves.
 
@@ -154,7 +160,22 @@ As we said earlier, each record will also include a special number (or a hash). 
 
 In the wallet, we will store the public and the private keys. These keys will be used to receive or spend money. With the private key, it is possible to write new blocks (or transactions) to the blockchain, effectively spending money. With the public key, others can send currency to the wallet and verify signatures.
 
+X> ### Exercise 3
+X>
+X> Come up with a table of functions such that:
+X>
+X> 1. The input is a number, and the output is a number
+X> 1. The input is a number, and the output is the name of employee in a company given that number
+
+X> ### Exercise 4
+X>
+X> Check the three properties one by one to ensure Caesar cipher is compatible with them.
+
 X> ### Exercise 5
+X>
+X> Come up with an encryption scheme, based on substitution.
+
+X> ### Exercise 6
 X>
 X> Use the algorithm we defined to sign a message and verify it.
 
@@ -180,7 +201,7 @@ The hash of the block is based on the block's data itself, so to verify a hash w
 
 Two or more blocks (or transactions) that are connected form a blockchain. The validity of each transaction will depend on the validity of the blockchain.
 
-X> ### Exercise 6
+X> ### Exercise 7
 X>
 X> Come up with your own hashing function.
 
