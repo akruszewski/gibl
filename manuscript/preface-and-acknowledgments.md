@@ -1,6 +1,6 @@
 # Preface and acknowledgments
 
-This book aims to be accessible to novices that have no prior experience in programming but have some basic working experience with computers. It will also assume some experience with high school mathematics, such as functions. Thus, this book is designed to be self-contained.
+This book aims to be accessible to novices that have experience with programming in at least one programming language, as well as some basic working experience with computers. Knowing how to program is not a strict necessity, although it may help in grasping some concepts. The book also assumes some experience with high school mathematics, such as functions.
 
 One of the reasons for writing this book is that I could not find a single book that explained how to implement blockchain from scratch, covering all the details. I had to do a lot of research on the Internet to come up with a complete picture of what blockchain is, how one can implement it, and what it is good for.
 
