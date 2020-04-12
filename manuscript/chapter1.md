@@ -12,7 +12,7 @@ I> **Blockchain** is a system in which a record of transactions is maintained ac
 
 We will give an example that will serve as a motivation, as well as define what encryption and hashing techniques are and how will they help us with our system.
 
-Note that we will hand-wave on some of the technical bits in this chapter, as it is only supposed to serve as an introductory material. The technical bits will be uncovered later when we start building the blockchain.
+Note that we will hand-wave on some of the technical bits in this chapter, as it is only supposed to serve as introductory material. The technical bits will be uncovered later when we start building the blockchain.
 
 ## 1.1. Motivation and basic definitions
 
@@ -56,7 +56,7 @@ In contrast, in a peer-to-peer network - which represents a decentralized system
 
 ![A decentralized ledger](images/decentralized-ledger.png)
 
-With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask this newcomer to prove that they can be trusted. We need to modify our system to support this kind of trust. One way to achieve that is through so called "proof of work", which we introduce next.
+With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask this newcomer to prove that they can be trusted. We need to modify our system to support this kind of trust. One way to achieve that is through so-called "proof of work", which we introduce next.
 
 I> ### Definition 6
 I>
@@ -80,7 +80,7 @@ X> Observe how we started with a simple definition of a ledger and gradually bui
 
 X> ### Exercise 2
 X>
-X> Think about why people think that gold is valuable, or that money is valuable, or that currencies in online games are valuable? Also think about how this relates to the "proof of work" notion.
+X> Think about why people think that gold is valuable, or that money is valuable, or that currencies in online games are valuable? Also, think about how this relates to the "proof of work" notion.
 
 ## 1.2. Encryption
 
@@ -90,7 +90,7 @@ I> ### Definition 7
 I>
 I> **Encryption** is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
 
-However, before we talk about encryption, we first have to recall what functions are, since encoding/decoding values is achieved with the usage of them.
+However, before we talk about encryption, we first have to recall what functions are, since the encoding/decoding values is achieved with the usage of them.
 
 ### 1.2.1. Functions
 
@@ -165,7 +165,7 @@ X>
 X> Come up with a table of functions such that:
 X>
 X> 1. The input is a number, and the output is a number
-X> 1. The input is a number, and the output is the name of employee in a company given that number
+X> 1. The input is a number, and the output is the name of an employee in a company given that number
 
 X> ### Exercise 4
 X>

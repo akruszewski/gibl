@@ -1,10 +1,10 @@
 # 2. Racket programming language
 
-Now that we have vaguely explained what a blockchain is and how it is useful, the next obvious step is to implement these calculations in a computer, so that they are automatically done. This chapter will give us the appartus that will allow us to exactly do that implementation.
+Now that we have vaguely explained what a blockchain is and how it is useful, the next obvious step is to implement these calculations in a computer, so that they are automatically done. This chapter will give us the apparatus that will allow us to exactly do that implementation.
 
 ## 2.1. Introduction to Lisp
 
-Lisp, originating from 1958, stands for LISt Processing, and is a family of programming languages.
+Lisp, originating from 1958, stands for LISt Processing and is a family of programming languages.
 
 Unlike standard programming languages, it has a fully parenthesized prefix notation. For example, instead of writing `1 + 2`, one would write `(+ 1 2)`.
 
@@ -28,7 +28,7 @@ From the motivation in the previous section we can see a need of forming such a 
 
 There are many data structures. An ordered list is one example, representing the numbers {$$}(1, 2, 3){/$$} in that order. There are operations on lists, such as counting the number of elements, merging two lists, etc.
 
-Next, we will introduce a way to repeatedly transform a data structure according to some specific rules. For example, if we have a blockchain data structure we may want to come up with a way to transform it such that, for example, a new block is inserted in it.
+Next, we will introduce a way to **repeatedly transform** a data structure according to some specific rules. For example, if we have a blockchain data structure we may want to come up with a way to transform it such that, for example, a new block is inserted in it.
 
 I> ### Definition 2
 I>
@@ -62,7 +62,7 @@ A family tree is one example of a tree. Another example of a tree is a binary tr
 
 ### 2.1.2. Languages and syntax
 
-In this section we'll take a quick look at the foundations of a Lisp. It is not necessary to remember all of it, but it is a good thing to keep in mind on how Lisps work in general.
+In this section we'll take a quick look at the foundations of a Lisp. It is not necessary to remember all of it, but it is a good thing to keep in mind how Lisps work in general.
 
 I> ### Definition 4
 I>
@@ -96,7 +96,7 @@ Lisps do not have the restriction of a special syntax like C has, for example. T
 
 Due to this minimalism, building a blockchain (or anything, for that matter) in Lisp will imply that you can do the same in most other programming languages with ease. This programming language favors function composition, and further in the book we will see the interesting properties that composition offers and how easily we can maintain and extend our code.
 
-Syntax has a special meaning in Lisps compared to other languages. With macros as part of the core language it's possible to extend this syntax[^ch2n1]. S-expressions form the syntax of a Lisp.
+Syntax has a special meaning in Lisps compared to other languages. With macros as part of the core language, it's possible to extend this syntax[^ch2n1]. S-expressions form the syntax of a Lisp.
 
 I> ### Definition 6
 I>
@@ -224,8 +224,6 @@ In order to produce the ordered list {$$}(1, 2, 3){/$$}, we can ask DrRacket to 
 ```
 
 `list` is a built-in function, just like `+` which we already used. `list` accepts any number of parameters, and as a result, returns a list generated from them.
-1. Lists - `(1, 2, 3)`
-1. Functions - `f(x) = x + 1`
 
 For additional information on `list` (or any other function), you can click on the word using the mouse and press the F1 button. This will open Racket's manuals screen that will give you an option to pick a function that you want information for. Usually, it's the first match on this list. Clicking on it will show the following:
 
@@ -233,7 +231,7 @@ For additional information on `list` (or any other function), you can click on t
 
 Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2, and we write `(f 2)`.
 
-In Racket, parentheses, brackets and braces have the same effect. Thus  `(list 1 2 3)` is the same as `[list 1 2 3]`, and is the same as `{list 1 2 3}`. This visual distinction may be useful to group evaluations when there are a lot of parentheses.
+In Racket, parentheses, brackets, and braces have the same effect. Thus  `(list 1 2 3)` is the same as `[list 1 2 3]`, and is the same as `{list 1 2 3}`. This visual distinction may be useful to group evaluations when there are a lot of parentheses.
 
 However, now as a result we get `'(1 2 3)`. Let's try to understand what happened here. If `(list 1 2 3)` had returned `(1 2 3)` this wouldn't have made much sense since as (we discussed above) this notation would try to call the function 1 with arguments 2 and 3. Instead, it returned a *quoted* list. This is the same as saying `'(1 2 3)`.
 
@@ -242,7 +240,7 @@ To understand how this affects the evaluation model better, let's consider an ex
 1. Say your name
 1. Say "your name"
 
-In the first example, you expect your friend to tell you their name. In the second example you expect them to say "your name", rather than their actual name.
+In the first example, you expect your friend to tell you their name. In the second example, you expect them to say "your name", rather than their actual name.
 
 There is a built-in syntax called `quote`. So the expression `'(1 2 3)` is just a fancy notation which is equivalent to the expression `(quote (1 2 3))`, where we tell Racket to return the actual list `(1 2 3)` instead of evaluating it.
 
@@ -269,7 +267,7 @@ X> Note that `list` is a function and `quote` is a syntax. Read the manual for b
 
 ### 2.4.3. Pairs
 
-Another built-in function is `cons` which stands for construct. This function only accepts two parameters, and as a result, it returns a pair:
+Another built-in function is `cons` which stands for construct. This function accepts only two parameters, and as a result, it returns a pair:
 
 ```racket
 > (cons 1 2)
@@ -313,8 +311,8 @@ So far we worked only in the interactions area in DrRacket. Let's try to do some
 
 We can notice a couple of things from the screenshot above:
 
-1. In the definitions area we added some code. We notice that we used another built-in syntax called `define` to attach a value (`123`) to a symbol (`a-number`)
-1. In the interactions area we interacted with something that was already defined in the definitions area. In this case the interaction was to just display the definition's value by referring to its symbol
+1. In the definitions area we added some code. We notice that we used another built-in syntax named `define` to attach a value (`123`) to a symbol (`a-number`)
+1. In the interactions area we interacted with something that was already defined in the definitions area. In this case, the interaction was to just display the definition's value by referring to its symbol
 
 In this book every Racket program will start with `#lang racket`. This means that we will be dealing with Racket's ordinary syntax. There are different values this can accept, for example, we can work with a language specialized in drawing graphics, but that is out of context for this book.
 
@@ -332,13 +330,13 @@ X> Store the list from exercise 7 in a definition and then use `car` and `cdr` o
 
 ### 2.4.5. Procedures and functions
 
-In Lisp a procedure is essentially a function. When invoked it returns some data as its value. However, some Lisp expressions and procedures have side effects, for example, getting weather data from an external service which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice, they are frequently referred to as "functions" anyway (even those that may have side effects), to emphasize that a computed result is always returned.
+In Lisp, a procedure is essentially a mathematical function. When called, it returns some data. However, unlike mathematical functions, some Lisp expressions and procedures have so-called "side effects", for example, getting weather data from an external service which means that this "function" can return different values at different points in time. Thus Lisp procedures are not always functions in the "pure" sense of mathematics, but in practice, they are frequently referred to as "functions" anyway (even those that may have side effects), to emphasize that a computed result is always returned.
 
 From this point, we will refrain from using the word "function" and stick to "procedure".
 
 There is a special built-in syntax called `lambda` which accepts two parameters and produces a procedure as a result. The first parameter is a list of arguments this procedure accepts, and the second parameter is an expression (body) that acts upon these parameters.
 
-For example, `(lambda (x) (+ x 1))` returns a procedure that accepts a single parameter `x`, and when this procedure is called with a parameter it increases this parameter's value by one - `(+ x 1)`.
+For example, `(lambda (x) (+ x 1))` returns a procedure that accepts a single parameter `x`, and when this procedure is called with a parameter it increases this parameter's value by one: `(+ x 1)`.
 
 Evaluating the expression above:
 
@@ -391,7 +389,7 @@ X> In exercise 7 you retrieved the second element from a list (`(car (cdr l))`).
 
 ### 2.4.6. Conditional procedures
 
-There are useful procedures that produce boolean output such as checking whether a value is a number, or whether a number is greater than another:
+There are useful built-in procedures that produce boolean output such as checking whether a value is a number, or whether a number is greater than another:
 
 ```racket
 > (number? 1)
@@ -529,7 +527,7 @@ X> Represent the following logic using `cond`: return `'foo` if the value is a s
 
 ### 2.4.7. Recursive procedures
 
-Procedures, just like data structures, can also be recursive. We already saw an example with the factorial procedure, in that it calls itself to make a computation or a loop. For example, here's how we could define factorial in Racket:
+Procedures, just like data structures (e.g. trees), can also be recursive. We already saw an example with the factorial procedure, in that it calls itself to make a computation or a loop. For example, here's how we could define factorial in Racket:
 
 ```racket
 (define (fact n)
@@ -619,7 +617,7 @@ Here's how it evaluates:
 = 3
 ```
 
-Both procedures are recursive, and that they generate the same result. However, the nature of evaluation is very different.
+Both procedures are recursive, and that they generate the same result. However, the nature of the evaluation is very different.
 
 I> ### Definition 7
 I>
@@ -630,9 +628,11 @@ I> 1. An iterative process is a process where the current state of calculation i
 
 In the examples above, `list-length` generates a recursive process since it needs to go down to the base case, and then build its way back up to do the calculations that were "deferred". In contrast, `list-length-iter` generates an iterative process, since the results are captured in the arguments.
 
+This distinction is important because of the very different nature of evaluation implies a few things. For example, iterative processes evaluate faster than recursive ones. Another example is that some algorithms cannot be written in an iterative process fashion, as we will see later with left and right folds.
+
 X> ### Exercise 12
 X>
-X> The way we implemented `fact` - it represents a recursive procedure that generates a recursive process. Rework it so that it is still a recursive procedure such that it generates an iterative process.
+X> The way we implemented `fact` represents a recursive procedure that generates a recursive process. Rework it so that it is still a recursive procedure such that it generates an iterative process.
 
 ### 2.4.8. Procedures that return procedures
 
@@ -733,7 +733,7 @@ To re-implement filter, note that it takes a predicate `p`, together with a list
         (else (my-filter p (cdr l)))))
 ```
 
-`fold` is a procedure that takes as input a combining procedure that accepts two parameters (current value and accumulator), an initial value and a list and returns a value combined with this procedure. There are two types of folds, a right and a left one, which combine from the right and the left respectively[^ch2n3]:
+`fold` is a procedure that takes as input a combining procedure that accepts two parameters (current value and accumulator), an initial value and a list and returns a value combined with this procedure. There are two types of folds, a right and a left one, which combine from the right and the left respectively:
 
 ```racket
 > (foldr cons '() '(1 2 3))
@@ -774,6 +774,8 @@ This function works in a similar way with `foldr`, except that the result is cap
 = (my-foldl + 6 '())
 = 6
 ```
+
+Note that the right fold exhibits a recursive process (think `my-length`), while the left one exhibits an iterative one (think `my-length-iter`).
 
 X> ### Exercise 14
 X>
@@ -844,7 +846,7 @@ I> ### Definition 10
 I>
 I> **Scope** refers to the visibility of the definitions, or which parts of the program can use them.
 
-`my-number` is defined at the same level as, and before `add-to-my-number` so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition and not accessible to anything outside it.
+`my-number` is defined at the same "level" as `add-to-my-number` so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition and not accessible to anything outside it.
 
 Using the `let` syntax we can introduce variables that are visible only in a certain section:
 
@@ -972,7 +974,7 @@ So far, so good. No side effects since `add-one` returns the same value every ti
 126
 ```
 
-This is what makes it hard to reason about programs, they modify the values so some procedures might return different values. Thus, care must be taken when using mutation. We will use mutation in our peer-to-peer implementation later.
+This is what makes it hard to reason about programs - when some of the values are modified, some procedures might return different values. Thus, care must be taken when using mutation. However, we will use mutation in our peer-to-peer implementation later which will make things slightly simpler.
 
 ### 2.4.13. Structures
 
@@ -980,7 +982,7 @@ I> ### Definition 13
 I>
 I> A **structure** is a composite data type that defines a grouped list of variables to be placed under one name.
 
-In Racket there's a special syntax `struct` that allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient since it will automatically provide procedures to construct a data type and retrieve its values.
+In Racket, there's a special syntax `struct` that allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient since it will automatically provide procedures to construct a data type and retrieve its values.
 
 For example, given the following definition:
 
@@ -1037,7 +1039,7 @@ The `#:mutable` keyword will automatically generate `set-<field>!` procedures fo
 
 X> ### Exercise 18
 X>
-X> Create a person structure that contains a first name, last name and age.
+X> Create a person structure that contains a first name, last name, and age.
 
 ### 2.4.14. Threads
 
@@ -1045,9 +1047,9 @@ I> ### Definition 14
 I>
 I> A **thread** is a sequence of instructions that can execute in parallel.
 
-Racket has a built-in procedure `thread` that accepts a procedure which will be ran in parallel without blocking the next instruction in order.
+Racket has a built-in procedure `thread` that accepts a procedure that will be running in parallel without blocking the next instruction in order.
 
-As usual, we will show an example demonstrating threads. We will implement a procedure `detailed-fact` that will be similar to `fact` but also print whatever it is currently processing.
+As usual, we will show an example of demonstrating threads. We will implement a procedure `detailed-fact` that will be similar to `fact` but also print whatever it is currently processing.
 
 ```racket
 (define (detailed-fact n)
@@ -1082,15 +1084,15 @@ Calculating factorial of 1
 Calculating factorial of 0
 ```
 
-Note how we used `(thread (lambda () ...))` instead of just `(thread ...)`. As we said, `thread` expects a procedure, but in the end of the evaluation `...` would be the output of factorial of some number (for example 3), so `(thread 3)` does not make sense.
+Note how we used `(thread (lambda () ...))` instead of just `(thread ...)`. As we said, `thread` expects a procedure, but at the end of the evaluation `...` would be the output of factorial of some number (for example 3), so `(thread 3)` does not make sense.
 
-In this parallel execution the output is not ordered as it was in the previous case. This means that the `lambda`s within `thread` are being executed in parallel so the order of execution cannot be guaranteed.
+In this parallel execution, the output is not ordered as it was in the previous case. This means that the `lambda`s within `thread` are being executed in parallel so the order of execution cannot be guaranteed.
 
-We will use threads for parallel processing in our peer-to-peer implementation later, where we will have one thread per peer, so that when we are serving one peer we don't block the serving of other peers.
+We will use threads for parallel processing in our peer-to-peer implementation later, where we will have one thread per peer so that when we are serving one peer we don't block the serving of other peers.
 
 ## 2.4. Creating an executable
 
-The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters we will create an executable so that our blockchain can be used and shared by others.
+The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters, we will create an executable so that our blockchain can be used and shared by others.
 
 To create an example executable, we start with the following code:
 
@@ -1100,7 +1102,7 @@ To create an example executable, we start with the following code:
 (read-bytes-line)
 ```
 
-This code will just print the text `Hello`. `print` is a procedure that prints some text (similar to `display`), and `read-bytes-line` is a procedure that waits for user input. If we did not use `read-bytes-line` it would just print and exit right away, before we are able to read any text.
+This code will just print the text `Hello`. `print` is a procedure that prints some text (similar to `display`), and `read-bytes-line` is a procedure that waits for user input. If we did not use `read-bytes-line` it would just print and exit right away, before we can read any text.
 
 Next, we choose `Racket > Create Executable`. Select `Distribution` and click `Create`. After doing that, the executable should be created in the target folder.
 
@@ -1124,5 +1126,3 @@ The point of this chapter was to get a basic understanding of the Racket program
 [^ch2n1]: We will cover details about macros in Appendix B.
 
 [^ch2n2]: The empty list doesn't exist in memory, but a pointer to the memory location 0 is considered as the empty list.
-
-[^ch2n3]: The right fold exhibits a recursive process (think `my-length`), while the left one exhibits an iterative one (think `my-length-iter`).
