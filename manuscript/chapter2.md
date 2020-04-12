@@ -84,7 +84,7 @@ When you write a program in a programming language, there's an intermediate step
 For example, the image above represents an abstract syntax tree for the following code in C:
 
 ```c
-while (x > 0) {
+while (a > b) {
     x = x - 1;
     y = y * 2;
 }
