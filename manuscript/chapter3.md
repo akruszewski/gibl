@@ -6,7 +6,7 @@ Next, we will give a definition of serialization. We will rely on it heavily in 
 
 I> ### Definition 1
 I>
-I> Serialization is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserialization is the opposite process - converting a stream of bytes into an object.
+I> **Serialization** is the process of converting an object into a stream of bytes to store the object or transmit it to memory, a database, or a file. Deserialization is the opposite process - converting a stream of bytes into an object.
 
 This chapter is hands-on, meaning that you will have to implement stuff as we go through. Exercises will be given to make sure you understand how the procedures we will build will be used. Every section will be named as the filename we're creating. Before we start, recall that at the top of every file you have to put `#lang racket` as we mentioned in the previous chapter.
 

@@ -4,11 +4,11 @@ In this chapter, we will get ourselves introduced to some definitions and exampl
 
 I> ### Definition 1
 I>
-I> Cryptocurrency is a digital currency in which encryption techniques are used to regulate the generation of units of currency and verify the transfer of funds, operating independently of a central bank.
+I> **Cryptocurrency** is a digital currency in which encryption techniques are used to regulate the generation of units of currency and verify the transfer of funds, operating independently of a central bank.
 
 I> ### Definition 2
 I>
-I> Blockchain is a system in which a record of transactions is maintained across several computers that are linked in a peer-to-peer network.
+I> **Blockchain** is a system in which a record of transactions is maintained across several computers that are linked in a peer-to-peer network.
 
 We will give an example that will serve as a motivation, as well as define what encryption and hashing techniques are and how will they help us with our system.
 
@@ -24,7 +24,7 @@ One possible solution is to keep records of all the bills that you and your frie
 
 I> ### Definition 3
 I>
-I> A ledger is a book that contains a record of transactions.
+I> A **ledger** is a book that contains a record of transactions.
 
 Further, at the end of every day, you all sit together and refer to the ledger to do the calculations to settle up. If you spent more than you received, you put that money in the pot, otherwise, you take that money out.
 
@@ -34,7 +34,7 @@ A problem that might appear with this kind of system is that anyone can add a tr
 
 I> ### Definition 4
 I>
-I> A digital signature is a way to verify the authenticity of digital messages or documents.
+I> A **digital signature** is a way to verify the authenticity of digital messages or documents.
 
 For signing and verifying transactions we will rely on digital signatures. For now, let's assume that anyone who adds information to the ledger also adds a signature with each record, and others have no way to modify the signature, but only to verify it. We will cover the technical details in section 1.2.
 
@@ -48,7 +48,7 @@ You are connected to your friends, and so are they to you. Informally, this make
 
 I> ### Definition 5
 I>
-I> A peer-to-peer network is formed when two or more computers are connected to each other.
+I> A **peer-to-peer network** is formed when two or more computers are connected to each other.
 
 For example, when you are accessing a web page on the Internet using a browser, your browser is the "client" and the web page you're accessing is hosted by a "server". This is a centralized system since every user is getting the information from a single place - the "server".
 
@@ -60,7 +60,7 @@ With this system, as the list of peers grows we might run into a problem of *tru
 
 I> ### Definition 6
 I>
-I> A proof of work is data that is time-consuming to calculate, and easy for others to verify.
+I> A **proof of work** is data that is time-consuming to calculate, and easy for others to verify.
 
 For each record we will also include a special number (or a hash) that will represent *proof of work*, in that it will provide proof that the transaction is valid. We will cover the technical details in section 1.3.
 
@@ -88,7 +88,7 @@ We will start with the following definition:
 
 I> ### Definition 7
 I>
-I> Encryption is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
+I> **Encryption** is a method of encoding values such that only authorized persons can view the original content. Decryption is a method of decoding encrypted values.
 
 However, before we talk about encryption, we first have to recall what functions are, since encoding/decoding values is achieved with the usage of them.
 
@@ -98,7 +98,7 @@ However, before we talk about encryption, we first have to recall what functions
 
 I> ### Definition 8
 I>
-I> Functions are mathematical entities that assign unique outputs to given inputs.
+I> **Functions** are mathematical entities that assign unique outputs to given inputs.
 
 For example, you might have a function that accepts as input a person, and as output returns the person's age or name. Another example is the function {$$}f(x) = x + 1{/$$}. There are many inputs this function can accept: 1, 2, 3.14. For example, when we input 2 it gives us an output of 3, since {$$}f(2) = 2 + 1 = 3{/$$}.
 
@@ -183,7 +183,7 @@ X> Use the algorithm we defined to sign a message and verify it.
 
 I> ### Definition 9
 I>
-I> Hashing is a one-way function that encodes text without a way to retrieve the original value back.
+I> **Hashing** is a one-way function that encodes text without a way to retrieve the original value back.
 
 Hashing, however, is simpler than the encryption schemes described above. One example of a hashing function is to return the length of characters - {$$}H(\text{"abc"}) = 3{/$$}, but also {$$}H(\text{"bcd"}) = 3{/$$}. This means that we don't have a way to retrieve the original value just by using the return value 3.
 
@@ -191,7 +191,7 @@ As we mentioned earlier, the reason to use such a technique is that they have so
 
 I> ### Definition 10
 I>
-I> Mining is the process of validating transactions. For this effort, successful miners obtain money as a reward.
+I> **Mining** is the process of validating transactions. For this effort, successful miners obtain money as a reward.
 
 Hashcash is one kind of a proof of work system[^ch1n2]. We will use it to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
 
@@ -209,7 +209,7 @@ X> Come up with your own hashing function.
 
 I> ### Definition 11
 I>
-I> A smart contract is a self-executing contract with the conditions of an agreement between a buyer and a seller being directly written into lines of code.
+I> A **smart contract** is a self-executing contract with the conditions of an agreement between a buyer and a seller being directly written into lines of code.
 
 A blockchain is programmable if the transactions themselves can be programmed by users. For example, users (not necessarily programmers) can write a script to add additional requirements that must be satisfied before sending money. It could look something like this:
 

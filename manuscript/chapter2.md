@@ -1,6 +1,6 @@
 # 2. Racket programming language
 
-TODO: Add more exercises to each section w.r.t. content
+Now that we have vaguely explained what a blockchain is and how it is useful, the next obvious step is to implement these calculations in a computer, so that they are automatically done. This chapter will give us the appartus that will allow us to exactly do that implementation.
 
 ## 2.1. Introduction to Lisp
 
@@ -10,9 +10,9 @@ Unlike standard programming languages, it has a fully parenthesized prefix notat
 
 There are three important notions in a Lisp:
 
-1. Primitives or axioms (starting points or building blocks). As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations on numbers, such as `+` and `*`.
-1. Composition or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
-1. Abstraction or capturing the composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
+1. **Primitives** or axioms (starting points or building blocks). As an example, the numbers 1, 2, etc. are something we do not have to implement ourselves since they are already included in the programming language. Another example is operations on numbers, such as `+` and `*`
+1. **Composition** or a way to compose primitives to do complex calculations. For example we can combine `+` and `*` as follows: `1 + (2 * 3)` or in prefix notation: `(+ 1 (* 2 3))`
+1. **Abstraction** or capturing the composition of primitives. For example, if we find ourselves doing some calculation over and over again, it would be good to capture (abstract, or wrap) it in a function that can be easily re-used
 
 We will be relying on these concepts repeatedly throughout the book.
 
@@ -20,7 +20,7 @@ We will be relying on these concepts repeatedly throughout the book.
 
 I> ### Definition 1
 I>
-I> A data structure is a collection of values, the relationships among them, and the functions or operations that can be applied to the data.
+I> A **data structure** is a collection of values, the relationships among them, and the functions or operations that can be applied to the data.
 
 An example of a data structure is numbers together with the plus and multiplication functions.
 
@@ -32,7 +32,7 @@ Next, we will introduce a way to repeatedly transform a data structure according
 
 I> ### Definition 2
 I>
-I> In mathematics and computer science, objects exhibit *recursive* behavior when they can be defined by two properties:
+I> In mathematics and computer science, objects exhibit **recursive** behavior when they can be defined by two properties:
 I>
 I> 1. A simple base case (or cases) - a terminating case that returns a value without using recursion
 I> 1. A set of rules that reduce all other cases toward the base case
@@ -47,7 +47,7 @@ The recursion we just discussed gives the motivation for the following definitio
 
 I> ### Definition 3
 I>
-I> A tree is a hierarchical, recursive data structure that can have two possible values:
+I> A **tree** is a hierarchical, recursive data structure that can have two possible values:
 I>
 I> 1. An empty value
 I> 1. A single value, coupled together with another two (sub)trees
@@ -75,7 +75,7 @@ The definition of a language also reflects programming languages where they have
 
 I> ### Definition 5
 I>
-I> An abstract syntax tree is a tree representation of the abstract syntactic structure of a source code written in a programming language.
+I> An **abstract syntax tree** is a tree representation of the abstract syntactic structure of a source code written in a programming language.
 
 When you write a program in a programming language, there's an intermediate step that parses the program's source code and derives an abstract syntax tree.
 
@@ -100,7 +100,7 @@ Syntax has a special meaning in Lisps compared to other languages. With macros a
 
 I> ### Definition 6
 I>
-I> The syntactic elements in Lisp are symbolic expressions or S-expressions. S-expressions' values are either a symbol or a list.
+I> The syntactic elements in Lisp are symbolic expressions or **S-expressions**. S-expressions' values are either a symbol or a list.
 
 The Racket programming language that we will use in this book is a multi-paradigm programming language, belonging to the Lisp family.
 
@@ -842,7 +842,7 @@ We created a variable `my-number` and assigned the number 123 to it. We also cre
 
 I> ### Definition 10
 I>
-I> Scope refers to the visibility of the definitions, or which parts of the program can use them.
+I> **Scope** refers to the visibility of the definitions, or which parts of the program can use them.
 
 `my-number` is defined at the same level as, and before `add-to-my-number` so it is in the scope of `add-to-my-number`. But the `x` within `add-to-my-number` is only accessible within the body of the procedure definition and not accessible to anything outside it.
 
@@ -874,7 +874,7 @@ There is another syntax `letrec` which is very similar to `let`, where in additi
 
 I> ### Definition 11
 I>
-I> Variable "shadowing" occurs when a variable defined in scope has the same name as a variable defined in an outer scope.
+I> **Variable "shadowing"** occurs when a variable defined in scope has the same name as a variable defined in an outer scope.
 
 For example, compare the result of these two evaluations:
 
@@ -914,7 +914,7 @@ X> Use DrRacket's feature to follow definitions on `test-1` and `test-2`.
 
 I> ### Definition 12
 I>
-I> Mutation allows a value re-definition of a variable.
+I> **Mutation** allows a value re-definition of a variable.
 
 Mutation can be done using the `set!` syntax. Consider the following definition:
 
@@ -978,7 +978,7 @@ This is what makes it hard to reason about programs, they modify the values so s
 
 I> ### Definition 13
 I>
-I> A structure is a composite data type that defines a grouped list of variables to be placed under one name.
+I> A **structure** is a composite data type that defines a grouped list of variables to be placed under one name.
 
 In Racket there's a special syntax `struct` that allows us to capture data structures and come up with a new kind of abstraction. In a sense, we already know how we can capture abstractions with `car`, `cons`, and `cdr`. However, `struct` is much more convenient since it will automatically provide procedures to construct a data type and retrieve its values.
 
@@ -1043,7 +1043,7 @@ X> Create a person structure that contains a first name, last name and age.
 
 I> ### Definition 14
 I>
-I> A thread is a sequence of instructions that can execute in parallel.
+I> A **thread** is a sequence of instructions that can execute in parallel.
 
 Racket has a built-in procedure `thread` that accepts a procedure which will be ran in parallel without blocking the next instruction in order.
 
