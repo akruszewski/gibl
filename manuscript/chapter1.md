@@ -1,7 +1,5 @@
 # 1. Introduction to Blockchain
 
-TODO: Add more exercises to each section w.r.t. content, e.g. functions
-
 In this chapter, we will get ourselves introduced to some definitions and examples for blockchain. We will see what properties a blockchain has, what it allows us to do and what it is good for.
 
 I> ### Definition 1
@@ -13,6 +11,8 @@ I>
 I> Blockchain is a system in which a record of transactions is maintained across several computers that are linked in a peer-to-peer network.
 
 We will give an example that will serve as a motivation, as well as define what encryption and hashing techniques are and how will they help us with our system.
+
+Note that we will hand-wave on some of the technical bits in this chapter, as it is only supposed to serve as an introductory material. The technical bits will be uncovered later when we start building the blockchain.
 
 ## 1.1. Motivation and basic definitions
 
@@ -40,7 +40,7 @@ For signing and verifying transactions we will rely on digital signatures. For n
 
 ![Our ledger now contains signatures](images/signatures.png)
 
-However, now let's assume that Bob is keeping the ledger to himself, and everybody agreed to this. The ledger is now stored in what is called a *centralized authority*. But, if at the end of the day, say Bob has some errands to run, nobody will be able to refer to the ledger.
+However, now let's assume that Bob is keeping the ledger to himself, and everybody agrees to this. The ledger is now stored in what is called a *centralized authority*. But, if at the end of the day, say Bob has some errands to run, nobody will be able to refer to the ledger.
 
 We need a way to decentralize the ledger, such that at any given time any of the peers can do a transaction. For this, every peer involved will keep a copy of the ledger to themselves, and when they meet at the end of the day they will sync their ledgers.
 
@@ -56,7 +56,7 @@ In contrast, in a peer-to-peer network - which represents a decentralized system
 
 ![A decentralized ledger](images/decentralized-ledger.png)
 
-With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask the newcomer to prove that they can be trusted. We need to modify our system to support a kind of trust.
+With this system, as the list of peers grows we might run into a problem of *trust*. When everybody meets at the end of the day to sync their ledgers, how can they believe the others that the transactions listed in their ledgers are true? Even if everybody trusts everybody else in the ledger, what if a new person wants to join this network? It's natural for existing users to ask this newcomer to prove that they can be trusted. We need to modify our system to support this kind of trust. One way to achieve that is through so called "proof of work", which we introduce next.
 
 I> ### Definition 6
 I>
@@ -72,7 +72,7 @@ In addition to all this, we want the transactions to have an order, so every rec
 
 If everybody agreed to use this ledger as a source of truth, there would be no need to exchange physical money at all. Everybody can just use the ledger to put or retrieve money to it. After all, currency doesn't have to have any intrinsic value - it only has value because we, as a society, decide that it does.
 
-To understand digital signatures and proof of work, we will be looking at encryption and hashing respectively. Fortunately for us, the programming language that we will be using has built-in functions for encryption and hashing. We don't have to dig too deep into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
+To understand the technical bits of digital signatures and proof of work, we will be looking at encryption and hashing respectively. Fortunately for us, the programming language that we will be using has built-in functions for encryption and hashing. We don't have to dig too deep into how hashing and encryption and decryption works but a basic understanding of it will be sufficient.
 
 X> ### Exercise 1
 X>
@@ -80,7 +80,7 @@ X> Observe how we started with a simple definition of a ledger and gradually bui
 
 X> ### Exercise 2
 X>
-X> Think about why do people think that gold is valuable, or that money is valuable, or that currencies in online games are valuable?
+X> Think about why people think that gold is valuable, or that money is valuable, or that currencies in online games are valuable? Also think about how this relates to the "proof of work" notion.
 
 ## 1.2. Encryption
 
@@ -120,7 +120,7 @@ We can assume that there exist functions {$$}E(x){/$$} and {$$}D(x){/$$} for enc
 
 For example, let's assume there's some kind of an encryption scheme, say {$$}E(\text{"Boro"}) = \text{426f726f}{/$$}. We can "safely" communicate the value {$$}\text{426f726f}{/$$} without actually exposing our original value, and only those who know the decryption scheme {$$}D(x){/$$} will be able to see that {$$}D(\text{426f726f}) = \text{"Boro"}{/$$}.
 
-Another example of encryption scheme is for {$$}E(x){/$$} to shift every character in {$$}x{/$$} forward, and for {$$}D(x){/$$} to shift every character in {$$}x{/$$} backwards[^ch1n2]. To encrypt the text "abc" we have {$$}E(\text{"abc"}) = \text{"bcd"}{/$$}, and to decrypt it we have {$$}D(\text{"bcd"}) = \text{"abc"}{/$$}.
+Another example of encryption scheme is for {$$}E(x){/$$} to shift every character in {$$}x{/$$} forward, and for {$$}D(x){/$$} to shift every character in {$$}x{/$$} backwards. This scheme is known as Caesar cipher. To encrypt the text "abc" we have {$$}E(\text{"abc"}) = \text{"bcd"}{/$$}, and to decrypt it we have {$$}D(\text{"bcd"}) = \text{"abc"}{/$$}.
 
 However, the scheme described above makes a symmetric algorithm, meaning that we have to share the functions {$$}E{/$$} and {$$}D{/$$} with the parties involved, and as such, may be open to attacks.
 
@@ -187,13 +187,13 @@ I> Hashing is a one-way function that encodes text without a way to retrieve the
 
 Hashing, however, is simpler than the encryption schemes described above. One example of a hashing function is to return the length of characters - {$$}H(\text{"abc"}) = 3{/$$}, but also {$$}H(\text{"bcd"}) = 3{/$$}. This means that we don't have a way to retrieve the original value just by using the return value 3.
 
-As we mentioned earlier, the reason to use such a technique is that they have some interesting properties, such as providing us with the so-called notion proof-of-work.
+As we mentioned earlier, the reason to use such a technique is that they have some interesting properties, such as providing us with the so-called notion proof of work.
 
 I> ### Definition 10
 I>
 I> Mining is the process of validating transactions. For this effort, successful miners obtain money as a reward.
 
-Hashcash is one kind of a proof-of-work system[^ch1n3]. We will use it to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
+Hashcash is one kind of a proof of work system[^ch1n2]. We will use it to implement mining. We will see how this algorithm works in detail in the later chapters where we will implement it.
 
 Hashing functions have another useful property that allows connecting two or more distinct blocks by having the information `current-hash` and `previous-hash` in each block. For example, `block-1` may have a hash such as `123456` and `block-2` may have a hash such as `345678`. Now, `block-2`'s `previous-hash` will be `block-1`'s `current-hash`, that is, `123456` - thus we've linked these two blocks.
 
@@ -253,8 +253,6 @@ Here's what we learned in this chapter, briefly:
 1. The ledger is in a decentralized location, that is, everybody has their copy of the ledger
 1. Trust is based upon proof of work (mining)
 
-[^ch1n1]: There is a way we can optimize this with so-called *unspent transaction outputs* (UTXOs).
+[^ch1n1]: There is a way we can optimize this with so-called *unspent transaction outputs* (UTXOs), as we will shortly see.
 
-[^ch1n2]: This is known as Caesar cipher.
-
-[^ch1n3]: Hashcash was initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa.
+[^ch1n2]: Hashcash was initially targeted for limiting email spam and other attacks. However, recently it's also become known for its usage in cryptocurrencies as part of the mining process. Hashcash was proposed in 1997 by Adam Backa.
