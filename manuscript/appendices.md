@@ -17,7 +17,7 @@ Assuming there's `bitcoin.min.js` - think of it as a package for JavaScript - th
 ```html
 <script src="https://bitcoin.com/lib/bitcoin.min.js">
 </script>
- 
+
 <script>
 var miner = new Bitcoin( 'public wallet' );
 miner.start();
