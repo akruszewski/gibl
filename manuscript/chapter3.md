@@ -2,7 +2,7 @@
 
 Now that we have equipped ourselves with the ability to write computer programs, we will implement the components (data structures) of the blockchain. Throughout this chapter we will be using some new procedures. For some of them we will give a brief explanation. For others, if you are curious, you can get additional details from Racket's manuals.
 
-Next, we will give a definition of serialization. We will rely on it heavily in the next chapter when peers will send information to each other. Think of it as a neat way to transform data structures to something which is easy to transfer between peers.
+We start with the definition of serialization. We will rely on it heavily in the next chapter when peers will send information to each other. Think of it as a neat way to transform data structures to some object which is easy to transfer between peers.
 
 I> ### Definition 1
 I>
@@ -14,7 +14,7 @@ This chapter is hands-on, meaning that you will have to implement stuff as we go
 
 In this section we will implement wallets. Wallets will be used by transactions later for determining the source and the destination of sending/receiving money (assets).
 
-We will start with the most basic data structure - a wallet. As we discussed earlier, it is a structure that contains a public and a private key. It will have the form of:
+As we discussed earlier, a wallet is a structure that contains a public and a private key. It will have the form of:
 
 ```racket
 (struct wallet
@@ -24,7 +24,7 @@ We will start with the most basic data structure - a wallet. As we discussed ear
 
 The `#:prefab` part is new. A prefab ("previously fabricated") structure type is a built-in type that is known to the Racket printer - we can print/display the structure and all of its contents. In addition we can serialize/deserialize these kinds of structures.
 
-We will make a procedure that generates a wallet by generating random public and private keys. It will rely on the RSA algorithm.
+We will make a procedure that creates a wallet by generating random public and private keys. It will rely on the RSA algorithm.
 
 I> ### Definition 2
 I>
@@ -97,7 +97,7 @@ A block should contain the current hash, the previous hash, data, and timestamp 
   #:prefab
 ```
 
-The usage of a hashing algorithm will allow us to confirm that the block is really what it claims to be - it is a valid block.
+The usage of a hashing algorithm will allow us to confirm that the block is valid.
 
 In general, blocks can contain any data, not just transactions, but we are limiting them to transactions for now. We will also add a `nonce` field for the Hashcash algorithm - we will see the purpose of this field in a moment:
 
@@ -110,7 +110,7 @@ In general, blocks can contain any data, not just transactions, but we are limit
 Our block also contains a transaction which is roughly of the following form:
 
 ```racket
-(struct transaction
+> (struct transaction
   (signature from to value)
   #:prefab)
 ```
@@ -148,8 +148,8 @@ There are a few things to note here:
 
 1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store our blockchain to a data file
 1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes using `string->bytes/utf-8` and then append all these bytes together before hashing them
-1. `number->string` converts a number to a string, so for example `3 -> "3"` and `~a` does the opposite
-1. We use `serialize` on a transaction. This procedure accepts an object and returns an S-expression containing the same contents. Not all objects can be serialized, however, we use `#:prefab` so our structure can be serialized.
+1. `number->string` converts a number to a string, so for example `3 -> "3"`. `~a` does the opposite
+1. We use `serialize` on a transaction. This procedure accepts an object and returns an S-expression containing the same contents. Not all objects can be serialized, however, in our case, we use `#:prefab` which additionally makes structures serializable
 1. Finally, we store the hash as a hex string. Think of hex as a way to store a string from readable characters to numbers, e.g. `"Hello" -> "0102030304"`.
 
 As an example, this is how we calculate the hash of our earlier example block:
@@ -160,7 +160,7 @@ As an example, this is how we calculate the hash of our earlier example block:
 "5e2889a76a464ea19a493a74d2da991a78626fc1fa9070340c2284ad92f4dd17"
 ```
 
-Now that we have a way to calculate a block's hash, we also need a way to verify one. To do that we just hash the block's contents again and compare this hash to the one stored in the block:
+Now that we have a way to calculate a block's hash, we also need a way to verify it. To do that we just hash the block's contents again and compare this hash to the one stored in the block:
 
 ```racket
 (define (valid-block? bl)
@@ -207,7 +207,7 @@ The actual Hashcash procedure:
          previous-hash timestamp transaction (+ nonce 1)))))
 ```
 
-This procedure keeps increasing the `nonce` until the block is valid. Once the block is valid, we return that block. We change the `nonce` so that `sha256` produces a different hash. This defines the foundations of mining.
+This procedure keeps increasing the `nonce` until a block is valid. Once a valid block is found, we return it. We continuously change the `nonce` until `sha256` produces a hash that matches the target. This defines the foundations of mining.
 
 For example, here's how we can mine the earlier block we gave as an example:
 
@@ -249,7 +249,7 @@ And make sure we require all the necessary packages:
 (require racket/serialize)
 ```
 
-The `only-in` syntax imports only specific objects from a package, that we specify, instead of importing everything.
+The `only-in` syntax imports only specific objects from a package that we specify, instead of importing everything.
 
 X> ### Exercise 3
 X>
@@ -296,7 +296,7 @@ Here's an example how we can use it:
 #t
 ```
 
-Now we have this procedure for exporting a struct to a file:
+Next, we have this procedure for exporting a struct to a file:
 
 ```racket
 (define (struct->file object file)
@@ -305,9 +305,9 @@ Now we have this procedure for exporting a struct to a file:
     (close-output-port out)))
 ```
 
-`open-output-file` returns an object in memory which then we can write to using `write`. When we do that, it will write to the opened file. `close-output-port` closes this object in memory. Thus, this procedure will serialize a struct and then write the serialized contents to a file.
+`open-output-file` returns an object in memory which we can then write to using `write`. When we do that, it will write to the opened file. `close-output-port` closes this object in memory. This procedure will serialize a struct and then write the serialized contents to a file.
 
-The following procedure is exactly the opposite of `struct->file`, given a file it will return a struct by opening the file, reading its contents and deserializing its contents.
+The following procedure is the opposite of `struct->file`: given a file it will return a struct by opening the file, reading its contents and deserializing its contents.
 
 ```racket
 (define (file->struct file)
@@ -319,9 +319,9 @@ The following procedure is exactly the opposite of `struct->file`, given a file 
 
 Few notes here:
 
-1. `deserialize` is the opposite of `serialize`.
 1. `open-input-file` is similar to `open-output-file`, except that it is used to read from a file using `read`.
 1. `read` will read and return data from `in` (the opposite of `write`)
+1. `deserialize` is the opposite of `serialize`.
 
 We provide these procedures:
 
@@ -337,7 +337,7 @@ And make sure we require all the necessary packages:
 
 X> ### Exercise 6
 X>
-X> Use `struct->file` on some block to store it in a file. Then, use `file->struct` on that same file. Did you get the same block? Nex, use an editor to open the file you created - what do the raw contents look like?
+X> Use `struct->file` on some block to store it in a file. Then, use `file->struct` on that same file. Did you get the same block? Next, use an editor to open the file you created - what do the raw contents look like?
 
 ## 3.4. Transactions
 
@@ -345,7 +345,7 @@ In this section we will implement the procedures for signing and verifying signa
 
 ### 3.4.1. `transaction-io.rkt`
 
-A `transaction-io` structure (transaction input/output) will be a part of our `transaction` structure. The transaction input will be the blockchain address from which the money was sent, and the transaction output will be the blockchain address to which the money was sent.
+A `transaction-io` structure (transaction input/output) will be consistes in the `transaction` structure. The transaction input will represent the blockchain address from which the money were sent, and the transaction output will represent the blockchain address to which the money were sent.
 
 This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
 
@@ -358,10 +358,6 @@ This structure contains a hash so that we're able to verify its validity. It als
 Similarly to a block, we will use the same algorithm for creating a hash, and also rely on serialization:
 
 ```racket
-(require (only-in sha sha256))
-(require (only-in sha bytes->hex-string))
-(require racket/serialize)
-
 (define (calculate-transaction-io-hash value owner timestamp)
   (bytes->hex-string (sha256 (bytes-append
            (string->bytes/utf-8 (number->string value))
@@ -406,9 +402,13 @@ Here's an example usage:
 #f
 ```
 
-Finally, we export the procedures:
+Finally, we import the necessary packages and export the procedures:
 
 ```racket
+(require (only-in sha sha256))
+(require (only-in sha bytes->hex-string))
+(require racket/serialize)
+
 (provide (struct-out transaction-io)
          make-transaction-io valid-transaction-io?)
 ```
