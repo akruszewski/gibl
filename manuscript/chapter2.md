@@ -142,7 +142,7 @@ Racket can be downloaded and installed via https://download.racket-lang.org. The
 
 ![DrRacket](images/drracket.png)
 
-The upper text area part is the definitions area, where we usually write our definitions. Alternatively, the lower part is the interactions area where we interact with the definitions.
+The upper text area part is the definitions area, where we usually write the definitions. Alternatively, the lower part is the interactions area where we interact with the definitions.
 
 The Help Desk under `Help > Help Desk` on the top menu contains useful information such as quick introduction, reference manuals, examples.
 
@@ -229,7 +229,7 @@ For additional information on `list` (or any other function), you can click on t
 
 ![Racket manual for `list`](images/drracket-docs.png)
 
-Back to our example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2, and we write `(f 2)`.
+Back to the example, we notice how parentheses are used to denote a function call, or evaluation. In general, the code `(f a_1 a_2 ... a_n)` makes a function call to `f`, passing `n` parameters in that order. For example, for the function {$$}f(x) = x + 1{/$$}, one example evaluation is {$$}f(1){/$$} where as a return value we get 2, and we write `(f 2)`.
 
 In Racket, parentheses, brackets, and braces have the same effect. Thus  `(list 1 2 3)` is the same as `[list 1 2 3]`, and is the same as `{list 1 2 3}`. This visual distinction may be useful to group evaluations when there are a lot of parentheses.
 
@@ -293,6 +293,19 @@ Pairs are so important that we can encode any data structure with them. In fact,
 
 The motivation for using a list is that it will allow us, for example, to link several blocks together to make a blockchain.
 
+Racket also supports sets. In a list/pair there can be repeated elements, but in a set all elements are unique. Additionally, there are operations that we can use on sets such as union (merge two sets), subtraction (remove the elements in set 1 that are found in set 2), etc. For example, consider the following code:
+
+```racket
+> (list->set '(1 2 3 4 4))
+(set 1 3 2 4)
+> '(1 2 3 4 4)
+'(1 2 3 4 4)
+> (set-union (list->set '(1 2 3)) (list->set '(3 4 5)))
+(set 1 5 3 2 4)
+> (set-subtract (list->set '(1 2 3)) (list->set '(3 4 5)))
+(set 1 2)
+```
+
 We notice how in Lisp, depending only on a few primitive notions (function calls, pairs, `quote`) we can capture abstraction. We will talk more about this in section 2.4.13.
 
 X> ### Exercise 6
@@ -352,7 +365,7 @@ In order to call the procedure we can try to pass a parameter:
 2
 ```
 
-Of course, writing and evaluating procedures this way is hard. Instead, we can define our procedure in the definitions area and then interact with it in the interactions area:
+Of course, writing and evaluating procedures this way is hard. Instead, we can define the procedure in the definitions area and then interact with it in the interactions area:
 
 ```racket
 (define add-one (lambda (x) (+ x 1)))
@@ -669,7 +682,7 @@ Evaluating:
 
 Note how we define `my-cons` to return another procedure that accepts a parameter, and then based on that parameter we either return the first parameter or the second one.
 
-Using the substitution method `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So our procedure "captures" data in a sense. Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
+Using the substitution method `(my-cons 10 20)` evaluates to `(lambda (z) (if (= z 1) 10 20))`. So the procedure "captures" data in a sense. Then, when we call `my-car` or `my-cdr` on this procedure, we just pass 1 or 2 to get the first or the second value respectively.
 
 X> ### Exercise 13
 X>
@@ -829,7 +842,7 @@ We can now interact with `test.rkt`:
 add-one: undefined;
 ```
 
-Note that `add-one` was undefined because only the procedures we provide within the special syntax `(provide ...)` will be available for usage by those who require our package.
+Note that `add-one` was undefined because only the procedures we provide within the special syntax `(provide ...)` will be available for usage by those that require the package.
 
 ### 2.4.11. Scope
 
@@ -974,7 +987,7 @@ So far, so good. No side effects since `add-one` returns the same value every ti
 126
 ```
 
-This is what makes it hard to reason about programs - when some of the values are modified, some procedures might return different values. Thus, care must be taken when using mutation. However, we will use mutation in our peer-to-peer implementation later which will make things slightly simpler.
+This is what makes it hard to reason about programs - when some of the values are modified, some procedures might return different values. Thus, care must be taken when using mutation. However, we will use mutation in the peer-to-peer implementation later which will make things slightly simpler.
 
 ### 2.4.13. Structures
 
@@ -1088,11 +1101,11 @@ Note how we used `(thread (lambda () ...))` instead of just `(thread ...)`. As w
 
 In this parallel execution, the output is not ordered as it was in the previous case. This means that the `lambda`s within `thread` are being executed in parallel so the order of execution cannot be guaranteed.
 
-We will use threads for parallel processing in our peer-to-peer implementation later, where we will have one thread per peer so that when we are serving one peer we don't block the serving of other peers.
+We will use threads for parallel processing in the peer-to-peer implementation later, where we will have one thread per peer so that when we are serving one peer we don't block the serving of other peers.
 
 ## 2.4. Creating an executable
 
-The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters, we will create an executable so that our blockchain can be used and shared by others.
+The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters, we will create an executable so that the blockchain can be used and shared by others.
 
 To create an example executable, we start with the following code:
 

@@ -58,7 +58,7 @@ We need to make sure to require the necessary packages:
 (require crypto/all)
 ```
 
-And we export everything, so that other packages can use our new procedure:
+And we export everything, so that other packages can use this procedure:
 
 ```racket
 (provide (struct-out wallet) make-wallet)
@@ -74,6 +74,8 @@ Here's an example of a generated wallet:
     "3082015502010030..."
     "305c300d06092a86...")
 ```
+
+TODO: Recap, what procedures did we create and why.
 
 X> ### Exercise 1
 X>
@@ -146,10 +148,10 @@ Here's how the procedure will look like:
 
 There are a few things to note here:
 
-1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store our blockchain to a data file
+1. We expect every field in the structure to be a string. This will make things much easier later, e.g. when we want to store the blockchain to a data file
 1. If you check the manuals for `sha256` you will notice it accepts bytes, so we have to convert every field to bytes using `string->bytes/utf-8` and then append all these bytes together before hashing them
 1. `number->string` converts a number to a string, so for example `3 -> "3"`. `~a` does the opposite
-1. We use `serialize` on a transaction. This procedure accepts an object and returns an S-expression containing the same contents. Not all objects can be serialized, however, in our case, we use `#:prefab` which additionally makes structures serializable
+1. We use `serialize` on a transaction. This procedure accepts an object and returns an S-expression containing the same contents. Not all objects can be serialized, however, in this case, we use `#:prefab` which additionally makes structures serializable
 1. Finally, we store the hash as a hex string. Think of hex as a way to store a string from readable characters to numbers, e.g. `"Hello" -> "0102030304"`.
 
 As an example, this is how we calculate the hash of our earlier example block:
@@ -251,6 +253,8 @@ And make sure we require all the necessary packages:
 
 The `only-in` syntax imports only specific objects from a package that we specify, instead of importing everything.
 
+TODO: Recap, what procedures did we create and why.
+
 X> ### Exercise 3
 X>
 X> Create a block (with a transaction) using `block` (and `transaction`) and store it in a variable using `define`. Then, calculate its hash using `calculate-block-hash`.
@@ -334,6 +338,8 @@ And make sure we require all the necessary packages:
 ```racket
 (require racket/serialize)
 ```
+
+TODO: Recap, what procedures did we create and why.
 
 X> ### Exercise 6
 X>
@@ -462,9 +468,9 @@ We will need a procedure that makes an empty, unsigned and unprocessed (no input
 
 ### 3.4.3. Digital signatures
 
-Next, we have a procedure for signing a transaction. It is similar to one of the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. However, in this case we will be using digital signatures.
+Next, we have a procedure for signing a transaction. It is similar to the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. The exception in this case is that we will be using digital signatures - functionalities for signing and verifying data.
 
-To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent our digital signature.
+To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent the digital signature.
 
 ```racket
 (define (sign-transaction from to value)
@@ -487,10 +493,11 @@ To create a digital signature, we use a hashing function (in this case, it is us
 Next, we implement a procedure for processing transactions which will:
 
 1. Sum all the inputs with `inputs-sum`
-1. Calculate the `leftover` 
-1. Generate new outputs to be used in the new signed and processed transaction `new-outputs`
+1. Calculate the `leftover`, which is the subtraction of `inputs-sum` and the transaction's `value`
+1. Generate new outputs based on transaction's `value` and `leftover`
+1. Add these outputs (`new-outputs`) to the newly generated transaction
 
-In other words, based on our inputs it will create outputs that contain the leftover money:
+In other words, based on some transaction inputs, the procedure will create transaction outputs that contain the transaction's `value` and `leftover` money:
 
 ```racket
 (define (process-transaction t)
@@ -516,7 +523,7 @@ In other words, based on our inputs it will create outputs that contain the left
      (append new-outputs outputs))))
 ```
 
-We have a procedure that checks a transaction's signature:
+We will also need a procedure that checks a transaction signature:
 
 ```racket
 (define (valid-transaction-signature? t)
@@ -563,6 +570,8 @@ Finally, we export:
 
 The `all-from-out` syntax specifies all objects that we import (and that are exported) from the target. In this case, besides the file exporting the `transaction` structure with a couple of procedures, it also exports everything from `transaction-io.rkt`.
 
+TODO: Recap, what procedures did we create and why.
+
 X> ### Exercise 7
 X>
 X> Create a transaction, process it, and verify it using the procedures above.
@@ -580,7 +589,7 @@ We will now implement the final component - blockchain. We'll need to `require` 
 (require "wallet.rkt")
 ```
 
-Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial balance of wallets. Thus, our structure will contain a list of blocks and utxo:
+Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial balance of wallets. Thus, the structure will contain a list of blocks and utxo:
 
 ```racket
 (struct blockchain
@@ -590,7 +599,7 @@ Recall that utxo is just a list of `transaction-io` objects, where it represents
 
 ### 3.5.1. Initialization
 
-We will need a procedure for initialization of the blockchain. It accepts the genesis (first, ever) transaction, genesis hash, and utxo:
+We will need a procedure for initialization of the blockchain. It should accept the genesis (first ever) transaction, genesis hash, and utxo:
 
 ```racket
 (define (init-blockchain t seed-hash utxo)
@@ -611,7 +620,7 @@ One way to initialize a blockchain is as follows:
 
 ### 3.5.2. Rewards
 
-In the original Bitcoin implementation the block reward started at 50 coins for the first block and halves every on every 210000 blocks. This means every block up until block 210000 rewards 50 coins, while block 210001 rewards 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
+In the original Bitcoin implementation the block reward starts at 50 coins for the first block and halves on every 210000 blocks. This means that every block up until block 210000 will reward 50 coins, while block 210001 will reward 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
 
 We follow the same algorithm - we start with 50 coins initially, and halve them on every 210000 blocks.
 
@@ -620,25 +629,16 @@ We follow the same algorithm - we start with 50 coins initially, and halve them 
   (/ 50 (expt 2 (floor (/ (length blocks) 210000)))))
 ```
 
-Before implementing the next procedure, we will introduce the notion of a set. In a list there can be repeated elements, but in a set all elements are unique. For example, consider the following code:
-
-```racket
-> (list->set '(1 2 3 4 4))
-(set 1 3 2 4)
-> '(1 2 3 4 4)
-'(1 2 3 4 4)
-```
-
-Using a set over a list will allow us to use operations such as union, subtraction, etc. This is why we will treat `utxo` as a set. 
-
 ### 3.5.3. Inserting a transaction
 
 The next procedure will insert a transaction into the blockchain. It should:
 
 1. Mine a block
 1. Create a new utxo based on the processed transaction outputs, inputs and the current utxo
-1. Generate a new list of blocks by `cons`-ing the mined block
+1. Generate a new list of blocks by adding the newly mined block
 1. Calculate the rewards based on the current utxo
+
+Additionally, utxo will be treated as a set so that we can easily remove specific inputs and append new transactions using set operations.
 
 ```racket
 (define (add-transaction-to-blockchain b t)
@@ -660,11 +660,9 @@ The next procedure will insert a transaction into the blockchain. It should:
      utxo-rewarded)))
 ```
 
-We are using `set-union` which will produce elements that are found in two sets, and `set-subtract` which will produce elements that are found in the first set but not in the second set.
+There is another special thing about `add-transaction-to-blockchain`: given a blockchain and a transaction, it returns a new - updated blockchain. This newly returned blockchain will be the latest blockchain since the previous one will not contain this new transaction. This way, we avoid mutating the previous blockchain.
 
-There is another special thing about `add-transaction-to-blockchain`. Given a blockchain and a transaction, it returns a new - updated blockchain. This newly returned blockchain will be our latest blockchain since the previous one does not contain the transaction.
-
-This procedure will determine the balance of a wallet - the sum of all unspent transactions for the matching owner:
+Next, we will create a procedure that will determine the balance of a wallet - the sum of all unspent transactions for the matching owner:
 
 ```racket
 (define (balance-wallet-blockchain b w)
@@ -675,7 +673,7 @@ This procedure will determine the balance of a wallet - the sum of all unspent t
     (foldr + 0 (map (lambda (t) (transaction-io-value t)) my-ts))))
 ```
 
-The next procedure will send money from one wallet to another by initiating a transaction and then adding it to the blockchain for processing. `my-ts` will contain the current receiver's transaction inputs. Finally, we add the transaction to the blockchain only if it is valid.
+We will also need a procedure that will send money from one wallet to another by initiating a transaction and then adding it to the blockchain for processing. `my-ts` will contain the current receiver's transaction inputs. Finally, we add the transaction to the blockchain only if it is valid.
 
 ```racket
 (define (send-money-blockchain b from to value)
@@ -694,7 +692,7 @@ The next procedure will send money from one wallet to another by initiating a tr
 
 ### 3.5.4. Verification
 
-Now we have this procedure that determines blockchain validity:
+We will now introduce a procedure that determines blockchain validity under the following conditions:
 
 1. All blocks are valid `valid-block?`
 1. Previous hashes are matching `equal?` check
@@ -716,7 +714,7 @@ Now we have this procedure that determines blockchain validity:
       mined-block? (map block-hash blocks)))))
 ```
 
-Finally:
+Finally, we export everything:
 
 ```racket
 (provide (all-from-out "block.rkt")
@@ -726,6 +724,8 @@ Finally:
          init-blockchain send-money-blockchain
          balance-wallet-blockchain valid-blockchain?)
 ```
+
+TODO: Recap, what procedures did we create and why.
 
 X> ### Exercise 8
 X>
@@ -744,6 +744,8 @@ X>
 X> Make a transfer in a blockchain using `send-money-blockchain`.
 
 ## 3.6. Integrating components
+
+TODO: In this section we will combine...
 
 ### 3.6.1. `main-helper.rkt`
 
@@ -836,7 +838,7 @@ We initialize transactions by creating the first (genesis) transaction:
 (define genesis-t (make-transaction coin-base wallet-a 100 '()))
 ```
 
-We initialize the unspent transactions - our genesis transaction:
+We initialize the unspent transactions - the genesis transaction:
 
 ```racket
 (define utxo (list
@@ -957,4 +959,4 @@ We built every component one by one, gradually. Some components are orthogonal -
 
 This design allows extending our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without changing the basic components.
 
-[^ch3n1]: In this case, this is a quoted expression but the algorithm itself is implemented in the crypto factories.
+[^ch3n1]: In this case, this is a quoted expression (`'sha1`) but the algorithm itself is implemented in the crypto factories.
