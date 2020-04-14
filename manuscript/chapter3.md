@@ -58,7 +58,7 @@ We need to make sure to require the necessary packages:
 (require crypto/all)
 ```
 
-And we export everything, so that other packages can use this procedure:
+And we export everything so that other packages can use this procedure:
 
 ```racket
 (provide (struct-out wallet) make-wallet)
@@ -75,7 +75,7 @@ Here's an example of a generated wallet:
     "305c300d06092a86...")
 ```
 
-TODO: Recap, what procedures did we create and why.
+We now have a way to create and sign wallets in our blockchain.
 
 X> ### Exercise 1
 X>
@@ -253,7 +253,7 @@ And make sure we require all the necessary packages:
 
 The `only-in` syntax imports only specific objects from a package that we specify, instead of importing everything.
 
-TODO: Recap, what procedures did we create and why.
+At this point, besides having the possibility to create and sign wallets, we now also have the necessary procedures to create and mine a block.
 
 X> ### Exercise 3
 X>
@@ -339,7 +339,7 @@ And make sure we require all the necessary packages:
 (require racket/serialize)
 ```
 
-TODO: Recap, what procedures did we create and why.
+Now we have a way to write our blockchain data into the filesystem (and read it from the filesystem). This way our blockchain data can persist.
 
 X> ### Exercise 6
 X>
@@ -351,7 +351,7 @@ In this section we will implement the procedures for signing and verifying signa
 
 ### 3.4.1. `transaction-io.rkt`
 
-A `transaction-io` structure (transaction input/output) will be consistes in the `transaction` structure. The transaction input will represent the blockchain address from which the money were sent, and the transaction output will represent the blockchain address to which the money were sent.
+A `transaction-io` structure (transaction input/output) will be consisted in the `transaction` structure. The transaction input will represent the blockchain address from which the money was sent, and the transaction output will represent the blockchain address to which the money was sent.
 
 This structure contains a hash so that we're able to verify its validity. It also has a value, an owner and a timestamp.
 
@@ -445,7 +445,7 @@ A transaction contains a signature, sender, receiver, value and a list of inputs
 
 I> ### Definition 4
 I>
-I> In Racket, a crypto factory is consisted of specific implementations of cryptographic algorithms.
+I> In Racket, a crypto factory consists of specific implementations of cryptographic algorithms.
 
 In addition to the code above, we need to use all crypto factories. It will allow us to use some procedures, for example `hex<->pk-key`:
 
@@ -468,7 +468,7 @@ We will need a procedure that makes an empty, unsigned and unprocessed (no input
 
 ### 3.4.3. Digital signatures
 
-Next, we have a procedure for signing a transaction. It is similar to the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. The exception in this case is that we will be using digital signatures - functionalities for signing and verifying data.
+Next, we have a procedure for signing a transaction. It is similar to the procedures we wrote earlier where we used hashing, in that we get all bytes from the structure and merge them. The exception, in this case, is that we will be using digital signatures - functionalities for signing and verifying data.
 
 To create a digital signature, we use a hashing function (in this case, it is using the SHA algorithm). The private key is then used to encrypt the produced hash. The encrypted hash will represent the digital signature.
 
@@ -494,7 +494,7 @@ Next, we implement a procedure for processing transactions which will:
 
 1. Sum all the inputs with `inputs-sum`
 1. Calculate the `leftover`, which is the subtraction of `inputs-sum` and the transaction's `value`
-1. Generate new outputs based on transaction's `value` and `leftover`
+1. Generate new outputs based on the transaction's `value` and `leftover`
 1. Add these outputs (`new-outputs`) to the newly generated transaction
 
 In other words, based on some transaction inputs, the procedure will create transaction outputs that contain the transaction's `value` and `leftover` money:
@@ -570,7 +570,7 @@ Finally, we export:
 
 The `all-from-out` syntax specifies all objects that we import (and that are exported) from the target. In this case, besides the file exporting the `transaction` structure with a couple of procedures, it also exports everything from `transaction-io.rkt`.
 
-TODO: Recap, what procedures did we create and why.
+In addition to wallets and blocks, our implementation now also supports the creation and processing of transactions.
 
 X> ### Exercise 7
 X>
@@ -589,7 +589,7 @@ We will now implement the final component - blockchain. We'll need to `require` 
 (require "wallet.rkt")
 ```
 
-Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way it resembles the initial balance of wallets. Thus, the structure will contain a list of blocks and utxo:
+Recall that utxo is just a list of `transaction-io` objects, where it represents unspent transaction outputs. In a way, it resembles the initial balance of wallets. Thus, the structure will contain a list of blocks and utxo:
 
 ```racket
 (struct blockchain
@@ -620,7 +620,7 @@ One way to initialize a blockchain is as follows:
 
 ### 3.5.2. Rewards
 
-In the original Bitcoin implementation the block reward starts at 50 coins for the first block and halves on every 210000 blocks. This means that every block up until block 210000 will reward 50 coins, while block 210001 will reward 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
+In the original Bitcoin implementation, the block reward starts at 50 coins for the first block and halves on every 210000 blocks. This means that every block up until block 210000 will reward 50 coins, while block 210001 will reward 25. In other words, the reward is {$$}\frac{2^{\lfloor\frac{b}{210000}\rfloor}}{50}{/$$} where {$$}b{/$$} is the number of blocks.
 
 We follow the same algorithm - we start with 50 coins initially, and halve them on every 210000 blocks.
 
@@ -634,7 +634,7 @@ We follow the same algorithm - we start with 50 coins initially, and halve them 
 The next procedure will insert a transaction into the blockchain. It should:
 
 1. Mine a block
-1. Create a new utxo based on the processed transaction outputs, inputs and the current utxo
+1. Create a new utxo based on the processed transaction outputs, inputs, and the current utxo
 1. Generate a new list of blocks by adding the newly mined block
 1. Calculate the rewards based on the current utxo
 
@@ -660,7 +660,7 @@ Additionally, utxo will be treated as a set so that we can easily remove specifi
      utxo-rewarded)))
 ```
 
-There is another special thing about `add-transaction-to-blockchain`: given a blockchain and a transaction, it returns a new - updated blockchain. This newly returned blockchain will be the latest blockchain since the previous one will not contain this new transaction. This way, we avoid mutating the previous blockchain.
+There is another special thing about `add-transaction-to-blockchain`: given a blockchain and a transaction, it returns a new - updated blockchain. This newly returned blockchain will be the latest since the previous one will not contain this new transaction. This way, we avoid mutating the previous blockchain.
 
 Next, we will create a procedure that will determine the balance of a wallet - the sum of all unspent transactions for the matching owner:
 
@@ -725,7 +725,7 @@ Finally, we export everything:
          balance-wallet-blockchain valid-blockchain?)
 ```
 
-TODO: Recap, what procedures did we create and why.
+We now have all the necessary components: managing wallets, blocks, transactions, and finally blockchain.
 
 X> ### Exercise 8
 X>
@@ -745,7 +745,7 @@ X> Make a transfer in a blockchain using `send-money-blockchain`.
 
 ## 3.6. Integrating components
 
-TODO: In this section we will combine...
+In this section we will combine all the various parts into a single point and demonstrate how they can be used.
 
 ### 3.6.1. `main-helper.rkt`
 
@@ -807,7 +807,7 @@ And export the procedures:
 
 X> ### Exercise 12
 X>
-X> Create a transaction and use `format-transaction` to see what it outputs. Repeat the same for block (`print-block`), blockchain (`print-blockchain`), and walles (`print-wallets`).
+X> Create a transaction and use `format-transaction` to see what it outputs. Repeat the same for a block (`print-block`), blockchain (`print-blockchain`), and wallets (`print-wallets`).
 
 ### 3.6.2. `main.rkt`
 
@@ -863,7 +863,7 @@ Making a second transaction:
 
 `set!` is just like a `define`, except that when something is already defined, we cannot use `define` to re-define/change its value.
 
-Making a third transaction:
+Making the third transaction:
 
 ```racket
 (printf "Mining third transaction...\n")
@@ -957,6 +957,6 @@ Exported blockchain to 'blockchain.data'...
 
 We built every component one by one, gradually. Some components are orthogonal - they are independent of one another. For example, `wallet` implementation does not call any procedures from `block`, and a `block` can be used independently of `wallet`. When we combine all of the components we get a nicely designed blockchain system.
 
-This design allows extending our system easily. In the next chapter we will extend it with peer-to-peer and smart contracts functionalities without changing the basic components.
+This design allows extending our system easily. In the next chapter, we will extend it with peer-to-peer and smart contracts functionalities without changing the basic components.
 
 [^ch3n1]: In this case, this is a quoted expression (`'sha1`) but the algorithm itself is implemented in the crypto factories.
