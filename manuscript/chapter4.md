@@ -1,12 +1,12 @@
 # 4. Extending the blockchain
 
-In the previous chapter, we implemented the most basic concepts that form a blockchain. In this chapter, we will extend our blockchain with smart contracts and peer-to-peer support.
+In the previous chapter, we implemented the most basic concepts that form a blockchain. In this chapter, we will extend the blockchain with smart contracts and peer-to-peer support.
 
 ## 4.1. Smart contracts implementation
 
-Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before sending money.
+Bitcoin's blockchain is programmable - the transactions themselves can be programmed by users. For example, users can write scripts to add additional requirements that must be satisfied before making a transaction.
 
-In section 2.4 we created an executable that we can send to our friends but they can no longer change the code because they don't have the original code, and even if they did not all users are programmers.
+In section 2.5 we created an executable that we can send to our friends but they can no longer change the code because they don't have the original code, and even if they did not all users are programmers.
 
 The point of smart contracts is to allow non-programmers to adjust the logic in the code without changing the original code.
 
@@ -18,7 +18,7 @@ Our implementation will depend on transactions:
 (require "transaction.rkt")
 ```
 
-We have to extend our original `valid-transaction?` so that it will also consider contracts when calculating validity:
+We have to extend the original `valid-transaction?` so that it will also consider contracts when calculating validity:
 
 ```racket
 (define (valid-transaction-contract? t contract)
@@ -26,7 +26,7 @@ We have to extend our original `valid-transaction?` so that it will also conside
        (valid-transaction? t)))
 ```
 
-We will now implement a procedure that will accept a transaction, a contract (scripting language) and return some value. This value can either be true, false, a number, or a string.
+We will now implement a procedure that will accept a transaction, a contract - scripting language (which is really just an S-expression), and return some value. The returned value can either be true, false, a number, or a string.
 
 ```racket
 (define (eval-contract t c)
@@ -66,7 +66,7 @@ A few example usages:
 3
 ```
 
-However, we still haven't used the transaction values in our procedure. Let's extend our scripting language with a few more commands:
+However, we still haven't used the transaction values in the procedure. Let's extend the scripting language with a few more commands:
 
 ```racket
 ...
@@ -87,7 +87,7 @@ Now we can do something like:
 "a book"
 ```
 
-We will implement a few more operators so that our scripting language becomes more expressive:
+We will implement a few more operators so that the scripting language becomes more expressive:
 
 ```racket
 ...
@@ -101,7 +101,7 @@ We will implement a few more operators so that our scripting language becomes mo
 ...
 ```
 
-However, there is a problem in our language implementation. Consider the evaluations of `(+ 1 2)` and `(+ (+ 1 2) 3)`:
+However, there is a problem in the language implementation. Consider the evaluations of `(+ 1 2)` and `(+ (+ 1 2) 3)`:
 
 ```racket
 > (eval-contract test-transaction '(+ 1 2))
@@ -110,14 +110,14 @@ However, there is a problem in our language implementation. Consider the evaluat
 . . +: contract violation
 ```
 
-The problem happens in the matching clause ``[`(+ ,l ,r) (+ l r)]``. when we match against `'(+ (+ 1 2) 3))` we end up with `(+ '(+ 1 2) 3)`, so Racket cannot sum a quoted list with a number. The solution to this problem is to *recursively* evaluate every sub-expression. So our match turns from ``[`(+ ,l ,r) (+ l r)]`` to ``[`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]``.
+The problem happens in the matching clause ``[`(+ ,l ,r) (+ l r)]``. when we match against `'(+ (+ 1 2) 3))` we end up with `(+ '(+ 1 2) 3)`, so Racket cannot sum a quoted list with a number. The solution to this problem is to *recursively* evaluate every sub-expression. So the match turns from ``[`(+ ,l ,r) (+ l r)]`` to ``[`(+ ,l ,r) (+ (eval-contract t l) (eval-contract t r))]``.
 
 In this case, the evaluation will happen as follows:
 
 ```racket
 (eval-contract t '(+ (+ 1 2) 3))
 = (eval-contract t (list '+ (eval-contract t '(+ 1 2))
-    (eval-contract t 3)))
+                            (eval-contract t 3)))
 = (eval-contract t (list '+ (+ 1 2) 3))
 = (eval-contract t (list '+ 3 3))
 = (eval-contract t '(+ 3 3))
@@ -127,7 +127,7 @@ In this case, the evaluation will happen as follows:
 
 It is important to recall the distinction between a quoted list and a non-quoted one: the latter will attempt evaluation. In this case, we just juggled with the quotation to produce the desired results.
 
-We will have to rewrite all of our operators:
+We will have to rewrite all of the operators:
 
 ```racket
 ...
@@ -142,7 +142,7 @@ We will have to rewrite all of our operators:
 ...
 ```
 
-The `if` implementation in our language has the same problem. So we will also change it:
+The `if` implementation in the language has the same problem. So we will also change it:
 
 ```racket
 ...
@@ -152,7 +152,7 @@ The `if` implementation in our language has the same problem. So we will also ch
 ...
 ```
 
-Thus, our final procedure becomes:
+Thus, the final procedure becomes:
 
 ```racket
 (define (eval-contract t c)
@@ -180,7 +180,7 @@ Thus, our final procedure becomes:
     [else #f]))
 ```
 
-Now users can supply scripting code such as `(if (= (+ 1 2) 3) from to)`:
+Users can now supply scripting code such as `(if (= (+ 1 2) 3) from to)`:
 
 ```racket
 > (eval-contract test-transaction '(if (= (+ 1 2) 3) from to))
@@ -188,8 +188,6 @@ Now users can supply scripting code such as `(if (= (+ 1 2) 3) from to)`:
 > (eval-contract test-transaction '(if (= (+ 1 2) 4) from to))
 "You"
 ```
-
-Note that a contract in our implementation is just an S-expression.
 
 Finally, we provide the output which is just the transaction validity check:
 
@@ -199,9 +197,9 @@ Finally, we provide the output which is just the transaction validity check:
 
 ### 4.1.2. Updating existing code
 
-Now that we implemented the smart-contracts logic, the next thing we need to address is the frontend - how will our users use it. For that, we will update our implementation to support contracts by reading from a file. If a file named `contract.script` exists, we will read and parse it (with `read`) and then run the code.
+Now that we implemented the logic for smart contracts, the next thing we need to address is the frontend - how the users can use it. For that, we will update the implementation to support contracts by reading from a file. If a file named `contract.script` exists, we will read and parse it (with `read`) and then run the code.
 
-Within `blockchain.rkt` we will slightly rewrite the money sending procedure to accept contracts:
+We will slightly rewrite the money sending procedure within `blockchain.rkt` to accept contracts:
 
 ```racket
 (define (send-money-blockchain b from to value c)
@@ -219,7 +217,7 @@ Within `blockchain.rkt` we will slightly rewrite the money sending procedure to 
         (add-transaction-to-blockchain b '()))))
 ```
 
-We will also update `blockchain.rkt` with `(require "smart-contracts.rkt")`. Then we update `utils.rkt` to add this helper procedure for reading contracts:
+We will also update `blockchain.rkt` with `(require "smart-contracts.rkt")`. Then we will update `utils.rkt` to add this helper procedure for reading contracts:
 
 ```racket
 (define (file->contract file)
@@ -233,22 +231,22 @@ Finally, we need to update every usage of `(send-money-blockchain ...)` to `(sen
 
 ## 4.2. Peer-to-peer implementation
 
-In section 3.6.2 we used DrRacket to execute our blockchain implementation. That's okay for testing purposes, however, if we wanted to share our implementation with other users and ask them to use it, it's kind of inconvenient as in our implementation there was no way to share data between different users.
+In section 3.6.2 we used DrRacket to execute the blockchain implementation. That's okay for testing purposes, however, if we wanted to share the implementation with other users and ask them to execute it, it will be kind of inconvenient because in the implementation there was no way to share data between different users.
 
-In this section we will implement peer-to-peer support so that users who are interested in our implementation can "join" the system/community.
+In this section we will implement peer-to-peer support so that users who are interested in the implementation can "join" the system/community.
 
 Before we dive into the implementation, we will give a high overview of the architecture we will build.
 
 ![Peer-to-peer architecture](images/p2p-architecture.png)
 
-Every peer node (in the peers list) will consist of a `peer-context-data` and a generic handler for transforming this contextual data. Further, there will be two ways to establish communication with other peers:
+Every peer node in the peers list will consist of a `peer-context-data` and a generic handler for transforming this contextual data. Further, there will be two ways to establish communication with other peers:
 
 1. A peer will accept new connections from other peers
 1. A peer will try to connect/make new connections to other peers
 
 Whenever a connection is established, peers will communicate with each other through the generic handler, parsing and evaluating commands such as syncing/updating the blockchain, updating the list of peers, etc.
 
-Building communication systems of this type is naturally complex. It is suggested you consult the Racket manuals (by pressing the F1 key) for every procedure that we will be using. Make sure you understand this section well - it will provide you with powerful knowledge. If you know how to build a peer-to-peer system, you will easily be able to build a Web server as well, or any other kind of a server. Going several times through this section should help with understanding the system better.
+Building communication systems of this type is naturally complex. It is suggested you consult the Racket manuals (by pressing the F1 key) for every procedure that we will be using. Going several times through this section until the information "sticks" will help with understanding the system better.
 
 ### 4.2.1. `peer-to-peer.rkt`
 
@@ -300,7 +298,7 @@ The list[^ch4n1] of valid peers will be updated depending on info retrieved from
 
 #### 4.2.1.2. Generic handler
 
-The generic handler will be a `handler` procedure that will be used both by the server and the client. It will be a procedure that accepts commands (similar commands as our smart contracts' `eval-contract` implementation), and then does something depending on the command.
+The generic handler will be a `handler` procedure that will be used both by the server and the client. It will be a procedure that accepts commands (similar commands as the smart contracts' `eval-contract` implementation), and then does something depending on the command.
 
 Here's a list of commands that peers will send to each other:
 
@@ -311,7 +309,7 @@ Here's a list of commands that peers will send to each other:
 | `latest-blockchain:X`   |                       | When a peer gets this request it will update the blockchain, given it is valid. |
 | `valid-peers:X`         |                       | When a peer gets this request it will update the list of valid peers. |
 
-Here is our handler implementation. It will accept a `peer-context`, and an input/output ports. Given these it will read the input (command) and send the appropriate output (evaluated command) back to the peer:
+Here is the handler implementation. It will accept a `peer-context`, and an input/output ports. Given these it will read the input (command) and send the appropriate output (evaluated command) back to the peer:
 
 ```racket
 (define (handler peer-context in out)
@@ -395,7 +393,7 @@ This procedure is just a helper one that will remove a command (prefix) from a s
      (string-replace line x "")))))
 ```
 
-We concluded our `handler` implementation.
+We concluded the `handler` implementation.
 
 #### 4.2.1.3. Server implementation
 
@@ -405,7 +403,7 @@ In the case where one peer connects to the server, here's what should happen:
 1. It will use the `handler` procedure to transform the necessary data
 1. It will send the transformed data back to the peer
 
-However, if more than one peer connects, then our procedure will "block", in the sense that the second peer will have to wait for the first one to be served, and the third will have to wait for the second, etc.
+However, if more than one peer connects, then the procedure will "block", in the sense that the second peer will have to wait for the first one to be served, and the third will have to wait for the second, etc.
 
 To resolve this issue, we turn to threads. `accept-and-handle` is the main procedure that will serve the incoming clients. It accepts a new connection and a peer context and launches `handler` in a thread:
 
@@ -542,7 +540,7 @@ Finally, we export the necessary objects:
 
 ### 4.2.2. Updating existing code
 
-We need to modify `main-helper.rkt` to include our peer-to-peer implementation:
+We need to modify `main-helper.rkt` to include the peer-to-peer implementation:
 
 ```racket
 ; ...
@@ -662,15 +660,15 @@ Here's a procedure to keep mining empty blocks, as the p2p runs in threaded mode
 
 As a recap, we did the following:
 
-1. Section 2.4: We created an executable in DrRacket.
-1. Section 3.6.2: We executed our basic blockchain implementation.
+1. Section 2.5: We created an executable in DrRacket.
+1. Section 3.6.2: We executed the basic blockchain implementation.
 1. Section 4.1: We implemented smart contracts.
 1. Section 4.2: We implemented peer-to-peer support.
 
-In this section we will create the final executable, and then use it to test our blockchain implementation with p2p, and also test smart contracts.
+In this section we will create the final executable, and then use it to test the blockchain implementation with p2p, and also test smart contracts.
 
 ## Summary
 
-We added two new important features to our blockchain implementation: smart contracts and peer-to-peer support. This concludes our blockchain implementation. The next steps (to create a real-world blockchain) would be to harden the security, tweak the communication logic and blockchain effort algorithms, etc.
+We added two new important features to the blockchain implementation: smart contracts and peer-to-peer support. This concludes the blockchain implementation. The next steps (to create a real-world blockchain) would be to harden the security, tweak the communication logic and blockchain effort algorithms, etc.
 
 [^ch4n1]: More precisely, a set, since we will use operations such as subtract.

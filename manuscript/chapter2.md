@@ -1103,7 +1103,7 @@ In this parallel execution, the output is not ordered as it was in the previous 
 
 We will use threads for parallel processing in the peer-to-peer implementation later, where we will have one thread per peer so that when we are serving one peer we don't block the serving of other peers.
 
-## 2.4. Creating an executable
+## 2.5. Creating an executable
 
 The idea of producing an executable is that you can use it on other computers without requiring the DrRacket installation on these computers, and also without requiring to share the original code. In the later chapters, we will create an executable so that the blockchain can be used and shared by others.
 
