@@ -95,8 +95,8 @@ A block should contain the current hash, the previous hash, data, and timestamp 
 
 ```racket
 (struct block
-  (hash previous-hash data timestamp))
-  #:prefab
+  (hash previous-hash data timestamp)
+  #:prefab)
 ```
 
 The usage of a hashing algorithm will allow us to confirm that the block is valid.
